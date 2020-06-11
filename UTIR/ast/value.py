@@ -2,7 +2,6 @@ from UTIR.exception import ASTError
 from .base import Expression
 
 
-
 class Value(Exception):
     """UTIR Value Exception"""
     type = None
@@ -11,7 +10,6 @@ class Value(Exception):
         if self.type is None:
             raise ASTError("Value class can not create instance")
         self.value = value
-
 
 
 class StringValue(Value):
