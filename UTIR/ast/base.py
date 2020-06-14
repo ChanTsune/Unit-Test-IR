@@ -1,5 +1,11 @@
+class Serializeable:
 
-class AST:
+    def serialize(self):
+        raise NotImplementedError(
+            "%s is not implemented 'serialize' method" % self.__class__.__name__)
+
+
+class AST(Serializeable):
     """Base class of UTIR AST"""
 
 
@@ -13,3 +19,25 @@ class AssignExpression(Expression):
     def __init__(self, name, value):
         self.name = name
         self.value = value
+
+    def serialize(self):
+        return {
+            'Assign': {
+                'Name': self.name,
+                'Value': self.value.serialize(),
+            }
+        }
+
+
+class Name(Expression):
+    """UTIR Name Expression"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def serialize(self):
+        return {
+            'Name': {
+                'Name': self.name,
+            }
+        }
