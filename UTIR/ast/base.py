@@ -22,6 +22,22 @@ class AssignExpression(Expression):
 
     def serialize(self):
         return {
-            'name': self.name,
-            'value': self.value.serialize(),
+            'Assign': {
+                'Name': self.name,
+                'Value': self.value.serialize(),
+            }
+        }
+
+
+class Name(Expression):
+    """UTIR Name Expression"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def serialize(self):
+        return {
+            'Name': {
+                'Name': self.name,
+            }
         }

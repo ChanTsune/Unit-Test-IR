@@ -4,18 +4,20 @@ from .base import AST
 class TestCase(AST):
     """UTIR Test Case"""
 
-    def __init__(self, type, excepted, actual, message=""):
-        self.type = type
+    def __init__(self, assert_, excepted, actual, message=""):
+        self.assert_ = assert_
         self.excepted = excepted
         self.actual = actual
         self.message = message
 
     def serialize(self):
         return {
-            'type': self.type,
-            'excepted': self.excepted.serialize(),
-            'actual': self.actual.serialize(),
-            'message': self.message,
+            'TestCase': {
+                'Assert': self.assert_,
+                'Excepted': self.excepted.serialize(),
+                'Actual': self.actual.serialize(),
+                'Message': self.message,
+            }
         }
 
 
@@ -29,7 +31,9 @@ class TestSuite(AST):
 
     def serialize(self):
         return {
-            'name': self.name,
-            'expressions': [i.serialize() for i in self.expressions],
-            'test_cases': [i.serialize() for i in self.test_cases],
+            'TestSuite': {
+                'Name': self.name,
+                'Expressions': [i.serialize() for i in self.expressions],
+                'TestCases': [i.serialize() for i in self.test_cases],
+            }
         }

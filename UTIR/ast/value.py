@@ -11,6 +11,14 @@ class Value(Exception):
             raise ASTError("Value class can not create instance")
         self.value = value
 
+    def serialize(self):
+        return {
+            'Value': {
+                'Type': self.type,
+                'Value': self.value,
+            }
+        }
+
 
 class StringValue(Value):
     """UTIR String Value"""
