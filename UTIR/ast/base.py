@@ -4,6 +4,11 @@ class Serializeable:
         raise NotImplementedError(
             "%s is not implemented 'serialize' method" % self.__class__.__name__)
 
+    @classmethod
+    def deserialize(cls, data):
+        raise NotImplementedError(
+            "%s is not implemented 'deserialize' method" % cls.__name__)
+
 
 class AST(Serializeable):
     """Base class of UTIR AST"""
