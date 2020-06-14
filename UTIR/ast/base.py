@@ -8,6 +8,10 @@ class Serializeable:
 class AST(Serializeable):
     """Base class of UTIR AST"""
 
+    def to_py_ast(self):
+        raise NotImplementedError(
+            "%s is not implemented 'to_py_ast' method" % self.__class__.__name__)
+
 
 class Expression(AST):
     """Base class of UTIR Expressions"""
@@ -28,6 +32,9 @@ class AssignExpression(Expression):
             }
         }
 
+    def to_py_ast(self):
+        return ast.Assign(self.name, self.value)
+
 
 class Name(Expression):
     """UTIR Name Expression"""
@@ -41,3 +48,6 @@ class Name(Expression):
                 'Name': self.name,
             }
         }
+
+    def to_py_ast(self):
+        return ast.Name(self.name)
