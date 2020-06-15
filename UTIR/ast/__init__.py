@@ -1,4 +1,4 @@
-from .base import Expression, AssignExpression, Name
+from .base import Expression, AssignExpression, Name, AST
 from .array import Array
 from .function import FunctionCall
 from .pointer import Pointer
