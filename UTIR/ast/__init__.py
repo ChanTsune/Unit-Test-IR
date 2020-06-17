@@ -4,4 +4,4 @@ from .function import FunctionCall
 from .pointer import Pointer
 from .struct import Struct
 from .suite import TestSuite, TestCase
-from .value import StringValue, IntValue, FloatValue, NilValue
+from .value import Value
