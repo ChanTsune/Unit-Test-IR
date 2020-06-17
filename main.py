@@ -3,10 +3,26 @@ import UTIR
 from UTIR import ast
 from UTIR import serializer
 from UTIR import dumper
+from UTIR import generator
 
 
 def main(argv):
-    pass
+    if len(argv) < 1:
+        return
+    generate_code_main(argv)
+
+def generate_code_main(argv):
+    import ast as py_ast
+    a = """
+a = 1
+a = 4
+a += 1
+print(a)
+    """
+    target_ast = py_ast.parse(a)
+    ast_generator = generator.PyASTToCodeGenerator()
+    code = ast_generator.generate(target_ast)
+    print(code)
 
 
 def serialize_main(argv):
