@@ -9,7 +9,20 @@ from UTIR import generator
 def main(argv):
     if len(argv) < 1:
         return
-    generate_code_main(argv)
+    generate_ast_main(argv)
+
+
+def generate_ast_main(argv):
+    from UTIR.reader import SourceReader
+    from UTIR.converter import PyAST2IRASTConverter
+    reader = SourceReader()
+    python_ast =  reader.readf(argv[1])
+
+    converter = PyAST2IRASTConverter()
+    ir_ast = converter.convert(python_ast)
+    print(ir_ast)
+
+
 
 def generate_code_main(argv):
     import ast as py_ast

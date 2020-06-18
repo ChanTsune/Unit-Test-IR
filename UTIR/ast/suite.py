@@ -24,16 +24,14 @@ class TestCase(AST):
 class TestSuite(AST):
     """UTIR Test Suite"""
 
-    def __init__(self, name, expressions, test_cases):
+    def __init__(self, name, expressions):
         self.name = name
         self.expressions = expressions
-        self.test_cases = test_cases
 
     def serialize(self):
         return {
             'TestSuite': {
                 'Name': self.name,
                 'Expressions': [i.serialize() for i in self.expressions],
-                'TestCases': [i.serialize() for i in self.test_cases],
             }
         }
