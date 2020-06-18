@@ -46,3 +46,19 @@ class Name(Expression):
                 'Name': self.name,
             }
         }
+
+
+class Attribute(Expression):
+    """UTIR Attribute Expression"""
+
+    def __init__(self, value, attribute):
+        self.value = value
+        self.attribute = attribute
+
+    def serialize(self):
+        return {
+            'Attribute': {
+                'Value': self.value.serialize(),
+                'Attribute': self.attribute,
+            }
+        }
