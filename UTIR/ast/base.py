@@ -13,6 +13,14 @@ class Serializeable:
 class AST(Serializeable):
     """Base class of UTIR AST"""
 
+    def dump(self):
+        return "%s(%s)" % (self.__class__.__name__, self._dump())
+
+    def _dump(self):
+        return ''
+
+    def __repr__(self):
+        return self.dump()
 
 class Expression(AST):
     """Base class of UTIR Expressions"""
@@ -21,17 +29,20 @@ class Expression(AST):
 class AssignExpression(Expression):
     """UTIR Assign Expression"""
 
-    def __init__(self, name, value):
-        self.name = name
+    def __init__(self, target, value):
+        self.target = target
         self.value = value
 
     def serialize(self):
         return {
             'Assign': {
-                'Name': self.name,
+                'Target': self.target.serialize(),
                 'Value': self.value.serialize(),
             }
         }
+
+    def _dump(self):
+        return f'target={self.target.dump()},value={self.value.dump()}'
 
 
 class Name(Expression):
@@ -46,6 +57,9 @@ class Name(Expression):
                 'Name': self.name,
             }
         }
+    
+    def _dump(self):
+        return f'name={repr(self.name)}'
 
 
 class Attribute(Expression):
@@ -62,3 +76,6 @@ class Attribute(Expression):
                 'Attribute': self.attribute,
             }
         }
+
+    def _dump(self):
+        return f'value={self.value.dump()},attribute={repr(self.attribute)}'

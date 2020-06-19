@@ -9,8 +9,8 @@ class ValueKind(Enum):
     nil = 'nil'
 
 
-class Value(Exception):
-    """UTIR Value Exception"""
+class Value(Expression):
+    """UTIR Value Expression"""
 
     def __init__(self, kind, value):
         self.kind = kind
@@ -23,3 +23,6 @@ class Value(Exception):
                 'Value': self.value,
             }
         }
+
+    def _dump(self):
+        return f'kind={repr(self.kind)},value={repr(self.value)}'

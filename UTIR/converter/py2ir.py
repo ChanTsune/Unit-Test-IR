@@ -54,7 +54,8 @@ class PyAST2IRASTConverter:
         elif isinstance(python_ast, py_ast.Assign):
             if len(python_ast.targets) != 1:
                 raise Exception('Unsupported multiple Assign')
-            return ir_ast.AssignExpression(python_ast.targets[0], self.map_exception(python_ast.value))
+            return ir_ast.AssignExpression(self.map_exception(python_ast.targets[0]),
+                                           self.map_exception(python_ast.value))
         elif isinstance(python_ast, py_ast.Num):
             return ir_ast.Value('int', python_ast.n)
         elif isinstance(python_ast, py_ast.Call):
@@ -63,9 +64,10 @@ class PyAST2IRASTConverter:
                     if python_ast.func.value.id == 'self':
                         return self.map_assert(python_ast)
             return ir_ast.FunctionCall(self.map_exception(python_ast.func),
-                                       *[self.map_exception(i)
+                                       [self.map_exception(i)
                                          for i in python_ast.args],
-                                    #    **{k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
+                                         {}
+                                    #    {k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
                                        )
         else:
             raise Exception('Unsupported AST Object %s found!' % python_ast)
@@ -77,8 +79,15 @@ class PyAST2IRASTConverter:
         assert_kind = python_ast.func.attr[len('assert'):]
         if assert_kind not in ['Equal']:
             raise Exception('Unsupported assert kind: %s' % assert_kind)
-        return ir_ast.TestCase(assert_kind,
-                               self.map_exception(python_ast.args[0]),
-                               self.map_exception(python_ast.args[1]),
-                               'message'
-                               )
+        args_len = len(python_ast.args)
+        if args_len == 2:
+            return ir_ast.TestCase(assert_kind,
+                                   self.map_exception(python_ast.args[0]),
+                                   self.map_exception(python_ast.args[1]),
+                                   )
+        if args_len == 3:
+            return ir_ast.TestCase(assert_kind,
+                                self.map_exception(python_ast.args[0]),
+                                self.map_exception(python_ast.args[1]),
+                                python_ast.args[2],
+                                )
