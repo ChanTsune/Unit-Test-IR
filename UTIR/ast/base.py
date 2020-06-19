@@ -29,20 +29,20 @@ class Expression(AST):
 class AssignExpression(Expression):
     """UTIR Assign Expression"""
 
-    def __init__(self, name, value):
-        self.name = name
+    def __init__(self, target, value):
+        self.target = target
         self.value = value
 
     def serialize(self):
         return {
             'Assign': {
-                'Name': self.name,
+                'Target': self.target.serialize(),
                 'Value': self.value.serialize(),
             }
         }
 
     def _dump(self):
-        return f'name={repr(self.name)},value={self.value.dump()}'
+        return f'target={self.target.dump()},value={self.value.dump()}'
 
 
 class Name(Expression):

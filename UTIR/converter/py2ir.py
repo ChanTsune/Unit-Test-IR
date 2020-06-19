@@ -54,7 +54,8 @@ class PyAST2IRASTConverter:
         elif isinstance(python_ast, py_ast.Assign):
             if len(python_ast.targets) != 1:
                 raise Exception('Unsupported multiple Assign')
-            return ir_ast.AssignExpression(python_ast.targets[0], self.map_exception(python_ast.value))
+            return ir_ast.AssignExpression(self.map_exception(python_ast.targets[0]),
+                                           self.map_exception(python_ast.value))
         elif isinstance(python_ast, py_ast.Num):
             return ir_ast.Value('int', python_ast.n)
         elif isinstance(python_ast, py_ast.Call):
@@ -65,6 +66,7 @@ class PyAST2IRASTConverter:
             return ir_ast.FunctionCall(self.map_exception(python_ast.func),
                                        [self.map_exception(i)
                                          for i in python_ast.args],
+                                         {}
                                     #    {k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
                                        )
         else:
