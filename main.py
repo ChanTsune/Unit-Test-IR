@@ -15,13 +15,31 @@ def main(argv):
 def generate_ast_main(argv):
     from UTIR.reader import SourceReader
     from UTIR.converter import PyAST2IRASTConverter
+    from UTIR.loader import YamlLoader
+    from UTIR.deserializer import ASTDeserializer
+    # ソースコードの読み込み
     reader = SourceReader()
     python_ast =  reader.readf(argv[1])
 
+    # ASTを中間表現ASTに変換
     converter = PyAST2IRASTConverter()
     ir_ast = converter.convert(python_ast)
-    print(ir_ast)
 
+    # 中間表現IRのシリアライズ
+    test_suite = ir_ast[0]
+    ast_serializer = serializer.ASTSerializer()
+    object = ast_serializer.serialize(test_suite)
+    # 中間表現ASTの書き出し
+    object_dumper = dumper.Dumper()
+    object_dumper.dumpf(argv[2], object)
+
+    # 中間表現ファイルの読み込み
+    object_loader = YamlLoader()
+    object = object_loader.loadf(argv[2])
+    ast_deserializer = ASTDeserializer()
+    loaded_ir_ast = ast_deserializer.deserialize(object)
+    print(loaded_ir_ast.dump())
+    print(test_suite.dump())
 
 
 def generate_code_main(argv):
@@ -36,16 +54,6 @@ print(a)
     ast_generator = generator.PyASTToCodeGenerator()
     code = ast_generator.generate(target_ast)
     print(code)
-
-
-def serialize_main(argv):
-    if len(argv) < 1:
-        return
-    test_suite = ast.TestSuite("Sample", [], [])
-    ast_serializer = serializer.ASTSerializer()
-    object = ast_serializer.serialize(test_suite)
-    object_dumper = dumper.Dumper()
-    object_dumper.dumpf(argv[1], object)
 
 
 if __name__ == "__main__":
