@@ -21,7 +21,7 @@ class TestCase(AST):
         }
 
     def _dump(self):
-        return f'assert={self.assert_:},excepted={self.excepted.dump()},actual={self.actual.dump()},message={self.message:}'
+        return f'assert={repr(self.assert_)},excepted={self.excepted.dump()},actual={self.actual.dump()},message={repr(self.message)}'
 
 
 class TestSuite(AST):

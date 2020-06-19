@@ -79,8 +79,15 @@ class PyAST2IRASTConverter:
         assert_kind = python_ast.func.attr[len('assert'):]
         if assert_kind not in ['Equal']:
             raise Exception('Unsupported assert kind: %s' % assert_kind)
-        return ir_ast.TestCase(assert_kind,
-                               self.map_exception(python_ast.args[0]),
-                               self.map_exception(python_ast.args[1]),
-                               'message'
-                               )
+        args_len = len(python_ast.args)
+        if args_len == 2:
+            return ir_ast.TestCase(assert_kind,
+                                   self.map_exception(python_ast.args[0]),
+                                   self.map_exception(python_ast.args[1]),
+                                   )
+        if args_len == 3:
+            return ir_ast.TestCase(assert_kind,
+                                self.map_exception(python_ast.args[0]),
+                                self.map_exception(python_ast.args[1]),
+                                python_ast.args[2],
+                                )
