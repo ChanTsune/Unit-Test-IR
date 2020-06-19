@@ -12,7 +12,7 @@ class FunctionCall(Expression):
     def serialize(self):
         return {
             'FunctionCall': {
-                'Func': self.name.serialize(),
+                'Func': self.func.serialize(),
                 'Args': [i.serialize() for i in self.args],
                 'KwArgs': {k: v.serialize() for k, v in self.kwargs.items()}
             }
