@@ -20,6 +20,9 @@ class TestCase(AST):
             }
         }
 
+    def _dump(self):
+        return f'assert={self.assert_:},excepted={self.excepted.dump()},actual={self.actual.dump()},message={self.message:}'
+
 
 class TestSuite(AST):
     """UTIR Test Suite"""
@@ -35,3 +38,6 @@ class TestSuite(AST):
                 'Expressions': [i.serialize() for i in self.expressions],
             }
         }
+
+    def _dump(self):
+        return f'name={repr(self.name)},expressions={[i.dump() for i in self.expressions]}'

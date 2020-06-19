@@ -23,3 +23,6 @@ class Value(Exception):
                 'Value': self.value,
             }
         }
+
+    def _dump(self):
+        return f'kind={repr(self.kind)},value={repr(self.value)}'

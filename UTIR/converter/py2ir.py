@@ -63,9 +63,9 @@ class PyAST2IRASTConverter:
                     if python_ast.func.value.id == 'self':
                         return self.map_assert(python_ast)
             return ir_ast.FunctionCall(self.map_exception(python_ast.func),
-                                       *[self.map_exception(i)
+                                       [self.map_exception(i)
                                          for i in python_ast.args],
-                                    #    **{k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
+                                    #    {k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
                                        )
         else:
             raise Exception('Unsupported AST Object %s found!' % python_ast)
