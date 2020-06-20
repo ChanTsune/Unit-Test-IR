@@ -20,20 +20,43 @@ class TestCase(AST):
             }
         }
 
+    def _dump(self):
+        return f'assert={repr(self.assert_)},excepted={self.excepted.dump()},actual={self.actual.dump()},message={repr(self.message)}'
+
 
 class TestSuite(AST):
     """UTIR Test Suite"""
 
-    def __init__(self, name, expressions, test_cases):
+    def __init__(self, name, expressions):
         self.name = name
         self.expressions = expressions
-        self.test_cases = test_cases
 
     def serialize(self):
         return {
             'TestSuite': {
                 'Name': self.name,
                 'Expressions': [i.serialize() for i in self.expressions],
-                'TestCases': [i.serialize() for i in self.test_cases],
             }
         }
+
+    def _dump(self):
+        return f'name={repr(self.name)},expressions={[i.dump() for i in self.expressions]}'
+
+
+class TestProject(AST):
+    """UTIR Test Project"""
+
+    def __init__(self, name, test_suites):
+        self.name = name
+        self.test_suites = test_suites
+
+    def serialize(self):
+        return {
+            'TestProject': {
+                'Name': self.name,
+                'TestSuites': [i.serialize() for i in self.test_suites]
+            }
+        }
+
+    def _dump(self):
+        return f'name={repr(self.name)}, test_suites={[i.dump() for i in self.test_suites]}'

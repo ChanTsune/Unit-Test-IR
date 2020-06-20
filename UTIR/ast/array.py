@@ -13,3 +13,6 @@ class Array(Expression):
                 'Values': [i.serialize() for i in self.values]
             }
         }
+
+    def _dump(self):
+        return f'values={[i.dump() for i in self.values]}'
