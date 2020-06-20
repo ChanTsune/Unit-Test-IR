@@ -26,11 +26,11 @@ def generate_ast_main(argv):
     ir_ast = converter.convert(python_ast)
 
     # 中間表現IRのシリアライズ
-    test_suite = ir_ast[0]
+    test_suite = ir_ast
     ast_serializer = serializer.ASTSerializer()
     object = ast_serializer.serialize(test_suite)
     # 中間表現ASTの書き出し
-    object_dumper = dumper.Dumper()
+    object_dumper = dumper.YamlDumper()
     object_dumper.dumpf(argv[2], object)
 
     # 中間表現ファイルの読み込み

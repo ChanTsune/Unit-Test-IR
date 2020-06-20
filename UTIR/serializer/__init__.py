@@ -10,3 +10,5 @@ class ASTSerializer:
         object = {'Version': 0}
         object.update(ir_ast.serialize())
         return object
+
+default_ast_serializer = ASTSerializer()

@@ -41,3 +41,22 @@ class TestSuite(AST):
 
     def _dump(self):
         return f'name={repr(self.name)},expressions={[i.dump() for i in self.expressions]}'
+
+
+class TestProject(AST):
+    """UTIR Test Project"""
+
+    def __init__(self, name, test_suites):
+        self.name = name
+        self.test_suites = test_suites
+
+    def serialize(self):
+        return {
+            'TestProject': {
+                'Name': self.name,
+                'TestSuites': [i.serialize() for i in self.test_suites]
+            }
+        }
+
+    def _dump(self):
+        return f'name={repr(self.name)}, test_suites={[i.dump() for i in self.test_suites]}'
