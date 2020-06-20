@@ -15,7 +15,7 @@ class PyAST2IRASTConverter:
                 suite = ir_ast.TestSuite(
                     method.name, [self.map_exception(i) for i in expressions])
                 ir_suites.append(suite)
-            return ir_suites
+            return ir_ast.TestProject(test_case_class.name, ir_suites)
 
     def get_test_case_class(self, python_ast):
         """"""

@@ -12,7 +12,12 @@ class ASTDeserializer:
             "Unsupported Version %s" % object['Version'])
 
     def _deserialize_object(self, object):
-        if 'TestSuite' in object.keys():
+        if 'TestProject' in object.keys():
+            test_project = object['TestProject']
+            return ast.TestProject(test_project['Name'],
+                                   [self._deserialize_object(
+                                       i) for i in test_project['TestSuites']])
+        elif 'TestSuite' in object.keys():
             test_suite = object['TestSuite']
             return ast.TestSuite(test_suite['Name'],
                                  [self._deserialize_object(
@@ -33,7 +38,8 @@ class ASTDeserializer:
         elif 'FunctionCall' in object.keys():
             function_call = object.get('FunctionCall')
             return ast.FunctionCall(self._deserialize_object(function_call['Func']),
-                                    [self._deserialize_object(i) for i in function_call['Args']],
+                                    [self._deserialize_object(
+                                        i) for i in function_call['Args']],
                                     {k: self._deserialize_object(v) for k, v in function_call['KwArgs'].items()})
         elif 'Assign' in object.keys():
             assign = object.get('Assign')
@@ -41,3 +47,6 @@ class ASTDeserializer:
                                         self._deserialize_object(assign['Value']))
         else:
             raise Exception('Unsupported key %s' % object.keys())
+
+
+default_ast_deserializer = ASTDeserializer()
