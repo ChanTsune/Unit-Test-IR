@@ -14,12 +14,15 @@ def main(argv):
 
 def generate_ast_main(argv):
     from UTIR.reader import SourceReader
-    from UTIR.converter import PyAST2IRASTConverter
+    from UTIR.converter import PyAST2IRASTConverter, IRAST2PyASTConverter
     from UTIR.loader import YamlLoader
     from UTIR.deserializer import ASTDeserializer
     # ソースコードの読み込み
     reader = SourceReader()
     python_ast =  reader.readf(argv[1])
+    # from ast import dump
+    # print(dump(python_ast))
+    # return 
 
     # ASTを中間表現ASTに変換
     converter = PyAST2IRASTConverter()
@@ -38,19 +41,8 @@ def generate_ast_main(argv):
     object = object_loader.loadf(argv[2])
     ast_deserializer = ASTDeserializer()
     loaded_ir_ast = ast_deserializer.deserialize(object)
-    print(loaded_ir_ast.dump())
-    print(test_suite.dump())
-
-
-def generate_code_main(argv):
-    import ast as py_ast
-    a = """
-a = 1
-a = 4
-a += 1
-print(a)
-    """
-    target_ast = py_ast.parse(a)
+    ir_to_py_comverter = IRAST2PyASTConverter()
+    target_ast = ir_to_py_comverter.convert(loaded_ir_ast)
     ast_generator = generator.PyASTToCodeGenerator()
     code = ast_generator.generate(target_ast)
     print(code)

@@ -22,6 +22,7 @@ class AST(Serializeable):
     def __repr__(self):
         return self.dump()
 
+
 class Expression(AST):
     """Base class of UTIR Expressions"""
 
@@ -57,7 +58,7 @@ class Name(Expression):
                 'Name': self.name,
             }
         }
-    
+
     def _dump(self):
         return f'name={repr(self.name)}'
 
