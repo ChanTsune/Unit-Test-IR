@@ -47,6 +47,12 @@ class IRAST2PyASTConverter:
         elif isinstance(ir, ir_ast.Value):
             if ir.kind == 'int':
                 return py_ast.Num(n=ir.value)
+            elif ir.kind == 'string':
+                return py_ast.Str(s=ir.value)
+            elif ir.kind == 'bool':
+                return py_ast.NameConstant(value=ir.value)
+            elif ir.kind == 'nil':
+                return py_ast.NameConstant(value=None)
             else:
                 raise Exception('Unsupported value kind %s' % ir.kind)
         elif isinstance(ir, ir_ast.FunctionCall):
