@@ -58,6 +58,8 @@ class PyAST2IRASTConverter:
                                            self.map_exception(python_ast.value))
         elif isinstance(python_ast, py_ast.Num):
             return ir_ast.Value('int', python_ast.n)
+        elif isinstance(python_ast, py_ast.Str):
+            return ir_ast.Value('string', python_ast.s)
         elif isinstance(python_ast, py_ast.Call):
             if isinstance(python_ast.func, py_ast.Attribute):
                 if isinstance(python_ast.func.value, py_ast.Name) and python_ast.func.attr.startswith('assert'):
@@ -69,6 +71,13 @@ class PyAST2IRASTConverter:
                                          {}
                                     #    {k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
                                        )
+        elif isinstance(python_ast, py_ast.NameConstant):
+            if python_ast.value == True:
+                return ir_ast.Value('bool', True)
+            elif python_ast.value == False:
+                return ir_ast.Value('bool', False)
+            elif python_ast.value == None:
+                return ir_ast.Value('nil', None)
         else:
             raise Exception('Unsupported AST Object %s found!' % python_ast)
 
@@ -87,7 +96,7 @@ class PyAST2IRASTConverter:
                                    )
         if args_len == 3:
             return ir_ast.TestCase(assert_kind,
-                                self.map_exception(python_ast.args[0]),
-                                self.map_exception(python_ast.args[1]),
-                                python_ast.args[2],
-                                )
+                                   self.map_exception(python_ast.args[0]),
+                                   self.map_exception(python_ast.args[1]),
+                                   python_ast.args[2],
+                                   )
