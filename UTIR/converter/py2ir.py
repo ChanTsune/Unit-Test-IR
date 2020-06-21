@@ -67,9 +67,8 @@ class PyAST2IRASTConverter:
                         return self.map_assert(python_ast)
             return ir_ast.FunctionCall(self.map_exception(python_ast.func),
                                        [self.map_exception(i)
-                                         for i in python_ast.args],
-                                         {}
-                                    #    {k: self.map_exception(v) for k, v in python_ast.keywords.items()} #TODO: kwargsのサポート
+                                        for i in python_ast.args],
+                                       {i.arg: self.map_exception(i.value) for i in python_ast.keywords}
                                        )
         elif isinstance(python_ast, py_ast.NameConstant):
             if python_ast.value == True:

@@ -59,7 +59,7 @@ class IRAST2PyASTConverter:
             return py_ast.Call(
                 func=self.map_expression(ir.func),
                 args=[self.map_expression(i) for i in ir.args],
-                keywords=[],
+                keywords=[py_ast.keyword(arg=k,value=self.map_expression(v)) for k,v in ir.kwargs.items()],
             )
         else:
             raise Exception('Unsupported ast type %s' % str(ir))
