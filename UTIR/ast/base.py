@@ -22,6 +22,19 @@ class AST(Serializeable):
     def __repr__(self):
         return self.dump()
 
+    @property
+    def _fields(self):
+        for field in dir(self):
+            try:
+                attr = getattr(self, field)
+                if isinstance(attr, (list, dict)):
+                    if len(attr) != 0:
+                        yield field
+                elif isinstance(attr, AST):
+                    yield field
+            except AttributeError:
+                pass
+
 
 class Expression(AST):
     """Base class of UTIR Expressions"""
