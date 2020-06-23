@@ -4,7 +4,17 @@ from UTIR import ast
 from UTIR import serializer
 from UTIR import dumper
 from UTIR import generator
+from UTIR.visitor import NodeVisitor
 
+class SampleVisitor(NodeVisitor):
+
+    def visit(self, node):
+        print("pre", type(node))
+        super().visit(node)
+        print("post", type(node))
+
+    def visit_Name(self, node):
+        print(node.name, type(node))
 
 def main(argv):
     if len(argv) < 1:
@@ -28,6 +38,8 @@ def generate_ast_main(argv):
     converter = PyAST2IRASTConverter()
     ir_ast = converter.convert(python_ast)
 
+    visitor = SampleVisitor()
+    visitor.visit(ir_ast)
     # 中間表現IRのシリアライズ
     test_suite = ir_ast
     ast_serializer = serializer.ASTSerializer()
