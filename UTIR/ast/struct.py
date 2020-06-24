@@ -1,8 +1,8 @@
 from .base import Expression
 
 
-class Struct(Exception):
-    """UTIR Struct Exception"""
+class StructDef(Exception):
+    """UTIR StructDef Exception"""
 
     def __init__(self, name, values):
         self.name = name
@@ -10,7 +10,7 @@ class Struct(Exception):
 
     def serialize(self):
         return {
-            'Struct':{
+            'StructDef': {
                 'Name': self.name,
                 'Values': {k: v.serialize() for k, v in self.values.items()},
             }
