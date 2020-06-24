@@ -6,6 +6,7 @@ from UTIR import dumper
 from UTIR import generator
 from UTIR.visitor import NodeVisitor
 
+
 class SampleVisitor(NodeVisitor):
 
     def visit(self, node):
@@ -16,10 +17,20 @@ class SampleVisitor(NodeVisitor):
     def visit_Name(self, node):
         print(node.name, type(node))
 
+
 def main(argv):
     if len(argv) < 1:
         return
-    generate_ast_main(argv)
+    _main(argv)
+
+
+def _main(argv):
+    from UTIR import Code2IR, IR2Code
+    code2ir = Code2IR
+    ir2code = IR2Code
+
+    code2ir.convert(argv[1], argv[2])
+    ir2code.convert(argv[2], '')
 
 
 def generate_ast_main(argv):
@@ -29,10 +40,10 @@ def generate_ast_main(argv):
     from UTIR.deserializer import ASTDeserializer
     # ソースコードの読み込み
     reader = SourceReader()
-    python_ast =  reader.readf(argv[1])
+    python_ast = reader.readf(argv[1])
     # from ast import dump
     # print(dump(python_ast))
-    # return 
+    # return
 
     # ASTを中間表現ASTに変換
     converter = PyAST2IRASTConverter()
