@@ -24,8 +24,8 @@ class FunctionDef(Expression):
         return f'name={self.name},args={[i.dump() for i in self.args]},kwargs={dict({k: v.dump() for k, v in self.kwargs.items()})},body={[i.dump() for i in self.body]}'
 
 
-class FunctionCall(Expression):
-    """UTIR FunctionCall Expression"""
+class Call(Expression):
+    """UTIR Call Expression"""
 
     def __init__(self, func, args, kwargs):
         self.func = func
@@ -34,7 +34,7 @@ class FunctionCall(Expression):
 
     def serialize(self):
         return {
-            'FunctionCall': {
+            'Call': {
                 'Func': self.func.serialize(),
                 'Args': [i.serialize() for i in self.args],
                 'KwArgs': {k: v.serialize() for k, v in self.kwargs.items()}
