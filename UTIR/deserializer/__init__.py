@@ -35,9 +35,9 @@ class ASTDeserializer:
         elif 'Name' in object.keys():
             name = object.get('Name')
             return ast.Name(name['Name'])
-        elif 'FunctionCall' in object.keys():
-            function_call = object.get('FunctionCall')
-            return ast.FunctionCall(self._deserialize_object(function_call['Func']),
+        elif 'Call' in object.keys():
+            function_call = object.get('Call')
+            return ast.Call(self._deserialize_object(function_call['Func']),
                                     [self._deserialize_object(
                                         i) for i in function_call['Args']],
                                     {k: self._deserialize_object(v) for k, v in function_call['KwArgs'].items()})
