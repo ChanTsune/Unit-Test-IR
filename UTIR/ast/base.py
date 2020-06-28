@@ -40,6 +40,18 @@ class AST(Serializeable):
 class Expression(AST):
     """Base class of UTIR Expressions"""
 
+class File(AST):
+    """UTIR File Expression"""
+
+    def __init__(self, body):
+        self.body = body
+
+    def serialize(self):
+        return {
+            'File': {
+                'Body': [i.serialize() for i in self.body],
+            }
+        }
 
 class AssignExpression(Expression):
     """UTIR Assign Expression"""
