@@ -21,7 +21,7 @@ struct Assign: Node {
 }
 
 struct Name: Node {
-    enum AccessLevel {
+    enum AccessLevel: String, Codable {
         case Public
         case Internal
         case Package
@@ -42,7 +42,7 @@ struct Attribute: Node {
 }
 
 struct FunctionDef: Node {
-    enum Kind {
+    enum Kind: String, Codable {
         case Function
         case StaticMethod
         case BinOp
@@ -69,7 +69,7 @@ struct ClassDef: Node {
 }
 
 struct Value: Node {
-    enum Kind {
+    enum Kind: String, Codable {
         case String
         case Int
         case Float
@@ -77,7 +77,7 @@ struct Value: Node {
         case Nil
     }
     var kind: Kind
-    var value: Any?
+    var value: String?
 }
 
 struct TestProject: Node { // as File
@@ -85,18 +85,18 @@ struct TestProject: Node { // as File
     var testSuites: [TestSuite]
 }
 
-struct TestSuite: Node {  // as TestClass
+struct TestSuite: Node { // as TestClass
     var name: String
     var testCases: [TestCase]
 }
 
-struct TestCase: Node {  // as TestMethod
+struct TestCase: Node { // as TestMethod
     var name: String
     var expressions: [Node]
 }
 
-struct Assert: Node {  // as assertXX
-    enum Kind {
+struct Assert: Node { // as assertXX
+    enum Kind: String, Codable {
         case Equal
     }
     var kind: Kind
