@@ -1,20 +1,22 @@
 from .base import Expression
 
 
-class StructDef(Exception):
-    """UTIR StructDef Exception"""
+class ClassDef(Exception):
+    """UTIR ClassDef Exception"""
 
-    def __init__(self, name, values):
+    def __init__(self, name, fields, body):
         self.name = name
-        self.values = values
+        self.fields = fields
+        self.body = body
 
     def serialize(self):
         return {
-            'StructDef': {
+            'ClassDef': {
                 'Name': self.name,
-                'Values': {k: v.serialize() for k, v in self.values.items()},
+                'Fields': [i.serialize() for i in self.fields],
+                'Body': [i.serialize() for i in self.body],
             }
         }
 
     def _dump(self):
-        return f'name={repr(self.name)},values={dict({k: v.dump() for k, v in self.values.items()})}'
+        return f'name={repr(self.name)},fields={self.fields}'

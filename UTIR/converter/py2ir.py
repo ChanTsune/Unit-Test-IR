@@ -65,7 +65,7 @@ class PyAST2IRASTConverter:
                 if isinstance(python_ast.func.value, py_ast.Name) and python_ast.func.attr.startswith('assert'):
                     if python_ast.func.value.id == 'self':
                         return self.map_assert(python_ast)
-            return ir_ast.FunctionCall(self.map_exception(python_ast.func),
+            return ir_ast.Call(self.map_exception(python_ast.func),
                                        [self.map_exception(i)
                                         for i in python_ast.args],
                                        {i.arg: self.map_exception(i.value) for i in python_ast.keywords}

@@ -55,7 +55,7 @@ class IRAST2PyASTConverter:
                 return py_ast.NameConstant(value=None)
             else:
                 raise Exception('Unsupported value kind %s' % ir.kind)
-        elif isinstance(ir, ir_ast.FunctionCall):
+        elif isinstance(ir, ir_ast.Call):
             return py_ast.Call(
                 func=self.map_expression(ir.func),
                 args=[self.map_expression(i) for i in ir.args],
