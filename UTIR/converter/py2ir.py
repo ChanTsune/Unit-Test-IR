@@ -6,70 +6,78 @@ from UTIR import ast as ir_ast
 class PyAST2IRASTConverter:
 
     def convert(self, python_ast):
-        test_case_classes = self.get_test_case_class(python_ast)
-        for test_case_class in test_case_classes:
-            test_methods = self.get_test_methods(test_case_class)
-            ir_suites = []
-            for method in test_methods:
-                expressions = self.parse_test_method(method)
-                suite = ir_ast.TestSuite(
-                    method.name, [self.map_exception(i) for i in expressions])
-                ir_suites.append(suite)
-            return ir_ast.TestProject(test_case_class.name, ir_suites)
+        return self.generic_convert(python_ast)
 
-    def get_test_case_class(self, python_ast):
-        """"""
-        if not isinstance(python_ast, py_ast.Module):
-            return []
-        classes = self._filter_test_class(python_ast.body)
-        return classes
+    def generic_convert(self, python_ast):
+        """Python AST to IR AST"""
+        if isinstance(python_ast, list):
+            new_nodes = []
+            for i in python_ast:
+                node = self.generic_convert(i)
+                if node is None:
+                    continue
+                new_nodes.append(node)
+            return new_nodes
 
-    def _filter_test_class(self, ast_list):
-        def _filter(i):
-            for i in i.bases:
-                if i.id == 'TestCase':
-                    return True
-            return False
-        classes = [i for i in ast_list if isinstance(
-            i, py_ast.ClassDef) and _filter(i)]
-        return classes
-
-    def get_test_methods(self, test_case_class):
-        """引数に期待するのは TestCase class"""
-        body = test_case_class.body
-        return [i for i in body if isinstance(i, py_ast.FunctionDef) and i.name.startswith('test')]
-
-    def parse_test_method(self, test_method):
-        """引数に期待するのは test_XX 関数"""
-        return test_method.body
-
-    def map_exception(self, python_ast):
-        """"""
         if isinstance(python_ast, py_ast.Expr):
             python_ast = python_ast.value
-        if isinstance(python_ast, py_ast.Name):
+        if isinstance(python_ast, py_ast.Module):
+            return ir_ast.File(self.generic_convert(python_ast.body))
+        elif isinstance(python_ast, py_ast.ImportFrom):
+            # ignore import directive
+            return None
+        elif isinstance(python_ast, py_ast.FunctionDef):
+            return ir_ast.FunctionDef(python_ast.name,
+                                      None,  # TODO: support Kind
+                                      self.generic_convert(python_ast.args),
+                                      self.generic_convert(python_ast.body),
+                                      None,  # return type
+                                      )
+        elif isinstance(python_ast, py_ast.arguments):
+            arg_defs = []
+            for arg in python_ast.args:
+                arg_defs.append(ir_ast.ArgumentDef(arg.arg))
+            # TODO: support 'args', 'defaults', 'kw_defaults', 'kwarg', 'kwonlyargs', 'vararg'
+            # for arg in python_ast:
+            #     pass
+            return arg_defs
+        elif isinstance(python_ast, py_ast.Return):
+            return ir_ast.Return(self.generic_convert(python_ast.value))
+        elif isinstance(python_ast, py_ast.BinOp):
+            return ir_ast.Call(ir_ast.Name(python_ast.op.__class__.__name__),
+                               self.generic_convert(
+                                   [python_ast.left, python_ast.right]),
+                               {},
+                               'OPERATOR')
+        elif isinstance(python_ast, py_ast.ClassDef):
+            bases = self.generic_convert(python_ast.bases)
+            bases = [i.name for i in bases]
+            return ir_ast.ClassDef(python_ast.name,
+                                   bases,
+                                   [],  # TODO: support fields
+                                   self.generic_convert(python_ast.body)
+                                   )
+
+        elif isinstance(python_ast, py_ast.Name):
             return ir_ast.Name(python_ast.id)
         elif isinstance(python_ast, py_ast.Attribute):
-            return ir_ast.Attribute(self.map_exception(python_ast.value), python_ast.attr)
+            return ir_ast.Attribute(self.generic_convert(python_ast.value), python_ast.attr)
         elif isinstance(python_ast, py_ast.Assign):
             if len(python_ast.targets) != 1:
                 raise Exception('Unsupported multiple Assign')
-            return ir_ast.AssignExpression(self.map_exception(python_ast.targets[0]),
-                                           self.map_exception(python_ast.value))
+            return ir_ast.AssignExpression(self.generic_convert(python_ast.targets[0]),
+                                           self.generic_convert(python_ast.value))
         elif isinstance(python_ast, py_ast.Num):
             return ir_ast.Value('int', python_ast.n)
         elif isinstance(python_ast, py_ast.Str):
             return ir_ast.Value('string', python_ast.s)
         elif isinstance(python_ast, py_ast.Call):
-            if isinstance(python_ast.func, py_ast.Attribute):
-                if isinstance(python_ast.func.value, py_ast.Name) and python_ast.func.attr.startswith('assert'):
-                    if python_ast.func.value.id == 'self':
-                        return self.map_assert(python_ast)
-            return ir_ast.Call(self.map_exception(python_ast.func),
-                                       [self.map_exception(i)
-                                        for i in python_ast.args],
-                                       {i.arg: self.map_exception(i.value) for i in python_ast.keywords}
-                                       )
+            return ir_ast.Call(self.generic_convert(python_ast.func),
+                               [self.generic_convert(i)
+                                for i in python_ast.args],
+                               {i.arg: self.generic_convert(
+                                   i.value) for i in python_ast.keywords}
+                               )
         elif isinstance(python_ast, py_ast.NameConstant):
             if python_ast.value == True:
                 return ir_ast.Value('bool', True)
@@ -78,24 +86,5 @@ class PyAST2IRASTConverter:
             elif python_ast.value == None:
                 return ir_ast.Value('nil', None)
         else:
+            print(dir(python_ast))
             raise Exception('Unsupported AST Object %s found!' % python_ast)
-
-    def map_assert(self, python_ast):
-        """期待するのはself.assertXXの呼び出し py_ast.Call"""
-        if not isinstance(python_ast, py_ast.Call):
-            raise Exception('Invalid AST Object %s passed!' % python_ast)
-        assert_kind = python_ast.func.attr[len('assert'):]
-        if assert_kind not in ['Equal']:
-            raise Exception('Unsupported assert kind: %s' % assert_kind)
-        args_len = len(python_ast.args)
-        if args_len == 2:
-            return ir_ast.TestCase(assert_kind,
-                                   self.map_exception(python_ast.args[0]),
-                                   self.map_exception(python_ast.args[1]),
-                                   )
-        if args_len == 3:
-            return ir_ast.TestCase(assert_kind,
-                                   self.map_exception(python_ast.args[0]),
-                                   self.map_exception(python_ast.args[1]),
-                                   python_ast.args[2],
-                                   )
