@@ -4,8 +4,9 @@ from .base import Expression
 class ClassDef(Exception):
     """UTIR ClassDef Exception"""
 
-    def __init__(self, name, fields, body):
+    def __init__(self, name, bases, fields, body):
         self.name = name
+        self.bases = bases
         self.fields = fields
         self.body = body
 
@@ -13,6 +14,7 @@ class ClassDef(Exception):
         return {
             'ClassDef': {
                 'Name': self.name,
+                'Bases': self.bases,
                 'Fields': [i.serialize() for i in self.fields],
                 'Body': [i.serialize() for i in self.body],
             }
