@@ -5,6 +5,7 @@ from .deserializer import ASTDeserializer
 from .dumper import YamlDumper
 from .loader import YamlLoader
 from .generator import PyASTToCodeGenerator
+from .transformer import DefaultIRTransformer
 
 version = "0.0.0"
 
@@ -15,7 +16,7 @@ class Code2IR:
     source_reader_class = SourceReader
     py_ast_transformer_classes = []
     ast_converter_class = PyAST2IRASTConverter
-    ir_ast_transformer_classes = []
+    ir_ast_transformer_classes = [DefaultIRTransformer]
     ir_ast_serializer_class = ASTSerializer
     ir_ast_dumper_class = YamlDumper
 
