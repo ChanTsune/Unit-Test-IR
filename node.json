@@ -15,6 +15,7 @@
     "ClassDef": {
         "fields": {
             "Name": "String",
+            "Bases": "[]String",
             "Fields": "[]Name",
             "Body": "[]FunctionDef"
         }
