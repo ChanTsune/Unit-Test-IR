@@ -1,0 +1,127 @@
+{
+    "File": {
+        "fields": {
+            "Body": "[]Node"
+        },
+        "category": "AST"
+    },
+    "FunctionDef": {
+        "fields": {
+            "Name": "String",
+            "Args": "[]ArgumentDef",
+            "Body": "[]Node"
+        }
+    },
+    "ClassDef": {
+        "fields": {
+            "Name": "String",
+            "Fields": "[]Name",
+            "Body": "[]FunctionDef"
+        }
+    },
+    "Return": {
+        "fields": {
+            "Value": "Node"
+        }
+    },
+    "Assign": {
+        "fields": {
+            "Target": "Node",
+            "Value": "Node"
+        }
+    },
+    "For": {
+        "fields": {
+            "Value": "Node",
+            "Generator": "Node",
+            "Body": "[]Node"
+        }
+    },
+    "Block": {
+        "fields": {
+            "Body": "[]Node"
+        }
+    },
+    "Try": {
+        "fields": {
+            "Body": "[]Node"
+        }
+    },
+    "Raise": {
+        "fields": {
+            "Value": "Node"
+        }
+    },
+    "Catch": {
+        "fields": {
+            "Body": "[]Node"
+        }
+    },
+    "BoolOp": {
+        "fields": {
+            "Kind": "String",
+            "Left": "Node",
+            "Right": "Node"
+        }
+    },
+    "BinOp": {
+        "fields": {
+            "Kind": "String",
+            "Left": "Node",
+            "Right": "Node"
+        }
+    },
+    "Constant": {
+        "fields": {
+            "Kind": "String",
+            "Value": "String"
+        }
+    },
+    "Attribute": {
+        "fields": {
+            "Value": "Node",
+            "Attribute": "String"
+        }
+    },
+    "Subscript": {
+        "fields": {
+            "Value": "Node",
+            "Index": "Node"
+        }
+    },
+    "Name": {
+        "fields": {
+            "Name": "String",
+            "Kind": "String?"
+        }
+    },
+    "Array": {
+        "fields": {
+            "Values": "[]Node"
+        }
+    },
+    "Tuple": {
+        "fields": {
+            "Values": "[]Node"
+        }
+    },
+    "Call": {
+        "fields": {
+            "Value": "Node",
+            "Args": "[]Node",
+            "KwArgs": "[]KwArg"
+        }
+    },
+    "ArgumentDef": {
+        "fields": {
+            "Key": "String",
+            "Default": "Node?"
+        }
+    },
+    "KwArg": {
+        "fields": {
+            "Key": "String",
+            "Value": "Node"
+        }
+    }
+}
