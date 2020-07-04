@@ -33,7 +33,9 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit_Num(self, node):
         if isinstance(node.n, float):
             return ir_ast.Constant('float', node.n)
-        return ir_ast.Constant('int', node.n)
+        elif isinstance(node.n, int):
+            return ir_ast.Constant('int', node.n)
+        return self.Unsupported()
 
     def visit_Bytes(self, node):
         return ir_ast.Constant('bytes', node.s)
@@ -168,7 +170,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             self.visit(node.operand))
 
     def visit_BinOp(self, node):
-        return ir_ast.BinOp(ir_ast.Name(node.op.__class__.__name__),
+        return ir_ast.BinOp(node.op.__class__.__name__,
                             self.visit(node.left),
                             self.visit(node.right))
 
@@ -182,9 +184,9 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             op_kind = 'Add'
         else:
             raise TypeError("%s" % node.op)
-        target = self.visit(node.target),
+        target = self.visit(node.target)
 
-        return ir_ast.AssignExpression(
+        return ir_ast.Assign(
             target,
             ir_ast.BinOp(op_kind,
                          target,
@@ -199,7 +201,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             for j in v:
                 print(j, j._fields)
         # TODO: support f-string
-        return ir_ast.Value('string', 'FORMAT_STRING')
+        return self.Unsupported()
 
     def visit_Assign(self, node):
         if len(node.targets) != 1:
