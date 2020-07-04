@@ -6,10 +6,9 @@ def _main(argv):
     with open(argv[1], 'r') as f:
         ir_def = load(f)
     with open(argv[2], 'w') as f:
+        f.write("from .base import Node")
         for k, v in ir_def.items():
             f.write(f"""
-from .base import Node
-
 class {k}(Node):
     def __init__(self,{",".join(k.lower()+"=None" if v.endswith('?') else k.lower() for k,v in v["fields"].items())}):
 """)

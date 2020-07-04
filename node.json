@@ -71,6 +71,12 @@
             "Right": "Node"
         }
     },
+    "UnaryOp": {
+        "fields": {
+            "Kind": "String",
+            "Value": "Node"
+        }
+    },
     "Constant": {
         "fields": {
             "Kind": "String",
