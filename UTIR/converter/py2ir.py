@@ -1,6 +1,19 @@
 import ast as py_ast
+from ast import NodeTransformer as PyNodeTransformer
 
 from UTIR import ast as ir_ast
+
+
+class PyAST2IRASTConverter(PyNodeTransformer):
+
+    def visit(self, node):
+        """Visit a node."""
+        method = 'visit_' + node.__class__.__name__
+        visitor = getattr(self, method, self.visit_unsupported)
+        return visitor(node)
+
+    def visit_unsupported(self, node):
+        raise Exception('Unsupported AST Object %s passed!' % node)
 
 
 class PyAST2IRASTConverter:
