@@ -2,7 +2,9 @@ from enum import Enum
 
 from .base import Expression
 
+
 class ValueKind(Enum):
+    bytes = 'bytes'
     string = 'string'
     int = 'int'
     float = 'float'
