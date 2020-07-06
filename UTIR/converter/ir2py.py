@@ -37,14 +37,14 @@ class IRAST2PyASTConverter:
             )
         elif isinstance(ir, ir_ast.TestCase):
             return self.map_assert(ir)
-        elif isinstance(ir, ir_ast.AssignExpression):
+        elif isinstance(ir, ir_ast.Assign):
             return py_ast.Assign(
                 targets=[self.map_expression(ir.target)],
                 value=self.map_expression(ir.value),
             )
         elif isinstance(ir, ir_ast.Name):
             return py_ast.Name(id=ir.name)
-        elif isinstance(ir, ir_ast.Value):
+        elif isinstance(ir, ir_ast.Constant):
             if ir.kind == 'int':
                 return py_ast.Num(n=ir.value)
             elif ir.kind == 'string':
@@ -59,21 +59,22 @@ class IRAST2PyASTConverter:
             return py_ast.Call(
                 func=self.map_expression(ir.func),
                 args=[self.map_expression(i) for i in ir.args],
-                keywords=[py_ast.keyword(arg=k,value=self.map_expression(v)) for k,v in ir.kwargs.items()],
+                keywords=[py_ast.keyword(arg=k, value=self.map_expression(
+                    v)) for k, v in ir.kwargs.items()],
             )
         else:
             raise Exception('Unsupported ast type %s' % str(ir))
 
     def map_assert(self, ir):
         return py_ast.Expr(value=py_ast.Call(
-                func=py_ast.Attribute(
-                    value=py_ast.Name(id='self'),
-                    attr='assert'+ir.assert_,
-                ),
-                args=[self.map_expression(ir.excepted),
-                    self.map_expression(ir.actual),
-                    ## TODO: Message ir.message
-                    ],
-                keywords=[],
-            )
+            func=py_ast.Attribute(
+                value=py_ast.Name(id='self'),
+                attr='assert'+ir.assert_,
+            ),
+            args=[self.map_expression(ir.excepted),
+                  self.map_expression(ir.actual),
+                  # TODO: Message ir.message
+                  ],
+            keywords=[],
+        )
         )
