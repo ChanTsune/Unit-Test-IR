@@ -38,6 +38,45 @@ class {k}(Node):
             }}
          }}
 """)
+    with open(argv[3], 'w') as f:
+        gen_deserializer(f, ir_def)
+
+
+def gen_deserializer(f, object):
+    f.write(f"""
+from UTIR import ast
+from UTIR.exception import InvalidFileFormatError
+
+
+class ASTDeserializer:
+    def deserialize(self, object):
+        if 'Version' not in object.keys():
+            raise InvalidFileFormatError("Key of 'Version' dose not exist.")
+        if object['Version'] == 0:
+            return self._deserialize_object(object)
+        raise InvalidFileFormatError(
+            "Unsupported Version %s" % object['Version'])
+
+    def _deserialize_object(self, object):
+    """)
+    for cls, define in object.items():
+        f.write(f"""
+        if '{cls}' in object.keys():
+            obj = object['{cls}']
+            return ast.{cls}(
+        """)
+        for field, type in define['fields'].items():
+            if type in ("[]Node", "[]ArgumentDef", "[]FunctionDef", "[]Name", "[]KwArg"):
+                f.write(
+                    f"""[self._deserialize_object(i) for i in obj['{field}']],""")
+            elif type in ("Node", "ArgumentDef"):
+                f.write(f"self._deserialize_object(obj['{field}']),")
+            elif type in ("Node?",):
+                f.write(
+                    f"obj['{field}'] if obj['{field}'] is None else self._deserialize_object(obj['{field}']),")
+            else:
+                f.write(f"""obj['{field}'],""")
+        f.write(""")""")
 
 
 def main(argv):

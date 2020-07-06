@@ -1,3 +1,4 @@
+
 from UTIR import ast
 from UTIR.exception import InvalidFileFormatError
 
@@ -12,41 +13,92 @@ class ASTDeserializer:
             "Unsupported Version %s" % object['Version'])
 
     def _deserialize_object(self, object):
-        if 'TestProject' in object.keys():
-            test_project = object['TestProject']
-            return ast.TestProject(test_project['Name'],
-                                   [self._deserialize_object(
-                                       i) for i in test_project['TestSuites']])
-        elif 'TestSuite' in object.keys():
-            test_suite = object['TestSuite']
-            return ast.TestSuite(test_suite['Name'],
-                                 [self._deserialize_object(
-                                     i) for i in test_suite['Expressions']])
-        elif 'TestCase' in object.keys():
-            test_case = object.get('TestCase')
-            return ast.TestCase(test_case['Assert'],
-                                self._deserialize_object(
-                                    test_case['Excepted']),
-                                self._deserialize_object(
-                                    test_case['Actual']))
-        elif 'Value' in object.keys():
-            value = object.get('Value')
-            return ast.Value(value['Kind'], value['Value'])
-        elif 'Name' in object.keys():
-            name = object.get('Name')
-            return ast.Name(name['Name'])
-        elif 'Call' in object.keys():
-            function_call = object.get('Call')
-            return ast.Call(self._deserialize_object(function_call['Func']),
-                                    [self._deserialize_object(
-                                        i) for i in function_call['Args']],
-                                    {k: self._deserialize_object(v) for k, v in function_call['KwArgs'].items()})
-        elif 'Assign' in object.keys():
-            assign = object.get('Assign')
-            return ast.AssignExpression(self._deserialize_object(assign['Target']),
-                                        self._deserialize_object(assign['Value']))
-        else:
-            raise Exception('Unsupported key %s' % object.keys())
 
-
-default_ast_deserializer = ASTDeserializer()
+        if 'File' in object.keys():
+            obj = object['File']
+            return ast.File(
+                [self._deserialize_object(i) for i in obj['Body']],)
+        if 'FunctionDef' in object.keys():
+            obj = object['FunctionDef']
+            return ast.FunctionDef(
+                obj['Name'], [self._deserialize_object(i) for i in obj['Args']], [self._deserialize_object(i) for i in obj['Body']],)
+        if 'ClassDef' in object.keys():
+            obj = object['ClassDef']
+            return ast.ClassDef(
+                obj['Name'], obj['Bases'], [self._deserialize_object(i) for i in obj['Fields']], [self._deserialize_object(i) for i in obj['Body']],)
+        if 'Return' in object.keys():
+            obj = object['Return']
+            return ast.Return(
+                self._deserialize_object(obj['Value']),)
+        if 'Assign' in object.keys():
+            obj = object['Assign']
+            return ast.Assign(
+                self._deserialize_object(obj['Target']), self._deserialize_object(obj['Value']),)
+        if 'For' in object.keys():
+            obj = object['For']
+            return ast.For(
+                self._deserialize_object(obj['Value']), self._deserialize_object(obj['Generator']), [self._deserialize_object(i) for i in obj['Body']],)
+        if 'Block' in object.keys():
+            obj = object['Block']
+            return ast.Block(
+                [self._deserialize_object(i) for i in obj['Body']],)
+        if 'Try' in object.keys():
+            obj = object['Try']
+            return ast.Try(
+                [self._deserialize_object(i) for i in obj['Body']],)
+        if 'Raise' in object.keys():
+            obj = object['Raise']
+            return ast.Raise(
+                self._deserialize_object(obj['Value']),)
+        if 'Catch' in object.keys():
+            obj = object['Catch']
+            return ast.Catch(
+                [self._deserialize_object(i) for i in obj['Body']],)
+        if 'BoolOp' in object.keys():
+            obj = object['BoolOp']
+            return ast.BoolOp(
+                obj['Kind'], self._deserialize_object(obj['Left']), self._deserialize_object(obj['Right']),)
+        if 'BinOp' in object.keys():
+            obj = object['BinOp']
+            return ast.BinOp(
+                obj['Kind'], self._deserialize_object(obj['Left']), self._deserialize_object(obj['Right']),)
+        if 'UnaryOp' in object.keys():
+            obj = object['UnaryOp']
+            return ast.UnaryOp(
+                obj['Kind'], self._deserialize_object(obj['Value']),)
+        if 'Constant' in object.keys():
+            obj = object['Constant']
+            return ast.Constant(
+                obj['Kind'], obj['Value'],)
+        if 'Attribute' in object.keys():
+            obj = object['Attribute']
+            return ast.Attribute(
+                self._deserialize_object(obj['Value']), obj['Attribute'],)
+        if 'Subscript' in object.keys():
+            obj = object['Subscript']
+            return ast.Subscript(
+                self._deserialize_object(obj['Value']), self._deserialize_object(obj['Index']),)
+        if 'Name' in object.keys():
+            obj = object['Name']
+            return ast.Name(
+                obj['Name'], obj['Kind'],)
+        if 'Array' in object.keys():
+            obj = object['Array']
+            return ast.Array(
+                [self._deserialize_object(i) for i in obj['Values']],)
+        if 'Tuple' in object.keys():
+            obj = object['Tuple']
+            return ast.Tuple(
+                [self._deserialize_object(i) for i in obj['Values']],)
+        if 'Call' in object.keys():
+            obj = object['Call']
+            return ast.Call(
+                self._deserialize_object(obj['Value']), [self._deserialize_object(i) for i in obj['Args']], [self._deserialize_object(i) for i in obj['KwArgs']],)
+        if 'ArgumentDef' in object.keys():
+            obj = object['ArgumentDef']
+            return ast.ArgumentDef(
+                obj['Key'], obj['Default'] if obj['Default'] is None else self._deserialize_object(obj['Default']),)
+        if 'KwArg' in object.keys():
+            obj = object['KwArg']
+            return ast.KwArg(
+                obj['Key'], self._deserialize_object(obj['Value']),)
