@@ -20,20 +20,16 @@ func main() {
 		fmt.Println("few args", n, "must be bigger than 2")
 		os.Exit(1)
 	}
-	src, err := ioutil.ReadFile(flag.Arg(0))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 	// ソースファイル群を表すデータの作成
 	// ソースファイルデータにはファイル名やファイル内の構文の位置などの情報を持つ
 	// たとえばパッケージ単位でコードの解析を行う場合は同一ディレクトリのソースファイルをまとめて扱う必要があるのでソースファイル群という単位でソース情報を持っているものと思われる
 	fset := token.NewFileSet()
 	// ソースコードを構文木に変換
 	// 第二引数にファイル名を渡すとファイルを、第三引数にソースコードの文字列を渡すと文字列を変換する
-	f, err := parser.ParseFile(fset, "", src, 0)
+	f, err := parser.ParseFile(fset, flag.Arg(0), nil, 0)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
 	// 構文木を見やすく表示する
