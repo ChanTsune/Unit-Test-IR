@@ -1,10 +1,30 @@
 import ast as py_ast
 from UTIR import ast as ir_ast
+from UTIR.transformer import NodeTransformer as IRNodeTransformer
 
 
-class IRAST2PyASTConverter:
-    def convert(self, ir):
-        return self.map_expression(ir)
+class IRAST2PyASTConverter(IRNodeTransformer):
+
+    def convert(self, node):
+        return self.visit(node)
+
+    def visit(self, node):
+        """Visit a node."""
+        method = 'visit_' + node.__class__.__name__
+        visitor = getattr(self, method, self.visit_unsupported)
+        return visitor(node)
+
+    def visit_File(self, node):
+        return py_ast.Module(body=[
+            self.visit(i) for i in node.body
+        ])
+
+    def visit_unsupported(self, node):
+        print(dir(node))
+        for i in node._fields:
+            v = getattr(node, i)
+            print('member:>', i, 'raw_value:>', v)
+        raise Exception('Unsupported AST Object %s found!' % node)
 
     def map_expression(self, ir):
         if isinstance(ir, ir_ast.TestProject):
