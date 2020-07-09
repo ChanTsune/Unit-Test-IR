@@ -1,5 +1,6 @@
 import ast as py_ast
 from ast import NodeTransformer as PyNodeTransformer
+from itertools import chain
 
 from UTIR import ast as ir_ast
 
@@ -84,12 +85,20 @@ class PyAST2IRASTConverter(PyNodeTransformer):
                                   )
 
     def visit_arguments(self, node):
+        pad_defaults = [None] * (len(node.args) - len(node.defaults))
         arg_defs = []
-        for arg in node.args:
-            arg_defs.append(ir_ast.ArgumentDef(arg.arg))
-        # TODO: support 'args', 'defaults', 'kw_defaults', 'kwarg', 'kwonlyargs', 'vararg'
-        # for arg in node:
-        #     pass
+        for arg, default in chain(zip(node.args, pad_defaults+node.defaults),
+                                  zip(node.kwonlyargs, node.kw_defaults)):
+            arg_defs.append(ir_ast.ArgumentDef(
+                arg.arg, default if default is None else self.visit(default)))
+        if node.vararg is not None:
+            # node.vararg is _ast.arg
+            raise Exception('Unsupported vararg')
+        if node.kwarg is not None:
+            # node.kwarg is _ast.arg
+            raise Exception('Unsupported kwargs')
+        # TODO: support 'kwarg''vararg'
+        # TODO: python 3.8
         return arg_defs
 
     def visit_keyword(self, node):
