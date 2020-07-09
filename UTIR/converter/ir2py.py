@@ -1,79 +1,108 @@
 import ast as py_ast
 from UTIR import ast as ir_ast
+from UTIR.transformer import NodeTransformer as IRNodeTransformer
 
 
-class IRAST2PyASTConverter:
-    def convert(self, ir):
-        return self.map_expression(ir)
+def isExpr(node):
+    return isinstance(node, py_ast.expr)
 
-    def map_expression(self, ir):
-        if isinstance(ir, ir_ast.TestProject):
-            return py_ast.Module(body=[
-                py_ast.ImportFrom(module='unittest',
-                                  names=[py_ast.alias(
-                                      name='TestCase', asname=None)],
-                                  level=0,
+
+def wrapNodes(nodes):
+    return [py_ast.Expr(node) if isExpr(node) else node for node in nodes]
+
+
+class IRAST2PyASTConverter(IRNodeTransformer):
+
+    def convert(self, node):
+        return self.visit(node)
+
+    def visit(self, node):
+        """Visit a node."""
+        method = 'visit_' + node.__class__.__name__
+        visitor = getattr(self, method, self.visit_unsupported)
+        return visitor(node)
+
+    def visit_File(self, node):
+        return py_ast.Module(body=wrapNodes(
+            [self.visit(i) for i in node.body]
+        ))
+
+    def visit_FunctionDef(self, node):
+        args = [py_ast.arg(i.key, annotation=None) for i in node.args]
+        defaults = [self.visit(i.default)
+                    for i in node.args if i.default is not None]
+        return py_ast.FunctionDef(
+            name=node.name,
+            args=py_ast.arguments(args=args,
+                                  vararg=None,
+                                  kwonlyargs=[],
+                                  kw_defaults=[],
+                                  kwarg=None,
+                                  defaults=defaults,
                                   ),
-                py_ast.ClassDef(name=ir.name,
-                                bases=[py_ast.Name(id='TestCase')],
-                                keywords=[],
-                                body=[self.map_expression(i)
-                                      for i in ir.test_suites],
-                                decorator_list=[],
-                                ),
-            ])
-        elif isinstance(ir, ir_ast.TestSuite):
-            return py_ast.FunctionDef(
-                name=ir.name,
-                args=py_ast.arguments(args=[py_ast.arg(arg='self', annotation=None)],
-                                      vararg=None,
-                                      kwonlyargs=[],
-                                      kw_defaults=[],
-                                      kwarg=None,
-                                      defaults=[],
-                                      ),
-                body=[self.map_expression(i) for i in ir.expressions],
-                decorator_list=[],
-            )
-        elif isinstance(ir, ir_ast.TestCase):
-            return self.map_assert(ir)
-        elif isinstance(ir, ir_ast.AssignExpression):
-            return py_ast.Assign(
-                targets=[self.map_expression(ir.target)],
-                value=self.map_expression(ir.value),
-            )
-        elif isinstance(ir, ir_ast.Name):
-            return py_ast.Name(id=ir.name)
-        elif isinstance(ir, ir_ast.Value):
-            if ir.kind == 'int':
-                return py_ast.Num(n=ir.value)
-            elif ir.kind == 'string':
-                return py_ast.Str(s=ir.value)
-            elif ir.kind == 'bool':
-                return py_ast.NameConstant(value=ir.value)
-            elif ir.kind == 'nil':
-                return py_ast.NameConstant(value=None)
-            else:
-                raise Exception('Unsupported value kind %s' % ir.kind)
-        elif isinstance(ir, ir_ast.Call):
-            return py_ast.Call(
-                func=self.map_expression(ir.func),
-                args=[self.map_expression(i) for i in ir.args],
-                keywords=[py_ast.keyword(arg=k,value=self.map_expression(v)) for k,v in ir.kwargs.items()],
-            )
-        else:
-            raise Exception('Unsupported ast type %s' % str(ir))
-
-    def map_assert(self, ir):
-        return py_ast.Expr(value=py_ast.Call(
-                func=py_ast.Attribute(
-                    value=py_ast.Name(id='self'),
-                    attr='assert'+ir.assert_,
-                ),
-                args=[self.map_expression(ir.excepted),
-                    self.map_expression(ir.actual),
-                    ## TODO: Message ir.message
-                    ],
-                keywords=[],
-            )
+            body=wrapNodes([self.visit(i) for i in node.body]),
+            decorator_list=[],
         )
+
+    def visit_Return(self, node):
+        return py_ast.Return(self.visit(node.value))
+
+    def visit_ClassDef(self, node):
+        bases = [py_ast.Name(i) for i in node.bases]
+        return py_ast.ClassDef(
+            name=node.name,
+            bases=[],
+            keywords=[],
+            body=wrapNodes([self.visit(i) for i in node.body]),
+            decorator_list=[],
+        )
+
+    def visit_Name(self, node):
+        return py_ast.Name(id=node.name)
+
+    def visit_Constant(self, node):
+        if node.kind == 'string':
+            return py_ast.Str(node.value)
+        if node.kind == 'int':
+            return py_ast.Num(int(node.value))
+        if node.kind == 'float':
+            return py_ast.Num(float(node.value))
+        if node.kind == 'bool':
+            return py_ast.NameConstant(value=node.value)
+        elif node.kind == 'nil':
+            return py_ast.NameConstant(value=None)
+        raise Exception('Unsupported Constant kind %s' % node.kind)
+
+    def visit_Attribute(self, node):
+        return py_ast.Attribute(
+            value=self.visit(node.value),
+            attr=node.attribute,
+        )
+
+    def visit_Assign(self, node):
+        return py_ast.Assign(
+            targets=[self.visit(node.target)],
+            value=self.visit(node.value),
+        )
+
+    def visit_Call(self, node):
+        return py_ast.Call(
+            func=self.visit(node.value),
+            args=[self.visit(i) for i in node.args],
+            keywords=[py_ast.keyword(arg=i.key, value=self.visit(
+                i.value)) for i in node.kwargs],
+        )
+
+    def visit_BinOp(self, node):
+        if node.kind == 'Add':
+            op = py_ast.Add()
+        else:
+            raise Exception('Unsupported BinOp kind', node.kind)
+        return py_ast.BinOp(self.visit(node.left), op, self.visit(node.right))
+
+    def visit_unsupported(self, node):
+        print(dir(node))
+        for i in node._fields:
+            v = getattr(node, i)
+            print('member:>', i, 'raw_value:>', v)
+        raise Exception('Unsupported AST Object %s found!' % node)
