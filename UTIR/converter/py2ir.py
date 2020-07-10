@@ -48,7 +48,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             return ir_ast.Constant('bool', False)
         elif node.value == None:
             return ir_ast.Constant('nil', None)
-        raise Exception('Unsupported %s' % node)
+        raise Exception('Unsupported NameConstant %s' % node)
 
     def visit_ImportFrom(self, node):
         # ignore import directive
