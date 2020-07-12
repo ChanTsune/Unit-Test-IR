@@ -3,7 +3,7 @@ from json import load
 
 
 class Generator:
-    def load_node_json(self, path):
+    def load_node(self, path):
         with open(path, 'r') as f:
             return load(f)
 
@@ -91,10 +91,28 @@ class ASTDeserializer:
         f.write(""")""")
 
 
+class KotlinGenerator(Generator):
+
+    def exec_main(self, argv, ir_def, f):
+        f.write("package Unit.Test.IR.ast.node")
+        for cls, define in ir_def.items():
+            f.write(f"""
+data class {cls}(""")
+            for field, type in define['fields'].items():
+                if type.startswith("[]"):
+                    f.write(f"""val {field}:List<{type[2:]}>,""")
+                else:
+                    f.write(f"""val {field}:{type},""")
+            p = f.tell()
+            f.seek(p-1)
+            f.write(f"""){{
+}}
+""")
+
+
 def main(argv):
-    if len(argv) <= 2:
-        return
-    PythonGenerator().main(argv)
+    # PythonGenerator().main(argv)
+    KotlinGenerator().main(argv)
 
 
 if __name__ == "__main__":
