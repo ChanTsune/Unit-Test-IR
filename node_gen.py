@@ -2,10 +2,22 @@ import sys
 from json import load
 
 
-def _main(argv):
-    with open(argv[1], 'r') as f:
-        ir_def = load(f)
-    with open(argv[2], 'w') as f:
+class Generator:
+    def load_node_json(self, path):
+        with open(path, 'r') as f:
+            return load(f)
+
+    def main(self, argv):
+        ir_def = self.load_node(argv[1])
+        with open(argv[2], 'w') as f:
+            self.exec_main(argv, ir_def, f)
+
+    def exec_main(self, argv, ir_def, f):
+        pass
+
+
+class PythonGenerator(Generator):
+    def exec_main(self, argv, ir_def, f):
         f.write("from .base import Node")
         for k, v in ir_def.items():
             f.write(f"""
@@ -38,8 +50,8 @@ class {k}(Node):
             }}
          }}
 """)
-    with open(argv[3], 'w') as f:
-        gen_deserializer(f, ir_def)
+        with open(argv[3], 'w') as f:
+            gen_deserializer(f, ir_def)
 
 
 def gen_deserializer(f, object):
@@ -82,7 +94,7 @@ class ASTDeserializer:
 def main(argv):
     if len(argv) <= 2:
         return
-    _main(argv)
+    PythonGenerator().main(argv)
 
 
 if __name__ == "__main__":
