@@ -28,10 +28,11 @@ open class Parser(val converter: Converter = Converter) {
         env.project
     }
 
-    fun parseFile(code: String) = converter.convertFile(parsePsiFile(code).also { _ ->
-//        if (throwOnError) file.collectDescendantsOfType<PsiErrorElement>().let {
-//            if (it.isNotEmpty()) throw ParseError(file, it)
-//        }
+    fun parseFile(code: String, throwOnError:Boolean=true) = converter.convertFile(parsePsiFile(code).also { file ->
+
+        if (throwOnError) file.children.filterIsInstance<PsiErrorElement>().let {
+            if (it.isNotEmpty()) throw ParseError(file, it)
+        }
     })
 
     fun parsePsiFile(code: String) =
