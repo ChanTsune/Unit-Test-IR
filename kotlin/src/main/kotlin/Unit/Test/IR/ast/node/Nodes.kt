@@ -1,66 +1,66 @@
 package Unit.Test.IR.ast.node
-data class File(val Body:List<Node>){
+data class File(val body:List<Node>):Node{
 }
 
-data class FunctionDef(val Name:String,val Args:List<ArgumentDef>,val Body:List<Node>){
+data class FunctionDef(val name:String,val args:List<ArgumentDef>,val body:List<Node>):Node{
 }
 
-data class ClassDef(val Name:String,val Bases:List<String>,val Fields:List<Name>,val Body:List<FunctionDef>){
+data class ClassDef(val name:String,val bases:List<String>,val fields:List<Name>,val body:List<FunctionDef>):Node{
 }
 
-data class Return(val Value:Node){
+data class Return(val value:Node):Node{
 }
 
-data class Assign(val Target:Node,val Value:Node){
+data class Assign(val target:Node,val value:Node):Node{
 }
 
-data class For(val Value:Node,val Generator:Node,val Body:List<Node>){
+data class For(val value:Node,val generator:Node,val body:List<Node>):Node{
 }
 
-data class Block(val Body:List<Node>){
+data class Block(val body:List<Node>):Node{
 }
 
-data class Try(val Body:List<Node>){
+data class Try(val body:List<Node>):Node{
 }
 
-data class Raise(val Value:Node){
+data class Raise(val value:Node):Node{
 }
 
-data class Catch(val Body:List<Node>){
+data class Catch(val body:List<Node>):Node{
 }
 
-data class BoolOp(val Kind:String,val Left:Node,val Right:Node){
+data class BoolOp(val kind:String,val left:Node,val right:Node):Node{
 }
 
-data class BinOp(val Kind:String,val Left:Node,val Right:Node){
+data class BinOp(val kind:String,val left:Node,val right:Node):Node{
 }
 
-data class UnaryOp(val Kind:String,val Value:Node){
+data class UnaryOp(val kind:String,val value:Node):Node{
 }
 
-data class Constant(val Kind:String,val Value:String){
+data class Constant(val kind:String,val value:String):Node{
 }
 
-data class Attribute(val Value:Node,val Attribute:String){
+data class Attribute(val value:Node,val attribute:String):Node{
 }
 
-data class Subscript(val Value:Node,val Index:Node){
+data class Subscript(val value:Node,val index:Node):Node{
 }
 
-data class Name(val Name:String,val Kind:String?){
+data class Name(val name:String,val kind:String?):Node{
 }
 
-data class Array(val Values:List<Node>){
+data class Array(val values:List<Node>):Node{
 }
 
-data class Tuple(val Values:List<Node>){
+data class Tuple(val values:List<Node>):Node{
 }
 
-data class Call(val Value:Node,val Args:List<Node>,val KwArgs:List<KwArg>){
+data class Call(val value:Node,val args:List<Node>,val kwArgs:List<KwArg>):Node{
 }
 
-data class ArgumentDef(val Key:String,val Default:Node?){
+data class ArgumentDef(val key:String,val default:Node?):Node{
 }
 
-data class KwArg(val Key:String,val Value:Node){
+data class KwArg(val key:String,val value:Node):Node{
 }
