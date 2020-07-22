@@ -99,13 +99,14 @@ class KotlinGenerator(Generator):
             f.write(f"""
 data class {cls}(""")
             for field, type in define['fields'].items():
+                field = field[:1].lower() + field[1:]
                 if type.startswith("[]"):
                     f.write(f"""val {field}:List<{type[2:]}>,""")
                 else:
                     f.write(f"""val {field}:{type},""")
             p = f.tell()
             f.seek(p-1)
-            f.write(f"""){{
+            f.write(f"""):Node{{
 }}
 """)
 
