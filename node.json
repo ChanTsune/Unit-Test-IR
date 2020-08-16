@@ -2,8 +2,7 @@
     "File": {
         "fields": {
             "Body": "[]Node"
-        },
-        "category": "AST"
+        }
     },
     "FunctionDef": {
         "fields": {
@@ -12,12 +11,22 @@
             "Body": "[]Node"
         }
     },
+    "ArgumentDef": {
+        "fields": {
+            "Key": "String",
+            "Type": "String",
+            "Default": "Node?",
+            "VarArgs": "Boolean"
+        }
+    },
     "ClassDef": {
         "fields": {
             "Name": "String",
             "Bases": "[]String",
-            "Fields": "[]Name",
-            "Body": "[]FunctionDef"
+            "Fields": "[]Var",
+            "Constructors": "FunctionDef[]",
+            "Body": "[]FunctionDef",
+            "Destructor": "FunctionDef"
         }
     },
     "Return": {
@@ -25,15 +34,16 @@
             "Value": "Node"
         }
     },
-    "Assign": {
+    "Var": {
         "fields": {
-            "Target": "Node",
-            "Value": "Node"
+            "Name": "String",
+            "Type": "String?",
+            "Accessor":"String[]"
         }
     },
     "For": {
         "fields": {
-            "Value": "Node",
+            "Vars": "Var[]",
             "Generator": "Node",
             "Body": "[]Node"
         }
@@ -58,13 +68,6 @@
             "Body": "[]Node"
         }
     },
-    "BoolOp": {
-        "fields": {
-            "Kind": "String",
-            "Left": "Node",
-            "Right": "Node"
-        }
-    },
     "BinOp": {
         "fields": {
             "Kind": "String",
@@ -84,12 +87,6 @@
             "Value": "String"
         }
     },
-    "Attribute": {
-        "fields": {
-            "Value": "Node",
-            "Attribute": "String"
-        }
-    },
     "Subscript": {
         "fields": {
             "Value": "Node",
@@ -99,7 +96,6 @@
     "Name": {
         "fields": {
             "Name": "String",
-            "Kind": "String?"
         }
     },
     "Array": {
@@ -115,17 +111,10 @@
     "Call": {
         "fields": {
             "Value": "Node",
-            "Args": "[]Node",
-            "KwArgs": "[]KwArg"
+            "Args": "[]Arg"
         }
     },
-    "ArgumentDef": {
-        "fields": {
-            "Key": "String",
-            "Default": "Node?"
-        }
-    },
-    "KwArg": {
+    "Arg": {
         "fields": {
             "Key": "String",
             "Value": "Node"
