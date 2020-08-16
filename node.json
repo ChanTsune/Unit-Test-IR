@@ -95,7 +95,7 @@
     },
     "Name": {
         "fields": {
-            "Name": "String",
+            "Name": "String"
         }
     },
     "Array": {
