@@ -30,7 +30,7 @@ sealed class Node {
             data class Arg(
                 val field:Var,
                 val vararg:Boolean
-            ): Node()
+            ): Decl()
         }
         data class Class(
             val name:String,
@@ -38,7 +38,7 @@ sealed class Node {
             val constractors:List<Func>,
             val fields:List<Decl>
         )
-        sealed class IR : Node() {
+        sealed class IR : Decl() {
             class Suite(
                 val setUp: List<Node>, // Expr
                 val cases: List<Case>,
@@ -91,11 +91,66 @@ sealed class Node {
     sealed class Expr: Node() {
         data class Name(
             val name:String
-        ):Node()
+        ):Expr()
+        data class Constant(
+            val kind:Kind,
+            val value:String
+        ): Expr() {
+            enum class Kind{
+                STRING
+            }
+        }
+        data class Tuple(
+            val values:List<Expr>
+        ): Expr()
         data class BinOp(
             val right:Expr,
-            val kind:String,
+            val kind:Kind,
             val left:Expr
-        ): Node()
+        ): Expr() {
+            enum class Kind(var kw:String){
+                DOT(".")
+            }
+        }
+        data class UnaryOp(
+            val kind:String,
+            val value:Expr
+        ): Expr() {
+            enum class Kind(var kw:String){
+                PLUS("+")
+            }
+        }
+        data class Subscript(
+            val value:Expr,
+            val index:Expr
+        ): Expr()
+        data class Call(
+            val value:Expr,
+            val args:List<Arg>
+        ): Expr() {
+            data class Arg(
+                val name: String,
+                val value: Expr
+            )
+        }
+        data class Throw(
+            val value:Expr
+        ): Expr()
+        data class Return(
+            val value:Expr
+        ): Expr()
+        data class For(
+            val value: Decl.Var,
+            val generator:Expr,
+            val body:Block
+        ): Expr()
+        data class Try(
+            val body:Block
+        ): Expr() {
+            data class Catch(
+                val type:String,
+                val body:Block
+            ): Expr()
+        }
     }
 }

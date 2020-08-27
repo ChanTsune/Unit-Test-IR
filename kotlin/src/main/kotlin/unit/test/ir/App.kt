@@ -3,6 +3,7 @@
  */
 package unit.test.ir
 
+import kastree.ast.Node
 import kastree.ast.Writer
 
 
@@ -12,18 +13,58 @@ fun main(args: Array<String>) {
     val code = """
         package foo
     
-        fun bar() {
-            // Print hello
-            println("Hello, World!")
-        }
-    
-        fun baz() = println("Hello, again!")
+//        fun bar() {
+//            // Print hello
+//            println("Hello, World!")
+//        }
+//    
+        fun baz(a:String) = println("Hello, again!" + a)
+        fun hoge(a:String) = baz(a=a)
+//        class A(val a:String){
+//            val d:String = ""
+//            fun c() = println(a)
+//        }
+//        fun p() {
+//            val b = A("w")
+//            var c = b.a
+//            c = "pow"[0]
+//            
+//            b.a = "pows"
+//        }
     """.trimIndent()
     // Call the parser with the code
     try {
         val file = Parser.parseFile(code)
         println(file)
-        println(file.decls)
+        val decls = file.decls
+        for (decl in decls) {
+            when(decl){
+                is Node.Decl.Structured -> {
+                    println(decl)
+                    println("MEMBERS")
+                    for (member in decl.members) {
+                        println(member)
+                    }
+                }
+                is Node.Decl.Func -> {
+                    println(decl)
+                    val body = decl.body
+                    when(body){
+                        is Node.Decl.Func.Body.Block -> {
+                            for (stmt in body.block.stmts){
+                                when(stmt) {
+                                    is Node.Stmt.Decl -> {}
+                                    is Node.Stmt.Expr -> {}
+                                }
+                                println(stmt)
+                            }
+                        }
+                        else -> println(decl.body)
+                    }
+                }
+                else -> println(decl)
+            }
+        }
 
 
         println(Writer.write(file))
