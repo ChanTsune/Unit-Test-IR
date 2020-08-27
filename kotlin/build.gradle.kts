@@ -39,5 +39,5 @@ dependencies {
 
 application {
     // Define the main class for the application
-    mainClassName = "Unit.Test.IR.AppKt"
+    mainClassName = "unit.test.ir.AppKt"
 }
