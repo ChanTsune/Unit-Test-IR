@@ -31,6 +31,10 @@ dependencies {
     implementation("com.github.cretz.kastree:kastree-ast-psi:0.4.0")
     implementation("com.github.cretz.kastree:kastree-ast-common:0.4.0")
 
+    // kotlin enum extension
+    // [kotlin-enum-extensions](https://github.com/ChanTsune/kotlin-enum-extensions)
+    implementation(platform("com.github.chantsune:kotlin-enum-extensions:0.0.0"))
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
