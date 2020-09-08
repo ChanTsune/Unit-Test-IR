@@ -25,7 +25,8 @@ dependencies {
     // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    // kotlin ast libraries.
+    // kotlin ast libraries
+    // [kastree](https://github.com/cretz/kastree)
     implementation("com.github.cretz.kastree:kastree-ast-jvm:0.4.0")
     implementation("com.github.cretz.kastree:kastree-ast-psi:0.4.0")
     implementation("com.github.cretz.kastree:kastree-ast-common:0.4.0")
