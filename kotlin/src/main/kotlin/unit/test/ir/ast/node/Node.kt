@@ -83,7 +83,7 @@ sealed class Node {
                 class CaseExpr(
                         val name: String,
                         val expr: List<Node>, // Expr
-                        val asserts: List<Node>
+                        val asserts: List<Assert>
                 ) : Case()
             }
 
