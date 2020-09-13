@@ -25,8 +25,8 @@ def main(argv):
 
 def _main(argv):
     from UTIR import Code2IR, IR2Code
-    code2ir = Code2IR
-    ir2code = IR2Code
+    code2ir = Code2IR()
+    ir2code = IR2Code()
 
     code2ir.convert(argv[1], argv[2])
     ir2code.convert(argv[2], '')
