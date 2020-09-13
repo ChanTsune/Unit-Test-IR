@@ -1,5 +1,4 @@
 import sys
-import UTIR
 from UTIR import ast
 from UTIR import serializer
 from UTIR import dumper
@@ -19,7 +18,7 @@ class SampleVisitor(NodeVisitor):
 
 
 def main(argv):
-    if len(argv) < 1:
+    if len(argv) <= 1:
         return
     _main(argv)
 
