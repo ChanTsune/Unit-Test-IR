@@ -45,7 +45,7 @@ sealed class Node {
                 val bases: List<String>,
                 val constractors: List<Func>,
                 val fields: List<Decl>
-        )
+        ) : Decl()
 
         sealed class IR : Decl() {
             class Suite(
