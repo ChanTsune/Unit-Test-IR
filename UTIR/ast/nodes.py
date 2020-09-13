@@ -1,30 +1,88 @@
-from .base import Node
+from dataclasses import dataclass
+from typing import Any, List, Optional
+from enum import Enum
+
+from .base import AST
 
 
+class Node(AST):
+    pass
+
+
+@dataclass
 class File(Node):
-    def __init__(self, body):
-
-        self.body = body
+    body: List[Node]
 
     def serialize(self):
         return {'File':
                 {'Body': [i.serialize() for i in self.body],
-
                  }
                 }
 
 
-class FunctionDef(Node):
-    def __init__(self, name, args, body):
+class Stmt(Node):
+    pass
 
-        self.name = name
 
-        self.args = args
-
-        self.body = body
+@dataclass
+class StmtDecl(Stmt):
+    decl: Node
 
     def serialize(self):
-        return {'FunctionDef':
+        return {'Decl': {
+            'Decl': self.decl.serialize()
+        }}
+
+
+class StmtExpr(Stmt):
+    expr: Node
+
+    def serialize(self):
+        return {'Expr': {
+            'Expr': self.expr.serialize()
+        }}
+
+
+@dataclass
+class Block(Node):
+    body: List[Stmt]
+
+    def serialize(self):
+        return {'Block': {
+            'Body': self.body.serialize()
+        }}
+
+
+class Decl(Node):
+    pass
+
+
+class Expr(Node):
+    pass
+
+
+@dataclass
+class Var(Decl):
+    name: str
+    type: str
+    value: Optional[Expr]
+
+    def serialize(self):
+        return {'Var': {
+            'Name': self.name,
+            'Type': self.type,
+            'Value': None if self.value is None else self.value.serialize()
+        }}
+
+
+@dataclass
+class Func(Decl):
+    name: str
+    args: List[Any]
+    body: Block
+
+    def serialize(self):
+        return {'Func':
                 {'Name': self.name,
                  'Args': [i.serialize() for i in self.args],
                  'Body': [i.serialize() for i in self.body],
@@ -32,221 +90,123 @@ class FunctionDef(Node):
                  }
                 }
 
+    @dataclass
+    class Arg(Decl):
+        field: Var
+        varargs: bool
 
-class ClassDef(Node):
-    def __init__(self, name, bases, fields, body):
+        def serialize(self):
+            return {'Arg': {
+                'Field': self.field.serialize(),
+                'Varargs': self.varargs,
+            }}
 
-        self.name = name
 
-        self.bases = bases
-
-        self.fields = fields
-
-        self.body = body
+@dataclass
+class Class(Decl):
+    name: str
+    bases: List[str]
+    constractors: List[Func]
+    fields: List[Decl]
 
     def serialize(self):
-        return {'ClassDef':
+        return {'Class':
                 {'Name': self.name,
                  'Bases': self.bases,
+                 'Constractors': [i.serialize() for i in self.constractors],
                  'Fields': [i.serialize() for i in self.fields],
-                 'Body': [i.serialize() for i in self.body],
-
                  }
                 }
 
 
-class Return(Node):
-    def __init__(self, value):
-
-        self.value = value
+@dataclass
+class Name(Expr):
+    name: str
 
     def serialize(self):
-        return {'Return':
-                {'Value': self.value.serialize(),
-
+        return {'Name':
+                {'Name': self.name,
                  }
                 }
 
 
-class Assign(Node):
-    def __init__(self, target, value):
-
-        self.target = target
-
-        self.value = value
-
-    def serialize(self):
-        return {'Assign':
-                {'Target': self.target.serialize(),
-                 'Value': self.value.serialize(),
-
-                 }
-                }
+class ConstantKind(Enum):
+    STRING = 'STRING'
+    BYTES = 'BYTES'
+    INTEGER = 'INTEGER'
+    FLOAT = 'FLOAT'
+    BOOLEAN = 'BOOLEAN'
+    NULL = 'NULL'
 
 
-class For(Node):
-    def __init__(self, value, generator, body):
-
-        self.value = value
-
-        self.generator = generator
-
-        self.body = body
-
-    def serialize(self):
-        return {'For':
-                {'Value': self.value.serialize(),
-                 'Generator': self.generator.serialize(),
-                 'Body': [i.serialize() for i in self.body],
-
-                 }
-                }
-
-
-class Block(Node):
-    def __init__(self, body):
-
-        self.body = body
-
-    def serialize(self):
-        return {'Block':
-                {'Body': [i.serialize() for i in self.body],
-
-                 }
-                }
-
-
-class Try(Node):
-    def __init__(self, body):
-
-        self.body = body
-
-    def serialize(self):
-        return {'Try':
-                {'Body': [i.serialize() for i in self.body],
-
-                 }
-                }
-
-
-class Raise(Node):
-    def __init__(self, value):
-
-        self.value = value
-
-    def serialize(self):
-        return {'Raise':
-                {'Value': self.value.serialize(),
-
-                 }
-                }
-
-
-class Catch(Node):
-    def __init__(self, body):
-
-        self.body = body
-
-    def serialize(self):
-        return {'Catch':
-                {'Body': [i.serialize() for i in self.body],
-
-                 }
-                }
-
-
-class BoolOp(Node):
-    def __init__(self, kind, left, right):
-
-        self.kind = kind
-
-        self.left = left
-
-        self.right = right
-
-    def serialize(self):
-        return {'BoolOp':
-                {'Kind': self.kind,
-                 'Left': self.left.serialize(),
-                 'Right': self.right.serialize(),
-
-                 }
-                }
-
-
-class BinOp(Node):
-    def __init__(self, kind, left, right):
-
-        self.kind = kind
-
-        self.left = left
-
-        self.right = right
-
-    def serialize(self):
-        return {'BinOp':
-                {'Kind': self.kind,
-                 'Left': self.left.serialize(),
-                 'Right': self.right.serialize(),
-
-                 }
-                }
-
-
-class UnaryOp(Node):
-    def __init__(self, kind, value):
-
-        self.kind = kind
-
-        self.value = value
-
-    def serialize(self):
-        return {'UnaryOp':
-                {'Kind': self.kind,
-                 'Value': self.value.serialize(),
-
-                 }
-                }
-
-
-class Constant(Node):
-    def __init__(self, kind, value):
-
-        self.kind = kind
-
-        self.value = value
+@dataclass
+class Constant(Expr):
+    kind: ConstantKind
+    value: str
 
     def serialize(self):
         return {'Constant':
-                {'Kind': self.kind,
+                {'Kind': self.kind.value,
                  'Value': self.value,
-
                  }
                 }
 
 
-class Attribute(Node):
-    def __init__(self, value, attribute):
-
-        self.value = value
-
-        self.attribute = attribute
+@dataclass
+class Tuple(Expr):
+    values: List[Expr]
 
     def serialize(self):
-        return {'Attribute':
-                {'Value': self.value.serialize(),
-                 'Attribute': self.attribute,
+        return {'Tuple':
+                {'Values': [i.serialize() for i in self.values],
 
                  }
                 }
 
 
-class Subscript(Node):
-    def __init__(self, value, index):
+class BinOpKind(Enum):
+    dot = 'DOT'
+    assign = 'ASSIGN'
 
-        self.value = value
 
-        self.index = index
+@dataclass
+class BinOp(Expr):
+    left: Expr
+    kind: BinOpKind
+    right: Expr
+
+    def serialize(self):
+        return {'BinOp':
+                {'Kind': self.kind.value,
+                 'Left': self.left.serialize(),
+                 'Right': self.right.serialize(),
+                 }
+                }
+
+
+class UnaryOpKind(Enum):
+    plus = 'PLUS'
+    minus = 'MINUS'
+
+
+@dataclass
+class UnaryOp(Expr):
+    kind: UnaryOpKind
+    value: Expr
+
+    def serialize(self):
+        return {'UnaryOp':
+                {'Kind': self.kind.value,
+                 'Value': self.value.serialize(),
+
+                 }
+                }
+
+
+@dataclass
+class Subscript(Expr):
+    value: Expr
+    index: Expr
 
     def serialize(self):
         return {'Subscript':
@@ -257,94 +217,92 @@ class Subscript(Node):
                 }
 
 
-class Name(Node):
-    def __init__(self, name, kind=None):
-
-        self.name = name
-
-        self.kind = kind
-
-    def serialize(self):
-        return {'Name':
-                {'Name': self.name,
-                 'Kind': self.kind,
-
-                 }
-                }
-
-
-class Array(Node):
-    def __init__(self, values):
-
-        self.values = values
-
-    def serialize(self):
-        return {'Array':
-                {'Values': [i.serialize() for i in self.values],
-
-                 }
-                }
-
-
-class Tuple(Node):
-    def __init__(self, values):
-
-        self.values = values
-
-    def serialize(self):
-        return {'Tuple':
-                {'Values': [i.serialize() for i in self.values],
-
-                 }
-                }
-
-
+@dataclass
 class Call(Node):
-    def __init__(self, value, args, kwargs):
-
-        self.value = value
-
-        self.args = args
-
-        self.kwargs = kwargs
+    value: Expr
+    args: List[Any]
 
     def serialize(self):
         return {'Call':
                 {'Value': self.value.serialize(),
                  'Args': [i.serialize() for i in self.args],
-                 'KwArgs': [i.serialize() for i in self.kwargs],
-
                  }
                 }
 
+    @dataclass
+    class Arg(Node):
+        name: str
+        value: Expr
 
-class ArgumentDef(Node):
-    def __init__(self, key, default=None):
+        def serialize(self):
+            return {'Arg': {
+                    'Name': self.name,
+                    'Value': self.value.serialize()
+                    }
+                    }
 
-        self.key = key
 
-        self.default = default
+@dataclass
+class Throw(Expr):
+    value: Expr
 
     def serialize(self):
-        return {'ArgumentDef':
-                {'Key': self.key,
-                 'Default': self.default if self.default is None else self.default.serialize(),
+        return {'Throw':
+                {'Value': self.value.serialize(),
 
                  }
                 }
 
 
-class KwArg(Node):
-    def __init__(self, key, value):
-
-        self.key = key
-
-        self.value = value
+@dataclass
+class Return(Expr):
+    value: Expr
 
     def serialize(self):
-        return {'KwArg':
-                {'Key': self.key,
-                 'Value': self.value.serialize(),
+        return {'Return':
+                {'Value': self.value.serialize(),
 
                  }
                 }
+
+
+@dataclass
+class For(Expr):
+    value: Var
+    generator: Expr
+    body: Block
+
+    def serialize(self):
+        return {'For':
+                {'Value': self.value.serialize(),
+                 'Generator': self.generator.serialize(),
+                 'Body': self.body.serialize(),
+
+                 }
+                }
+
+
+@dataclass
+class Try(Expr):
+    body: Block
+
+    def serialize(self):
+        return {'Try':
+                {'Body': self.body.serialize(),
+
+                 }
+                }
+
+
+@dataclass
+class Catch(Expr):
+    type: str
+    body: Block
+
+    def serialize(self):
+        return {'Catch': {
+            'Type': self.type,
+            'Body': self.body.serialize(),
+
+        }
+        }

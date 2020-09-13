@@ -13,14 +13,20 @@ class Serializeable:
 class AST(Serializeable):
     """Base class of UTIR AST"""
 
-    def dump(self):
-        return "%s(%s)" % (self.__class__.__name__, self._dump())
-
-    def _dump(self):
-        return ''
-
     def __repr__(self):
-        return self.dump()
+        fields = []
+        for name in self._fields:
+            field = getattr(name)
+            if isinstance(field, AST):
+                fields.append("%s=%s" % (name, repr(field)))
+            elif isinstance(field, (list, tuple)):
+                fields.append("%s=%s" % (name, [repr(i) for i in field]))
+            elif isinstance(field, dict):
+                fields.append("%s=%s" %
+                              (name, {k: repr(v) for k, v in field.items()}))
+            else:
+                raise TypeError
+        return "%s(%s)" % (self.__class__.__name__, ", ".join(fields))
 
     @property
     def _fields(self):
@@ -35,7 +41,3 @@ class AST(Serializeable):
                         yield field
                 except AttributeError:
                     pass
-
-
-class Node(AST):
-    pass

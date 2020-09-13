@@ -29,25 +29,25 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return ir_ast.File(self.visit(node.body))
 
     def visit_Str(self, node):
-        return ir_ast.Constant('string', node.s)
+        return ir_ast.Constant(ir_ast.ConstantKind.STRING, node.s)
 
     def visit_Num(self, node):
         if isinstance(node.n, float):
-            return ir_ast.Constant('float', node.n)
+            return ir_ast.Constant(ir_ast.ConstantKind.FLOAT, node.n)
         elif isinstance(node.n, int):
-            return ir_ast.Constant('int', node.n)
+            return ir_ast.Constant(ir_ast.ConstantKind.INTEGER, node.n)
         return self.Unsupported()
 
     def visit_Bytes(self, node):
-        return ir_ast.Constant('bytes', node.s)
+        return ir_ast.Constant(ir_ast.ConstantKind.BYTES, node.s)
 
     def visit_NameConstant(self, node):
         if node.value == True:
-            return ir_ast.Constant('bool', True)
+            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, True)
         elif node.value == False:
-            return ir_ast.Constant('bool', False)
+            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, False)
         elif node.value == None:
-            return ir_ast.Constant('nil', None)
+            return ir_ast.Constant(ir_ast.ConstantKind.NULL, None)
         raise Exception('Unsupported NameConstant %s' % node)
 
     def visit_ImportFrom(self, node):
@@ -65,32 +65,35 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         _bases = self.visit(node.bases)
         bases = []
         for i in _bases:
-            if isinstance(i, ir_ast.Attribute):
-                bases.append(i.attribute)
-            elif isinstance(i, ir_ast.Name):
+            if isinstance(i, ir_ast.Name):
                 bases.append(i.name)
+            elif isinstance(i, ir_ast.BinOp) and i.kind == ir_ast.BinOpKind.dot:
+                bases.append(i.right)
             else:
                 raise TypeError("%s" % i.__class__.__name__)
 
-        return ir_ast.ClassDef(node.name,
-                               bases,
-                               [],  # TODO: support fields
-                               self.visit(node.body)
-                               )
+        return ir_ast.Class(node.name,
+                            bases,
+                            [],  # TODO: support fields
+                            self.visit(node.body)
+                            )
 
     def visit_FunctionDef(self, node):
-        return ir_ast.FunctionDef(node.name,
-                                  self.visit(node.args),
-                                  self.visit(node.body),
-                                  )
+        return ir_ast.Func(node.name,
+                           self.visit(node.args),
+                           self.visit(node.body),
+                           )
 
     def visit_arguments(self, node):
         pad_defaults = [None] * (len(node.args) - len(node.defaults))
         arg_defs = []
         for arg, default in chain(zip(node.args, pad_defaults+node.defaults),
                                   zip(node.kwonlyargs, node.kw_defaults)):
-            arg_defs.append(ir_ast.ArgumentDef(
-                arg.arg, default if default is None else self.visit(default)))
+            arg_default = default if default is None else self.visit(default)
+            # TODO: Type (2nd arg)
+            var = ir_ast.Var(arg.arg, None, arg_default)
+            func_arg = ir_ast.Func.Arg(var, False)  # TODO: vararg (2nd arg)
+            arg_defs.append(func_arg)
         if node.vararg is not None:
             # node.vararg is _ast.arg
             raise Exception('Unsupported vararg')
@@ -215,11 +218,14 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit_Assign(self, node):
         if len(node.targets) != 1:
             raise Exception('Unsupported multiple Assign')
-        return ir_ast.Assign(self.visit(node.targets[0]),
-                             self.visit(node.value))
+        return ir_ast.BinOp(self.visit(node.targets[0]),
+                            ir_ast.BinOpKind.assign,
+                            self.visit(node.value))
 
     def visit_Attribute(self, node):
-        return ir_ast.Attribute(self.visit(node.value), node.attr)
+        return ir_ast.BinOp(ir_ast.Name(node.attr),
+                            ir_ast.BinOpKind.dot,
+                            self.visit(node.value))
 
     def visit_Name(self, node):
         return ir_ast.Name(node.id)
@@ -229,8 +235,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
     def visit_Call(self, node):
         return ir_ast.Call(self.visit(node.func),
-                           self.visit(node.args),
-                           self.visit(node.keywords)
+                           self.visit(node.args) + self.visit(node.keywords)
                            )
 
     def visit_Subscript(self, node):
