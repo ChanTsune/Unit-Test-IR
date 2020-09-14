@@ -7,6 +7,8 @@
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.4.0"
+    // Apply the kotlinx.serialization plugin
+    kotlin("plugin.serialization") version "1.4.0"
     // Apply the application plugin to add support for building a CLI application.
     application
 }
@@ -31,6 +33,9 @@ dependencies {
     // kotlin enum extension
     // [kotlin-enum-extensions](https://github.com/ChanTsune/kotlin-enum-extensions)
     implementation(platform("com.github.chantsune:kotlin-enum-extensions:0.0.0"))
+
+    // [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
