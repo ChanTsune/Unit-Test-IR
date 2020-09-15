@@ -25,7 +25,12 @@ def main(argv):
 
 def _main(argv):
     from UTIR import Code2IR, IR2Code
-    code2ir = Code2IR()
+    from UTIR.dumper import JsonDumper
+
+    class MyCode2IR(Code2IR):
+        ir_ast_dumper_class = JsonDumper
+
+    code2ir = MyCode2IR()
     ir2code = IR2Code()
 
     code2ir.convert(argv[1], argv[2])

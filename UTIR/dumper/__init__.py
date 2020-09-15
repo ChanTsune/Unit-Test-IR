@@ -1,3 +1,5 @@
+import json
+
 import yaml
 
 
@@ -7,4 +9,8 @@ class YamlDumper:
         with open(path, 'w') as f:
             yaml.dump(object, f)
 
-default_yaml_dumper = YamlDumper()
+class JsonDumper:
+
+    def dumpf(self, path, object):
+        with open(path, 'w') as f:
+            json.dump(object, f)
