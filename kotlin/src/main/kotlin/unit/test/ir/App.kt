@@ -3,7 +3,7 @@
  */
 package unit.test.ir
 
-import kastree.ast.Node
+import kastree.ast.Node as KNode
 import kastree.ast.Writer
 
 
@@ -39,22 +39,22 @@ fun main(args: Array<String>) {
         val decls = file.decls
         for (decl in decls) {
             when(decl){
-                is Node.Decl.Structured -> {
+                is KNode.Decl.Structured -> {
                     println(decl)
                     println("MEMBERS")
                     for (member in decl.members) {
                         println(member)
                     }
                 }
-                is Node.Decl.Func -> {
+                is KNode.Decl.Func -> {
                     println(decl)
                     val body = decl.body
                     when(body){
-                        is Node.Decl.Func.Body.Block -> {
+                        is KNode.Decl.Func.Body.Block -> {
                             for (stmt in body.block.stmts){
                                 when(stmt) {
-                                    is Node.Stmt.Decl -> {}
-                                    is Node.Stmt.Expr -> {}
+                                    is KNode.Stmt.Decl -> {}
+                                    is KNode.Stmt.Expr -> {}
                                 }
                                 println(stmt)
                             }
