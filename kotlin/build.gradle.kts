@@ -37,6 +37,9 @@ dependencies {
     // [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
+//    // [kaml](https://github.com/charleskorn/kaml)
+//    implementation("com.charleskorn.kaml:kaml:0.22.0")
+//
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
