@@ -3,6 +3,7 @@
  */
 package unit.test.ir
 
+import kastree.ast.Visitor
 import kastree.ast.Node as KNode
 import kastree.ast.Writer
 import kotlinx.serialization.json.Json
@@ -33,46 +34,18 @@ fun main(args: Array<String>) {
     // Call the parser with the code
     try {
         val file = Parser.parseFile(code)
-        println(file)
-        val decls = file.decls
-        for (decl in decls) {
-            when(decl){
-                is KNode.Decl.Structured -> {
-                    println(decl)
-                    println("MEMBERS")
-                    for (member in decl.members) {
-                        println(member)
-                    }
-                }
-                is KNode.Decl.Func -> {
-                    println(decl)
-                    val body = decl.body
-                    when(body){
-                        is KNode.Decl.Func.Body.Block -> {
-                            for (stmt in body.block.stmts){
-                                when(stmt) {
-                                    is KNode.Stmt.Decl -> {}
-                                    is KNode.Stmt.Expr -> {}
-                                }
-                                println(stmt)
-                            }
-                        }
-                        else -> println(decl.body)
-                    }
-                }
-                else -> println(decl)
-            }
+        Visitor.visit(file) { node, parentNode ->
+            println(node)
         }
-
-
         println(Writer.write(file))
     } catch (e: Parser.ParseError){
         println(e)
     }
 
     try {
-        val currentPath = Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.json")
-        val fileContent = File(currentPath.toString()).readText()
+        val fileContent = File(
+                args.firstOrNull() ?: Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.json").toString()
+        ).readText()
 
         Json{
             classDiscriminator = "Node"
