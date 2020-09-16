@@ -5,49 +5,54 @@ from itertools import chain
 from UTIR import ast as ir_ast
 
 
+def filterNull(lst):
+    return [i for i in lst if i is not None]
+
+
 class PyAST2IRASTConverter(PyNodeTransformer):
+
+    def _wrap_for_block(self, node):
+        if isinstance(node, ir_ast.Decl):
+            return ir_ast.StmtDecl(node)
+        elif isinstance(node, ir_ast.Expr):
+            return ir_ast.StmtExpr(node)
+        raise Exception('Excepted Decl or Expr, but %s' %
+                        node.__class__.__name__)
 
     def visit(self, node):
         """Visit a node."""
-        if isinstance(node, list):
-            new_nodes = []
-            for old_node in node:
-                new_node = self.visit(old_node)
-                if new_node is None:
-                    continue
-                elif isinstance(new_node, ir_ast.AST):
-                    new_nodes.append(new_node)
-                    continue
-                elif isinstance(new_node, list):
-                    new_nodes.extend(new_node)
-            return new_nodes
+        if not isinstance(node, py_ast.AST):
+            raise TypeError('python node excepted, but %s received.' %
+                            node.__class__.__name__)
         method = 'visit_' + node.__class__.__name__
         visitor = getattr(self, method, self.visit_unsupported)
         return visitor(node)
 
     def visit_Module(self, node):
-        return ir_ast.File(self.visit(node.body))
+        return ir_ast.File(
+            body=filterNull([self.visit(i) for i in node.body])
+        )
 
     def visit_Str(self, node):
         return ir_ast.Constant(ir_ast.ConstantKind.STRING, node.s)
 
     def visit_Num(self, node):
         if isinstance(node.n, float):
-            return ir_ast.Constant(ir_ast.ConstantKind.FLOAT, node.n)
+            return ir_ast.Constant(ir_ast.ConstantKind.FLOAT, str(node.n))
         elif isinstance(node.n, int):
-            return ir_ast.Constant(ir_ast.ConstantKind.INTEGER, node.n)
+            return ir_ast.Constant(ir_ast.ConstantKind.INTEGER, str(node.n))
         return self.Unsupported()
 
     def visit_Bytes(self, node):
-        return ir_ast.Constant(ir_ast.ConstantKind.BYTES, node.s)
+        return ir_ast.Constant(ir_ast.ConstantKind.BYTES, str(node.s))
 
     def visit_NameConstant(self, node):
         if node.value == True:
-            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, True)
+            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, str(True))
         elif node.value == False:
-            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, False)
+            return ir_ast.Constant(ir_ast.ConstantKind.BOOLEAN, str(False))
         elif node.value == None:
-            return ir_ast.Constant(ir_ast.ConstantKind.NULL, None)
+            return ir_ast.Constant(ir_ast.ConstantKind.NULL, 'NULL')
         raise Exception('Unsupported NameConstant %s' % node)
 
     def visit_ImportFrom(self, node):
@@ -62,7 +67,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return self.visit(node.value)
 
     def visit_ClassDef(self, node):
-        _bases = self.visit(node.bases)
+        _bases = [self.visit(i) for i in node.bases]
         bases = []
         for i in _bases:
             if isinstance(i, ir_ast.Name):
@@ -74,14 +79,15 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
         return ir_ast.Class(node.name,
                             bases,
-                            [],  # TODO: support fields
-                            self.visit(node.body)
+                            [],  # TODO: support constractors
+                            [self.visit(i) for i in node.body]
                             )
 
     def visit_FunctionDef(self, node):
         return ir_ast.Func(node.name,
                            self.visit(node.args),
-                           self.visit(node.body),
+                           ir_ast.Block([self._wrap_for_block(self.visit(i))
+                                         for i in node.body]),
                            )
 
     def visit_arguments(self, node):
@@ -235,7 +241,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
     def visit_Call(self, node):
         return ir_ast.Call(self.visit(node.func),
-                           self.visit(node.args) + self.visit(node.keywords)
+                           [self.visit(i) for i in node.args + node.keywords]
                            )
 
     def visit_Subscript(self, node):
