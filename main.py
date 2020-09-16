@@ -34,7 +34,7 @@ def _main(argv):
     ir2code = IR2Code()
 
     code2ir.convert(argv[1], argv[2])
-    ir2code.convert(argv[2], '')
+    # ir2code.convert(argv[2], '')
 
 
 if __name__ == "__main__":
