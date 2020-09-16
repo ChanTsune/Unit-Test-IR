@@ -219,7 +219,7 @@ class Subscript(Expr):
 
 
 @dataclass
-class Call(Node):
+class Call(Expr):
     value: Expr
     args: List[Any]
 
