@@ -229,9 +229,10 @@ class PyAST2IRASTConverter(PyNodeTransformer):
                             self.visit(node.value))
 
     def visit_Attribute(self, node):
-        return ir_ast.BinOp(ir_ast.Name(node.attr),
+        return ir_ast.BinOp(self.visit(node.value),
                             ir_ast.BinOpKind.DOT,
-                            self.visit(node.value))
+                            ir_ast.Name(node.attr),
+                            )
 
     def visit_Name(self, node):
         return ir_ast.Name(node.id)
