@@ -14,10 +14,10 @@ class File(Node):
     body: List[Node]
 
     def serialize(self):
-        return {'File':
-                {'Body': [i.serialize() for i in self.body],
-                 }
-                }
+        return {
+            'Node': 'File',
+            'Body': [i.serialize() for i in self.body],
+        }
 
 
 class Stmt(Node):
@@ -29,19 +29,20 @@ class StmtDecl(Stmt):
     decl: Node
 
     def serialize(self):
-        return {'Decl': {
-            'Decl': self.decl.serialize()
-        }}
-
+        return {
+            'Node': 'Decl',
+            'Decl': self.decl.serialize(),
+        }
 
 @dataclass
 class StmtExpr(Stmt):
     expr: Node
 
     def serialize(self):
-        return {'Expr': {
-            'Expr': self.expr.serialize()
-        }}
+        return {
+            'Node': 'Expr',
+            'Expr': self.expr.serialize(),
+        }
 
 
 @dataclass
@@ -49,9 +50,10 @@ class Block(Node):
     body: List[Stmt]
 
     def serialize(self):
-        return {'Block': {
-            'Body': self.body.serialize()
-        }}
+        return {
+            'Node': 'Block',
+            'Body': [i.serialize() for i in self.body],
+        }
 
 
 class Decl(Node):
@@ -69,11 +71,12 @@ class Var(Decl):
     value: Optional[Expr]
 
     def serialize(self):
-        return {'Var': {
+        return {
+            'Node': 'Var',
             'Name': self.name,
             'Type': self.type,
             'Value': None if self.value is None else self.value.serialize()
-        }}
+        }
 
 
 @dataclass
@@ -83,13 +86,12 @@ class Func(Decl):
     body: Block
 
     def serialize(self):
-        return {'Func':
-                {'Name': self.name,
-                 'Args': [i.serialize() for i in self.args],
-                 'Body': [i.serialize() for i in self.body],
-
-                 }
-                }
+        return {
+            'Node': 'Func',
+            'Name': self.name,
+            'Args': [i.serialize() for i in self.args],
+            'Body': self.body.serialize(),
+        }
 
     @dataclass
     class Arg(Decl):
@@ -97,10 +99,11 @@ class Func(Decl):
         varargs: bool
 
         def serialize(self):
-            return {'Arg': {
+            return {
+                'Node': 'Arg',
                 'Field': self.field.serialize(),
                 'Varargs': self.varargs,
-            }}
+            }
 
 
 @dataclass
@@ -111,13 +114,13 @@ class Class(Decl):
     fields: List[Decl]
 
     def serialize(self):
-        return {'Class':
-                {'Name': self.name,
-                 'Bases': self.bases,
-                 'Constractors': [i.serialize() for i in self.constractors],
-                 'Fields': [i.serialize() for i in self.fields],
-                 }
-                }
+        return {
+            'Node': 'Class',
+            'Name': self.name,
+            'Bases': self.bases,
+            'Constractors': [i.serialize() for i in self.constractors],
+            'Fields': [i.serialize() for i in self.fields],
+        }
 
 
 @dataclass
@@ -125,10 +128,10 @@ class Name(Expr):
     name: str
 
     def serialize(self):
-        return {'Name':
-                {'Name': self.name,
-                 }
-                }
+        return {
+            'Node': 'Name',
+            'Name': self.name,
+        }
 
 
 class ConstantKind(Enum):
@@ -146,11 +149,11 @@ class Constant(Expr):
     value: str
 
     def serialize(self):
-        return {'Constant':
-                {'Kind': self.kind.value,
-                 'Value': self.value,
-                 }
-                }
+        return {
+            'Node': 'Constant',
+            'Kind': self.kind.value,
+            'Value': self.value,
+        }
 
 
 @dataclass
@@ -158,11 +161,10 @@ class Tuple(Expr):
     values: List[Expr]
 
     def serialize(self):
-        return {'Tuple':
-                {'Values': [i.serialize() for i in self.values],
-
-                 }
-                }
+        return {
+            'Node': 'Tuple',
+            'Values': [i.serialize() for i in self.values],
+        }
 
 
 class BinOpKind(Enum):
@@ -177,12 +179,12 @@ class BinOp(Expr):
     right: Expr
 
     def serialize(self):
-        return {'BinOp':
-                {'Kind': self.kind.value,
-                 'Left': self.left.serialize(),
-                 'Right': self.right.serialize(),
-                 }
-                }
+        return {
+            'Node': 'BinOp',
+            'Kind': self.kind.value,
+            'Left': self.left.serialize(),
+            'Right': self.right.serialize(),
+        }
 
 
 class UnaryOpKind(Enum):
@@ -196,12 +198,11 @@ class UnaryOp(Expr):
     value: Expr
 
     def serialize(self):
-        return {'UnaryOp':
-                {'Kind': self.kind.value,
-                 'Value': self.value.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'UnaryOp',
+            'Kind': self.kind.value,
+            'Value': self.value.serialize(),
+        }
 
 
 @dataclass
@@ -210,12 +211,11 @@ class Subscript(Expr):
     index: Expr
 
     def serialize(self):
-        return {'Subscript':
-                {'Value': self.value.serialize(),
-                 'Index': self.index.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'Subscript',
+            'Value': self.value.serialize(),
+            'Index': self.index.serialize(),
+        }
 
 
 @dataclass
@@ -224,11 +224,11 @@ class Call(Expr):
     args: List[Any]
 
     def serialize(self):
-        return {'Call':
-                {'Value': self.value.serialize(),
-                 'Args': [i.serialize() for i in self.args],
-                 }
-                }
+        return {
+            'Node': 'Call',
+            'Value': self.value.serialize(),
+            'Args': [i.serialize() for i in self.args],
+        }
 
     @dataclass
     class Arg(Node):
@@ -236,11 +236,11 @@ class Call(Expr):
         value: Expr
 
         def serialize(self):
-            return {'Arg': {
-                    'Name': self.name,
-                    'Value': self.value.serialize()
-                    }
-                    }
+            return {
+                'Node': 'Arg',
+                'Name': self.name,
+                'Value': self.value.serialize(),
+            }
 
 
 @dataclass
@@ -248,11 +248,10 @@ class Throw(Expr):
     value: Expr
 
     def serialize(self):
-        return {'Throw':
-                {'Value': self.value.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'Throw',
+            'Value': self.value.serialize(),
+        }
 
 
 @dataclass
@@ -260,11 +259,10 @@ class Return(Expr):
     value: Expr
 
     def serialize(self):
-        return {'Return':
-                {'Value': self.value.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'Return',
+            'Value': self.value.serialize(),
+        }
 
 
 @dataclass
@@ -274,13 +272,12 @@ class For(Expr):
     body: Block
 
     def serialize(self):
-        return {'For':
-                {'Value': self.value.serialize(),
-                 'Generator': self.generator.serialize(),
-                 'Body': self.body.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'For',
+            'Value': self.value.serialize(),
+            'Generator': self.generator.serialize(),
+            'Body': self.body.serialize(),
+        }
 
 
 @dataclass
@@ -288,11 +285,10 @@ class Try(Expr):
     body: Block
 
     def serialize(self):
-        return {'Try':
-                {'Body': self.body.serialize(),
-
-                 }
-                }
+        return {
+            'Node': 'Try',
+            'Body': self.body.serialize(),
+        }
 
 
 @dataclass
@@ -301,9 +297,8 @@ class Catch(Expr):
     body: Block
 
     def serialize(self):
-        return {'Catch': {
+        return {
+            'Node': 'Catch',
             'Type': self.type,
             'Body': self.body.serialize(),
-
-        }
         }
