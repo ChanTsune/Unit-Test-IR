@@ -72,7 +72,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         for i in _bases:
             if isinstance(i, ir_ast.Name):
                 bases.append(i.name)
-            elif isinstance(i, ir_ast.BinOp) and i.kind == ir_ast.BinOpKind.dot:
+            elif isinstance(i, ir_ast.BinOp) and i.kind == ir_ast.BinOpKind.DOT:
                 bases.append(i.right)
             else:
                 raise TypeError("%s" % i.__class__.__name__)
@@ -225,12 +225,12 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         if len(node.targets) != 1:
             raise Exception('Unsupported multiple Assign')
         return ir_ast.BinOp(self.visit(node.targets[0]),
-                            ir_ast.BinOpKind.assign,
+                            ir_ast.BinOpKind.ASSIGN,
                             self.visit(node.value))
 
     def visit_Attribute(self, node):
         return ir_ast.BinOp(ir_ast.Name(node.attr),
-                            ir_ast.BinOpKind.dot,
+                            ir_ast.BinOpKind.DOT,
                             self.visit(node.value))
 
     def visit_Name(self, node):
@@ -240,8 +240,11 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return ir_ast.Return(self.visit(node.value))
 
     def visit_Call(self, node):
+        args = [ir_ast.Call.Arg(name=None, value=self.visit(i))
+                for i in node.args]
+        # print(node.keywords) # TODO: kwargs
         return ir_ast.Call(self.visit(node.func),
-                           [self.visit(i) for i in node.args + node.keywords]
+                           args,
                            )
 
     def visit_Subscript(self, node):

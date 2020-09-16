@@ -168,8 +168,8 @@ class Tuple(Expr):
 
 
 class BinOpKind(Enum):
-    dot = 'DOT'
-    assign = 'ASSIGN'
+    DOT = 'DOT'
+    ASSIGN = 'ASSIGN'
 
 
 @dataclass
@@ -238,7 +238,7 @@ class Call(Expr):
         def serialize(self):
             return {
                 'Node': 'Arg',
-                'Name': self.name,
+                'Name': None if self.name is None else self.name,
                 'Value': self.value.serialize(),
             }
 
