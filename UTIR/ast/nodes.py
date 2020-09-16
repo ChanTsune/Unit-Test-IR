@@ -34,6 +34,7 @@ class StmtDecl(Stmt):
         }}
 
 
+@dataclass
 class StmtExpr(Stmt):
     expr: Node
 
