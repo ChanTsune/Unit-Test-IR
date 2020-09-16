@@ -1,5 +1,6 @@
 package unit.test.ir.ast.node
 
+import kotlin.collections.List as IList
 import com.github.chantsune.kotlin.enumext.EnumExtension
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,15 +11,16 @@ sealed class Node {
     @SerialName("File")
     data class File(
             @SerialName("Body")
-            val body: List<Decl>,
+            val body: IList<Decl>,
             @SerialName("Version")
             val version: Int,
     ) : Node()
+
     @Serializable
     @SerialName("Block")
     data class Block(
             @SerialName("Body")
-            val body: List<Stmt>
+            val body: IList<Stmt>
     ) : Node() {
         @Serializable
         sealed class Stmt {
@@ -28,6 +30,7 @@ sealed class Node {
                     @SerialName("Decl")
                     val decl: Node.Decl
             ) : Stmt()
+
             @Serializable
             @SerialName("Expr")
             data class Expr(
@@ -56,7 +59,7 @@ sealed class Node {
                 @SerialName("Name")
                 val name: String,
                 @SerialName("Args")
-                val args: List<Arg>,
+                val args: IList<Arg>,
                 @SerialName("Body")
                 val body: Block,
         ) : Decl() {
@@ -76,20 +79,20 @@ sealed class Node {
                 @SerialName("Name")
                 val name: String,
                 @SerialName("Bases")
-                val bases: List<String>,
+                val bases: IList<String>,
                 @SerialName("Constractors")
-                val constractors: List<Func>,
+                val constractors: IList<Func>,
                 @SerialName("Fields")
-                val fields: List<Decl>
+                val fields: IList<Decl>
         ) : Decl()
 
         @Serializable
         sealed class IR : Decl() {
             @Serializable
             class Suite(
-                    val setUp: List<Node>, // Expr
-                    val cases: List<Case>,
-                    val tearDown: List<Node> // Expr
+                    val setUp: IList<Node>, // Expr
+                    val cases: IList<Case>,
+                    val tearDown: IList<Node> // Expr
             ) : IR()
 
             @Serializable
@@ -98,7 +101,7 @@ sealed class Node {
                 class Set(
                         val target: Node,
                         val call: String,
-                        val params: List<Params>,
+                        val params: IList<Params>,
                         val kind: Kind
                 ) : Case() {
                     @Serializable
@@ -120,13 +123,15 @@ sealed class Node {
                         companion object : EnumExtension<Kind>
                     }
                 }
+
                 @Serializable
                 class CaseExpr(
                         val name: String,
-                        val expr: List<Node>, // Expr
-                        val asserts: List<Assert>
+                        val expr: IList<Node>, // Expr
+                        val asserts: IList<Assert>
                 ) : Case()
             }
+
             @Serializable
             class Assert(
                     val kind: Kind
@@ -168,14 +173,23 @@ sealed class Node {
                 BOOLEAN,
                 NULL,
                 ;
+
                 companion object : EnumExtension<Kind>
             }
         }
+
+        @Serializable
+        @SerialName("IList")
+        data class List(
+                @SerialName("Values")
+                val values: IList<Expr>
+        ) : Expr()
+
         @Serializable
         @SerialName("Tuple")
         data class Tuple(
                 @SerialName("Values")
-                val values: List<Expr>
+                val values: IList<Expr>
         ) : Expr()
 
         @Serializable
@@ -191,10 +205,13 @@ sealed class Node {
             enum class Kind {
                 DOT,
                 ASSIGN,
+                ADD,
                 ;
+
                 companion object : EnumExtension<Kind>
             }
         }
+
         @Serializable
         @SerialName("UnaryOp")
         data class UnaryOp(
@@ -226,7 +243,7 @@ sealed class Node {
                 @SerialName("Value")
                 val value: Expr,
                 @SerialName("Args")
-                val args: List<Arg>
+                val args: IList<Arg>
         ) : Expr() {
             @Serializable
             @SerialName("Arg")

@@ -188,8 +188,13 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             self.visit(node.operand))
 
     def visit_BinOp(self, node):
-        return ir_ast.BinOp(node.op.__class__.__name__,
-                            self.visit(node.left),
+        def get_kind(kind):
+            kind = kind.__class__.__name__
+            if kind == 'Add':
+                return ir_ast.BinOpKind.ADD
+            raise Exception('Unsupported BinOp kind %s' % kind)
+        return ir_ast.BinOp(self.visit(node.left),
+                            get_kind(node.op),
                             self.visit(node.right))
 
     def visit_Compare(self, node):
@@ -257,7 +262,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return self.visit(node.value)
 
     def visit_List(self, node):
-        return ir_ast.Array(self.visit(node.elts))
+        return ir_ast.IRList([self.visit(i) for i in node.elts])
 
     def generic_visit(self, node):
         print("%s" % node)

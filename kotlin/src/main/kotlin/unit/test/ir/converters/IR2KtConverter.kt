@@ -109,7 +109,11 @@ class IR2KtConverter {
                                     token = KNode.Expr.BinaryOp.Token.ASSN
                             )
                         }
-                        else -> { TODO() }
+                        Node.Expr.BinOp.Kind.ADD -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.ADD
+                            )
+                        }
                     }
                 }
                 KNode.Expr.BinaryOp(
@@ -166,6 +170,9 @@ class IR2KtConverter {
                 TODO()
             }
             is Node.Expr.Tuple -> {
+                TODO()
+            }
+            is Node.Expr.List -> {
                 TODO()
             }
             is Node.Expr.UnaryOp -> {

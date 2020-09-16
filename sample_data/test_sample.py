@@ -6,4 +6,5 @@ class IRSampleTest(TestCase):
     def test_case_one(self):
         a = 1
         b = 2
-        self.assertEqual(a, b)
+        c = 3
+        self.assertEqual(a + b, c)

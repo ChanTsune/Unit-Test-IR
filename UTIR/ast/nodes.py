@@ -155,6 +155,15 @@ class Constant(Expr):
             'Value': self.value,
         }
 
+@dataclass
+class IRList(Expr):
+    values: List[Expr]
+
+    def serialize(self):
+        return {
+            'Node': 'List',
+            'Values': [i.serialize() for i in self.values],
+        }
 
 @dataclass
 class Tuple(Expr):
@@ -170,6 +179,7 @@ class Tuple(Expr):
 class BinOpKind(Enum):
     DOT = 'DOT'
     ASSIGN = 'ASSIGN'
+    ADD = 'ADD'
 
 
 @dataclass
