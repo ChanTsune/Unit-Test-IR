@@ -9,20 +9,29 @@ sealed class Node {
     @Serializable
     @SerialName("File")
     data class File(
-            val body: List<Decl>
+            @SerialName("Body")
+            val body: List<Decl>,
+            @SerialName("Version")
+            val version: Int,
     ) : Node()
     @Serializable
+    @SerialName("Block")
     data class Block(
+            @SerialName("Body")
             val body: List<Stmt>
     ) : Node() {
         @Serializable
         sealed class Stmt {
             @Serializable
+            @SerialName("Decl")
             data class Decl(
+                    @SerialName("Decl")
                     val decl: Node.Decl
             ) : Stmt()
             @Serializable
+            @SerialName("Expr")
             data class Expr(
+                    @SerialName("Expr")
                     val expr: Node.Expr
             ) : Stmt()
         }
@@ -31,30 +40,46 @@ sealed class Node {
     @Serializable
     sealed class Decl : Node() {
         @Serializable
+        @SerialName("Var")
         data class Var(
+                @SerialName("Name")
                 val name: String,
-                val type: String,
+                @SerialName("Type")
+                val type: String?,
+                @SerialName("Value")
                 val value: Expr?
         ) : Decl()
 
         @Serializable
+        @SerialName("Func")
         data class Func(
+                @SerialName("Name")
                 val name: String,
+                @SerialName("Args")
                 val args: List<Arg>,
-                val body: Block
+                @SerialName("Body")
+                val body: Block,
         ) : Decl() {
             @Serializable
+            @SerialName("Arg")
             data class Arg(
+                    @SerialName("Field")
                     val field: Var,
+                    @SerialName("Vararg")
                     val vararg: Boolean
             ) : Decl()
         }
 
         @Serializable
+        @SerialName("Class")
         data class Class(
+                @SerialName("Name")
                 val name: String,
+                @SerialName("Bases")
                 val bases: List<String>,
+                @SerialName("Constractors")
                 val constractors: List<Func>,
+                @SerialName("Fields")
                 val fields: List<Decl>
         ) : Decl()
 
@@ -121,41 +146,61 @@ sealed class Node {
     @Serializable
     sealed class Expr : Node() {
         @Serializable
+        @SerialName("Name")
         data class Name(
+                @SerialName("Name")
                 val name: String
         ) : Expr()
 
         @Serializable
+        @SerialName("Constant")
         data class Constant(
+                @SerialName("Kind")
                 val kind: Kind,
+                @SerialName("Value")
                 val value: String
         ) : Expr() {
             enum class Kind {
-                STRING;
-
+                STRING,
+                BYTES,
+                INTEGER,
+                FLOAT,
+                BOOLEAN,
+                NULL,
+                ;
                 companion object : EnumExtension<Kind>
             }
         }
         @Serializable
+        @SerialName("Tuple")
         data class Tuple(
+                @SerialName("Values")
                 val values: List<Expr>
         ) : Expr()
 
         @Serializable
+        @SerialName("BinOp")
         data class BinOp(
+                @SerialName("Right")
                 val right: Expr,
+                @SerialName("Kind")
                 val kind: Kind,
+                @SerialName("Left")
                 val left: Expr
         ) : Expr() {
-            enum class Kind(var kw: String) {
-                DOT(".");
-
+            enum class Kind {
+                DOT,
+                ASSIGN,
+                ;
                 companion object : EnumExtension<Kind>
             }
         }
         @Serializable
+        @SerialName("UnaryOp")
         data class UnaryOp(
+                @SerialName("Kind")
                 val kind: String,
+                @SerialName("Value")
                 val value: Expr
         ) : Expr() {
             enum class Kind(var kw: String) {
@@ -167,49 +212,72 @@ sealed class Node {
         }
 
         @Serializable
+        @SerialName("Subscript")
         data class Subscript(
+                @SerialName("Value")
                 val value: Expr,
+                @SerialName("Index")
                 val index: Expr
         ) : Expr()
 
         @Serializable
+        @SerialName("Call")
         data class Call(
+                @SerialName("Value")
                 val value: Expr,
+                @SerialName("Args")
                 val args: List<Arg>
         ) : Expr() {
             @Serializable
+            @SerialName("Arg")
             data class Arg(
-                    val name: String,
+                    @SerialName("Name")
+                    val name: String?,
+                    @SerialName("Value")
                     val value: Expr
             )
         }
 
         @Serializable
+        @SerialName("Throw")
         data class Throw(
+                @SerialName("Value")
                 val value: Expr
         ) : Expr()
 
         @Serializable
+        @SerialName("Return")
         data class Return(
+                @SerialName("Value")
                 val value: Expr
         ) : Expr()
 
         @Serializable
+        @SerialName("For")
         data class For(
+                @SerialName("Value")
                 val value: Decl.Var,
+                @SerialName("Generator")
                 val generator: Expr,
+                @SerialName("Body")
                 val body: Block
         ) : Expr()
 
         @Serializable
+        @SerialName("Try")
         data class Try(
+                @SerialName("Body")
                 val body: Block
         ) : Expr() {
             @Serializable
+            @SerialName("Catch")
             data class Catch(
+                    @SerialName("Type")
                     val type: String,
+                    @SerialName("Body")
                     val body: Block
             ) : Expr()
         }
     }
 }
+
