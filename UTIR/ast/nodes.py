@@ -96,13 +96,13 @@ class Func(Decl):
     @dataclass
     class Arg(Decl):
         field: Var
-        varargs: bool
+        vararg: bool
 
         def serialize(self):
             return {
                 'Node': 'Arg',
                 'Field': self.field.serialize(),
-                'Varargs': self.varargs,
+                'Vararg': self.vararg,
             }
 
 
