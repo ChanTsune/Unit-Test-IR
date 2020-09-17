@@ -182,8 +182,30 @@ class IR2KtConverter {
                                 raw = false
                         )
                     }
-                    else -> {
-                        TODO()
+                    Node.Expr.Constant.Kind.NULL -> {
+                        KNode.Expr.Const(
+                                value = "",
+                                form = KNode.Expr.Const.Form.NULL
+                        )
+                    }
+                    Node.Expr.Constant.Kind.FLOAT -> {
+                        KNode.Expr.Const(
+                                value = node.value,
+                                form = KNode.Expr.Const.Form.FLOAT
+                        )
+                    }
+                    Node.Expr.Constant.Kind.BOOLEAN -> {
+                        KNode.Expr.Const(
+                                value = node.value,
+                                form = KNode.Expr.Const.Form.BOOLEAN
+                        )
+                    }
+                    Node.Expr.Constant.Kind.BYTES -> {
+                        println("Warn: ${node.kind} passed but currently unsupported!")
+                        KNode.Expr.StringTmpl(
+                                elems = listOf(KNode.Expr.StringTmpl.Elem.Regular(node.value)),
+                                raw = false
+                        )
                     }
                 }
             }
@@ -200,7 +222,10 @@ class IR2KtConverter {
                 )
             }
             is Node.Expr.Subscript -> {
-                TODO()
+                KNode.Expr.ArrayAccess(
+                        expr = visit(node.value),
+                        indices = listOf(visit(node.index))
+                )
             }
             is Node.Expr.Throw -> {
                 TODO()
@@ -212,10 +237,66 @@ class IR2KtConverter {
                 TODO()
             }
             is Node.Expr.List -> {
-                TODO()
+                KNode.Expr.BinaryOp(
+                        lhs = KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "mutableListOf"),
+                                typeArgs = listOf(),
+                                args = listOf(),
+                                lambda = null),
+                        oper = KNode.Expr.BinaryOp.Oper.Token(token = KNode.Expr.BinaryOp.Token.DOT),
+                        rhs = KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "apply"),
+                                typeArgs = listOf(),
+                                args = listOf(),
+                                lambda = KNode.Expr.Call.TrailLambda(
+                                        anns = listOf(),
+                                        label = null,
+                                        func = KNode.Expr.Brace(
+                                                params = listOf(),
+                                                block = KNode.Block(
+                                                        stmts = mutableListOf<KNode.Stmt.Expr>().apply {
+                                                            node.values.map {
+                                                                add(KNode.Stmt.Expr(
+                                                                        expr = KNode.Expr.Call(
+                                                                                expr = KNode.Expr.Name(name = "add"),
+                                                                                typeArgs = listOf(),
+                                                                                args = listOf(KNode.ValueArg(
+                                                                                        name = null,
+                                                                                        asterisk = false,
+                                                                                        expr = visit(it))
+                                                                                ),
+                                                                                lambda = null)
+                                                                )
+                                                                )
+                                                            }
+                                                        }
+                                                )
+                                        )
+                                )
+                        )
+                )
             }
             is Node.Expr.UnaryOp -> {
-                TODO()
+                when (node.kind) {
+                    Node.Expr.UnaryOp.Kind.PLUS -> {
+                        KNode.Expr.UnaryOp(
+                                expr = visit(node.value),
+                                oper = KNode.Expr.UnaryOp.Oper(
+                                        token = KNode.Expr.UnaryOp.Token.POS
+                                ),
+                                prefix = false
+                        )
+                    }
+                    Node.Expr.UnaryOp.Kind.MINUS -> {
+                        KNode.Expr.UnaryOp(
+                                expr = visit(node.value),
+                                oper = KNode.Expr.UnaryOp.Oper(
+                                        token = KNode.Expr.UnaryOp.Token.NEG
+                                ),
+                                prefix = false
+                        )
+                    }
+                }
             }
             else -> {
                 throw Exception("This branch will never execute! but given $node")
