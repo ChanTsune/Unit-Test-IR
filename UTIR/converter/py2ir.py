@@ -30,7 +30,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
     def visit_Module(self, node):
         return ir_ast.File(
-            body=filterNull([self.visit(i) for i in node.body])
+            body=filterNull([self.visit(i) for i in node.body]) # TODO: filter
         )
 
     def visit_Str(self, node):
@@ -80,14 +80,16 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return ir_ast.Class(node.name,
                             bases,
                             [],  # TODO: support constractors
-                            [self.visit(i) for i in node.body]
+                            filterNull([self.visit(i) for i in node.body]) # TODO: filter
                             )
 
     def visit_FunctionDef(self, node):
+        raw_stmt = [self.visit(i) for i in node.body]
+        raw_stmt = filterNull(raw_stmt) # TODO: filter
+        stmt = [self._wrap_for_block(i) for i in raw_stmt]
         return ir_ast.Func(node.name,
                            self.visit(node.args),
-                           ir_ast.Block([self._wrap_for_block(self.visit(i))
-                                         for i in node.body]),
+                           ir_ast.Block(stmt),
                            )
 
     def visit_arguments(self, node):
