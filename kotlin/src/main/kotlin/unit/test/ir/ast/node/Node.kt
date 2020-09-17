@@ -222,14 +222,14 @@ sealed class Node {
         @SerialName("UnaryOp")
         data class UnaryOp(
                 @SerialName("Kind")
-                val kind: String,
+                val kind: Kind,
                 @SerialName("Value")
                 val value: Expr
         ) : Expr() {
-            enum class Kind(var kw: String) {
-                PLUS("+"),
-                MINUS("-");
-
+            enum class Kind {
+                PLUS,
+                MINUS,
+                ;
                 companion object : EnumExtension<Kind>
             }
         }
