@@ -184,7 +184,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
     def visit_UnaryOp(self, node):
         if isinstance(node.op, py_ast.USub):
-            op_kind = 'USub'
+            op_kind = ir_ast.UnaryOpKind.MINUS
         else:
             raise TypeError("%s" % node.op)
         return ir_ast.UnaryOp(
@@ -192,10 +192,33 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             self.visit(node.operand))
 
     def visit_BinOp(self, node):
+        node_kind = node.op.__class__.__name__
+        if node_kind == 'Pow':
+            return ir_ast.Call(
+                ir_ast.Name('pow'),
+                [
+                    ir_ast.Call.Arg(name=None, value=self.visit(node.left)),
+                    ir_ast.Call.Arg(name=None, value=self.visit(node.right)),
+                ]
+            )
+
         def get_kind(kind):
             kind = kind.__class__.__name__
             if kind == 'Add':
                 return ir_ast.BinOpKind.ADD
+            elif kind == 'Sub':
+                return ir_ast.BinOpKind.SUB
+            elif kind == 'Mult':
+                return ir_ast.BinOpKind.MUL
+            # elif kind == 'Div':
+            #     return ir_ast.BinOpKind.DIV
+            elif kind == 'Mod':
+                return ir_ast.BinOpKind.MOD
+            elif kind == 'LShift':
+                return ir_ast.BinOpKind.LEFT_SHIFT
+            elif kind == 'RShift':
+                return ir_ast.BinOpKind.RIGHT_SHIFT
+            
             raise Exception('Unsupported BinOp kind %s' % kind)
         return ir_ast.BinOp(self.visit(node.left),
                             get_kind(node.op),
@@ -280,7 +303,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         raise Exception('Unsupported AST Object %s found!' % node)
 
     def Unsupported(self):
-        return ir_ast.Constant('nil', None)
+        return ir_ast.Constant(ir_ast.ConstantKind.NULL, 'NULL')
 
     def convert(self, node):
         return self.visit(node)

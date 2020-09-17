@@ -116,6 +116,36 @@ class IR2KtConverter {
                                     token = KNode.Expr.BinaryOp.Token.ADD
                             )
                         }
+                        Node.Expr.BinOp.Kind.SUB -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.SUB
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.MUL -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.MUL
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.DIV -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.DIV
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.MOD -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.MOD
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.LEFT_SHIFT -> {
+                            KNode.Expr.BinaryOp.Oper.Infix(
+                                    str = "shl"
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.RIGHT_SHIFT -> {
+                            KNode.Expr.BinaryOp.Oper.Infix(
+                                    str = "shr"
+                            )
+                        }
                     }
                 }
                 KNode.Expr.BinaryOp(
@@ -164,7 +194,10 @@ class IR2KtConverter {
                 KNode.Expr.Name(node.name)
             }
             is Node.Expr.Return -> {
-                TODO()
+                KNode.Expr.Return(
+                        label = null,
+                        expr = visit(node.value)
+                )
             }
             is Node.Expr.Subscript -> {
                 TODO()

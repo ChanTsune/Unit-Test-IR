@@ -180,6 +180,12 @@ class BinOpKind(Enum):
     DOT = 'DOT'
     ASSIGN = 'ASSIGN'
     ADD = 'ADD'
+    SUB = 'SUB'
+    MUL = 'MUL'
+    DIV = 'DIV'
+    MOD = 'MOD'
+    LEFT_SHIFT = 'LEFT_SHIFT'
+    RIGHT_SHIFT = 'RIGHT_SHIFT'
 
 
 @dataclass
@@ -198,8 +204,8 @@ class BinOp(Expr):
 
 
 class UnaryOpKind(Enum):
-    plus = 'PLUS'
-    minus = 'MINUS'
+    PLUS = 'PLUS'
+    MINUS = 'MINUS'
 
 
 @dataclass

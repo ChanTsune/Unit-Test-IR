@@ -206,6 +206,12 @@ sealed class Node {
                 DOT,
                 ASSIGN,
                 ADD,
+                SUB,
+                MUL,
+                DIV,
+                MOD,
+                LEFT_SHIFT,
+                RIGHT_SHIFT,
                 ;
 
                 companion object : EnumExtension<Kind>

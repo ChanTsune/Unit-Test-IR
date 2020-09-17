@@ -1,6 +1,6 @@
-"""
-Common tests shared by test_unicode, test_userstring and test_bytes.
-"""
+# """
+# Common tests shared by test_unicode, test_userstring and test_bytes.
+# """
 
 import unittest, string, sys, struct
 from test import support
@@ -26,12 +26,13 @@ class BaseTest:
 
     # The type to be tested
     # Change in subclasses to change the behaviour of fixtesttype()
-    type2test = None
+
+#@@    type2test = None
 
     # Whether the "contained items" of the container are integers in
     # range(0, 256) (i.e. bytes, bytearray) or strings of length 1
     # (str)
-    contains_bytes = False
+#@@    contains_bytes = False
 
     # All tests pass their arguments to the testing methods
     # as str objects. fixtesttype() can be used to propagate
