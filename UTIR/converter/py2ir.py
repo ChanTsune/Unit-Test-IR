@@ -98,17 +98,19 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         for arg, default in chain(zip(node.args, pad_defaults+node.defaults),
                                   zip(node.kwonlyargs, node.kw_defaults)):
             arg_default = default if default is None else self.visit(default)
-            # TODO: Type (2nd arg)
-            var = ir_ast.Var(arg.arg, None, arg_default)
-            func_arg = ir_ast.Func.Arg(var, False)  # TODO: vararg (2nd arg)
+            var = ir_ast.Var(arg.arg, None, arg_default) # TODO: Type (2nd arg)
+            func_arg = ir_ast.Func.Arg(var, vararg=False)
             arg_defs.append(func_arg)
         if node.vararg is not None:
-            # node.vararg is _ast.arg
-            raise Exception('Unsupported vararg')
+            arg = node.vararg
+            var = ir_ast.Var(arg.arg, None, None) # TODO: Type (2nd arg)
+            func_arg = ir_ast.Func.Arg(var, vararg=True)
+            arg_defs.append(func_arg)
         if node.kwarg is not None:
-            # node.kwarg is _ast.arg
-            raise Exception('Unsupported kwargs')
-        # TODO: support 'kwarg''vararg'
+            arg = node.vararg
+            var = ir_ast.Var(arg.arg, 'Dictionary', None)
+            func_arg = ir_ast.Func.Arg(var, vararg=False)
+            arg_defs.append(func_arg)
         # TODO: python 3.8
         return arg_defs
 
