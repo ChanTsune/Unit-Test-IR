@@ -70,13 +70,15 @@ class IR2KtConverter {
                         receiverType = null,
                         name = node.name,
                         paramTypeParams = listOf(),
-                        params = node.args.map { KNode.Decl.Func.Param(
-                                mods = listOf(),
-                                readOnly = true,
-                                name = it.field.name,
-                                type = null,// it.field.type
-                                default = it.field.value?.let { visit(it) }
-                        ) },
+                        params = node.args.map {
+                            KNode.Decl.Func.Param(
+                                    mods = listOf(),
+                                    readOnly = true,
+                                    name = it.field.name,
+                                    type = null,// it.field.type
+                                    default = it.field.value?.let { visit(it) }
+                            )
+                        },
                         type = null,
                         typeConstraints = listOf(),
                         body = KNode.Decl.Func.Body.Block(visit(node.body))
@@ -97,7 +99,7 @@ class IR2KtConverter {
     private fun visit(node: Node.Expr): KNode.Expr {
         return when (node) {
             is Node.Expr.BinOp -> {
-                fun visit(node:Node.Expr.BinOp.Kind): KNode.Expr.BinaryOp.Oper {
+                fun visit(node: Node.Expr.BinOp.Kind): KNode.Expr.BinaryOp.Oper {
                     return when (node) {
                         Node.Expr.BinOp.Kind.DOT -> {
                             KNode.Expr.BinaryOp.Oper.Token(
@@ -126,16 +128,18 @@ class IR2KtConverter {
                 KNode.Expr.Call(
                         expr = visit(node.value),
                         typeArgs = listOf(),
-                        args = node.args.map { KNode.ValueArg(
-                                name = it.name,
-                                asterisk = false,
-                                expr = visit(it.value)
-                        ) },
+                        args = node.args.map {
+                            KNode.ValueArg(
+                                    name = it.name,
+                                    asterisk = false,
+                                    expr = visit(it.value)
+                            )
+                        },
                         lambda = null,
                 )
             }
             is Node.Expr.Constant -> {
-                when(node.kind) {
+                when (node.kind) {
                     Node.Expr.Constant.Kind.INTEGER -> {
                         KNode.Expr.Const(
                                 value = node.value,
@@ -144,11 +148,13 @@ class IR2KtConverter {
                     }
                     Node.Expr.Constant.Kind.STRING -> {
                         KNode.Expr.StringTmpl(
-                                elems = listOf(KNode.Expr.StringTmpl.Elem.Regular(node.value) ),
+                                elems = listOf(KNode.Expr.StringTmpl.Elem.Regular(node.value)),
                                 raw = false
                         )
                     }
-                    else -> { TODO() }
+                    else -> {
+                        TODO()
+                    }
                 }
             }
             is Node.Expr.For -> {
