@@ -179,7 +179,7 @@ sealed class Node {
         }
 
         @Serializable
-        @SerialName("IList")
+        @SerialName("List")
         data class List(
                 @SerialName("Values")
                 val values: IList<Expr>
