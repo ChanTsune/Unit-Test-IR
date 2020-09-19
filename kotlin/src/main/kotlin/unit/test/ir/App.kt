@@ -54,8 +54,11 @@ fun main(args: Array<String>) {
             try {
                 decodeFromString(Node.serializer(), fileContent).let {
                     IR2KtConverter().visit(it).let {
-                        Writer.write(it).let {
-                            println(it)
+                        val ktCode = Writer.write(it)
+                        val outputFile = File("../sample_data/test_sample.kt")
+                        FileWriter(outputFile).apply {
+                            write(ktCode)
+                            close()
                         }
                     }
                 }
