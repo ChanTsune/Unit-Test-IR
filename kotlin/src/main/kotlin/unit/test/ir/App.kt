@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import unit.test.ir.ast.node.Node
 import unit.test.ir.converters.IR2KtConverter
 import java.io.File
+import java.io.FileWriter
 import java.nio.file.Paths
 
 
