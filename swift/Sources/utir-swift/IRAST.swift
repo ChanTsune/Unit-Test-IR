@@ -12,95 +12,182 @@ protocol AST { }
 protocol Node: AST { }
 
 struct File: Node {
-    var body: [Node]
+    var body: [Decl]
 }
 
-struct Assign: Node {
-    var target: Node
-    var value: Node
+protocol Block: Node { }
+
+protocol Stmt { }
+
+struct StmtDecl: Stmt {
+    var decl: Decl
 }
 
-struct Name: Node {
-    enum AccessLevel: String, Codable {
-        case Public
-        case Internal
-        case Package
-        case FilePrivate
-        case Protected
-        case ProtectedInternal
-        case PrivateProtected
-        case Private
-    }
+struct StmtExpr {
+    var expr: Expr
+}
+
+protocol Decl: Node { }
+
+struct Var: Decl {
     var name: String
     var type: String?
-    var access: AccessLevel?
+    var expr: Expr?
 }
 
-struct Attribute: Node {
-    var value: Node
-    var attribute: String
-}
-
-struct FunctionDef: Node {
-    enum Kind: String, Codable {
-        case Function
-        case StaticMethod
-        case BinOp
-        case SingleOp
+struct Func: Decl {
+    var name: String
+    var args: [Arg]
+    var body: Block
+    struct Arg: Decl {
+        var field: Var
+        var vararg: Bool
     }
+}
+
+struct Class: Decl {
     var name: String
+    var bases: [String]
+    var constractors: [Func]
+    var fields: [Decl]
+}
+
+protocol IR: Decl { }
+
+struct Suite: IR {
+    var setUp: [Node] // Expr
+    var cases: [Case]
+    var tearDown: [Node] // Expr
+}
+protocol Case: IR { }
+
+struct Set: Case {
+    var target: Node
+    var call: String
+    var params: [Params]
     var kind: Kind
-    var args: [Node]
-    var kwargs: [String: Node]
-    var body: [Node]
-    var returnType: String?
-}
-
-struct Call: Node {
-    var func_: Node
-    var args: [Node]
-    var kwargs: [String: Node]
-}
-
-struct ClassDef: Node {
-    var name: String
-    var fields: [Name]
-    var body: [FunctionDef]
-}
-
-struct Value: Node {
-    enum Kind: String, Codable {
-        case String
-        case Int
-        case Float
-        case Bool
-        case Nil
+    enum Kind {
+        case METHOD
+        case MEMBER
+        case FUNCTION
+        case BIN_OP
+        case UNARY_OP
     }
-    var kind: Kind
-    var value: String?
 }
-
-struct TestProject: Node { // as File
+struct Params: IR {
     var name: String
-    var testSuites: [TestSuite]
-}
-
-struct TestSuite: Node { // as TestClass
-    var name: String
-    var testCases: [TestCase]
-}
-
-struct TestCase: Node { // as TestMethod
-    var name: String
-    var expressions: [Node]
-}
-
-struct Assert: Node { // as assertXX
-    enum Kind: String, Codable {
-        case Equal
-    }
-    var kind: Kind
+    var args: [String: Node]
     var excepted: Node
     var actual: Node
     var message: String?
+}
+
+struct CaseExpr: Case {
+    var name: String
+    var expr: [Node] // Expr
+    var asserts: [Assert]
+}
+
+struct Assert: IR {
+    var kind: AssertKind
+}
+
+protocol AssertKind: IR { }
+
+struct AssertEqual: AssertKind {
+    var excepted: Node
+    var actual: Node
+    var message: String?
+}
+
+protocol Expr: Node { }
+
+struct Name: Expr {
+    var name: String
+}
+
+struct Constant: Expr {
+    var kind: Kind
+    var value: String
+
+    enum Kind {
+        case STRING
+        case BYTES
+        case INTEGER
+        case FLOAT
+        case BOOLEAN
+        case NULL
+    }
+}
+
+struct List: Expr {
+    var values: [Expr]
+}
+
+struct Tuple: Expr {
+    var values: [Expr]
+}
+
+struct BinOp: Expr {
+    var right: Expr
+    var kind: Kind
+    var left: Expr
+
+    enum Kind {
+        case DOT
+        case ASSIGN
+        case ADD
+        case SUB
+        case MUL
+        case DIV
+        case MOD
+        case LEFT_SHIFT
+        case RIGHT_SHIFT
+    }
+}
+struct UnaryOp: Expr {
+    var kind: Kind
+    var value: Expr
+
+    enum Kind {
+        case PLUS
+        case MINUS
+    }
+}
+struct Subscript: Expr {
+    var value: Expr
+    var index: Expr
+}
+
+struct Call: Expr {
+    var value: Expr
+    var args: [Arg]
+
+    struct Arg {
+        var name: String?
+        var value: Expr
+    }
+}
+
+struct Throw: Expr {
+    var value: Expr
+}
+
+struct Return: Expr {
+    var value: Expr
+}
+
+struct For: Expr {
+    var value: Var
+    var generator: Expr
+    var body: Block
+}
+
+struct Try: Expr {
+    var body: Block
+}
+
+struct Catch: Expr {
+    var type: String
+    var body: Block
 }
