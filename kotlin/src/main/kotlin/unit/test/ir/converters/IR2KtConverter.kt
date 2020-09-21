@@ -248,43 +248,17 @@ class IR2KtConverter {
                 TODO()
             }
             is Node.Expr.List -> {
-                KNode.Expr.BinaryOp(
-                        lhs = KNode.Expr.Call(
-                                expr = KNode.Expr.Name(name = "mutableListOf"),
-                                typeArgs = listOf(),
-                                args = listOf(),
-                                lambda = null),
-                        oper = KNode.Expr.BinaryOp.Oper.Token(token = KNode.Expr.BinaryOp.Token.DOT),
-                        rhs = KNode.Expr.Call(
-                                expr = KNode.Expr.Name(name = "apply"),
-                                typeArgs = listOf(),
-                                args = listOf(),
-                                lambda = KNode.Expr.Call.TrailLambda(
-                                        anns = listOf(),
-                                        label = null,
-                                        func = KNode.Expr.Brace(
-                                                params = listOf(),
-                                                block = KNode.Block(
-                                                        stmts = mutableListOf<KNode.Stmt.Expr>().apply {
-                                                            node.values.map {
-                                                                add(KNode.Stmt.Expr(
-                                                                        expr = KNode.Expr.Call(
-                                                                                expr = KNode.Expr.Name(name = "add"),
-                                                                                typeArgs = listOf(),
-                                                                                args = listOf(KNode.ValueArg(
-                                                                                        name = null,
-                                                                                        asterisk = false,
-                                                                                        expr = visit(it))
-                                                                                ),
-                                                                                lambda = null)
-                                                                )
-                                                                )
-                                                            }
-                                                        }
-                                                )
-                                        )
-                                )
-                        )
+                KNode.Expr.Call(
+                        expr = KNode.Expr.Name(name = "listOf"),
+                        typeArgs = listOf(),
+                        args = node.values.map {
+                            KNode.ValueArg(
+                                    name = null,
+                                    asterisk = false,
+                                    expr = visit(it),
+                            )
+                        },
+                        lambda = null,
                 )
             }
             is Node.Expr.UnaryOp -> {
