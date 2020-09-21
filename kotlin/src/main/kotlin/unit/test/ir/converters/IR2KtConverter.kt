@@ -1,6 +1,7 @@
 package unit.test.ir.converters
 
 import unit.test.ir.ast.node.Node
+import unit.test.ir.escape
 import kastree.ast.Node as KNode
 
 
@@ -188,7 +189,7 @@ class IR2KtConverter {
                     }
                     Node.Expr.Constant.Kind.STRING -> {
                         KNode.Expr.StringTmpl(
-                                elems = listOf(KNode.Expr.StringTmpl.Elem.Regular(node.value)),
+                                elems = listOf(KNode.Expr.StringTmpl.Elem.Regular(node.value.escape())),
                                 raw = false
                         )
                     }
@@ -206,7 +207,7 @@ class IR2KtConverter {
                     }
                     Node.Expr.Constant.Kind.BOOLEAN -> {
                         KNode.Expr.Const(
-                                value = node.value,
+                                value = node.value.toLowerCase(),
                                 form = KNode.Expr.Const.Form.BOOLEAN
                         )
                     }
