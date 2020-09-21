@@ -73,9 +73,19 @@ class IR2KtConverter {
                         params = node.args.map {
                             KNode.Decl.Func.Param(
                                     mods = listOf(),
-                                    readOnly = true,
+                                    readOnly = null,
                                     name = it.field.name,
-                                    type = null,// it.field.type
+                                    type = KNode.Type(
+                                            mods = listOf(),
+                                            ref = KNode.TypeRef.Simple(
+                                                    pieces = listOf(
+                                                            KNode.TypeRef.Simple.Piece(
+                                                                name = it.field.type ?: "Any",
+                                                                typeParams = listOf()
+                                                            )
+                                                    )
+                                            )
+                                    ),
                                     default = it.field.value?.let { visit(it) }
                             )
                         },
