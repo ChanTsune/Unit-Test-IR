@@ -4,6 +4,7 @@ val defaultEscapeMap = mapOf(
         '\t' to "\\t",
         '\n' to "\\n",
         '\r' to "\\r",
+        '"' to "\\\""
 )
 
 fun String.escape(escapeMap: Map<Char, String> = defaultEscapeMap): String {
