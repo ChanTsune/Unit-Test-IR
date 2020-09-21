@@ -294,7 +294,7 @@ class IR2KtConverter {
                                 oper = KNode.Expr.UnaryOp.Oper(
                                         token = KNode.Expr.UnaryOp.Token.POS
                                 ),
-                                prefix = false
+                                prefix = true
                         )
                     }
                     Node.Expr.UnaryOp.Kind.MINUS -> {
@@ -303,7 +303,7 @@ class IR2KtConverter {
                                 oper = KNode.Expr.UnaryOp.Oper(
                                         token = KNode.Expr.UnaryOp.Token.NEG
                                 ),
-                                prefix = false
+                                prefix = true
                         )
                     }
                 }
