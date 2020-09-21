@@ -1,5 +1,5 @@
-from UTIR import ast
-from UTIR.transformer import NodeTransformer
+import ast
+from ast import NodeTransformer
 
 
 class MyTransformer(NodeTransformer):
