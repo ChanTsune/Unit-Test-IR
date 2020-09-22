@@ -18,7 +18,11 @@ fun main(args: Array<String>) {
     val code = """
         package foo
 
-        fun baz(a:String) = 1
+        fun baz(a:String) {
+          for(i in listOf(1)) {
+            println(i)
+          }
+        }
 //        fun hoge(a:String) = baz(a=a)
 //        class A(val a:String){
 //            val d:String = ""
