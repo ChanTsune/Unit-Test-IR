@@ -210,8 +210,8 @@ class PyAST2IRASTConverter(PyNodeTransformer):
                 return ir_ast.BinOpKind.SUB
             elif kind == 'Mult':
                 return ir_ast.BinOpKind.MUL
-            # elif kind == 'Div':
-            #     return ir_ast.BinOpKind.DIV
+            elif kind == 'Div':
+                return ir_ast.BinOpKind.DIV
             elif kind == 'Mod':
                 return ir_ast.BinOpKind.MOD
             elif kind == 'LShift':
