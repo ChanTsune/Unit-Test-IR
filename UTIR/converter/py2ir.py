@@ -231,17 +231,18 @@ class PyAST2IRASTConverter(PyNodeTransformer):
 
     def visit_AugAssign(self, node):
         if isinstance(node.op, py_ast.Add):
-            op_kind = 'Add'
+            op_kind = ir_ast.BinOpKind.ADD
         else:
             raise TypeError("%s" % node.op)
         target = self.visit(node.target)
-
-        return ir_ast.Assign(
+        return ir_ast.BinOp(
             target,
-            ir_ast.BinOp(op_kind,
-                         target,
-                         self.visit(node.value)
-                         ),
+            ir_ast.BinOpKind.ASSIGN,
+            ir_ast.BinOp(
+                target,
+                op_kind,
+                self.visit(node.value),
+            ),
         )
 
     def visit_JoinedStr(self, node):
