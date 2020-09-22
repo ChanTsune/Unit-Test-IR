@@ -167,9 +167,9 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return self.Unsupported()
 
     def visit_Tuple(self, node):
-        print('warn: Unsupported', node)
-        print(node.elts)
-        return self.Unsupported()
+        return ir_ast.Tuple(
+            values=[self.visit(i) for i in node.elts]
+        )
 
     def visit_Dict(self, node):
         print('warn: Unsupported', node)

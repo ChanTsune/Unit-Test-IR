@@ -245,7 +245,50 @@ class IR2KtConverter {
                 TODO()
             }
             is Node.Expr.Tuple -> {
-                TODO()
+                when (node.values.size) {
+                    2 -> {
+                        KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "Pair"),
+                                typeArgs = listOf(),
+                                args = node.values.map {
+                                    KNode.ValueArg(
+                                            name = null,
+                                            asterisk = false,
+                                            expr = visit(it),
+                                    )
+                                },
+                                lambda = null,
+                        )
+                    }
+                    3 -> {
+                        KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "Triple"),
+                                typeArgs = listOf(),
+                                args = node.values.map {
+                                    KNode.ValueArg(
+                                            name = null,
+                                            asterisk = false,
+                                            expr = visit(it),
+                                    )
+                                },
+                                lambda = null,
+                        )
+                    }
+                    else -> {
+                        KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "listOf"),
+                                typeArgs = listOf(),
+                                args = node.values.map {
+                                    KNode.ValueArg(
+                                            name = null,
+                                            asterisk = false,
+                                            expr = visit(it),
+                                    )
+                                },
+                                lambda = null,
+                        )
+                    }
+                }
             }
             is Node.Expr.List -> {
                 KNode.Expr.Call(
