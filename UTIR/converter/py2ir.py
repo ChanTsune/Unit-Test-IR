@@ -156,10 +156,22 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return None
 
     def visit_For(self, node):
-        print('warn: Unsupported', node)
-        print(node.target, node.iter,
-              node.body, node.orelse)
-        return None
+        print('warn: Unsupported for node else stmt.', node.orelse)
+        body = [self.visit(i) for i in node.body]
+        body = filterNull(body)
+        body = [self._wrap_for_block(i) for i in body]
+
+        value = self.visit(node.target)
+        if isinstance(value, ir_ast.Name):
+            value = ir_ast.Var(value.name, None, None)
+        else:
+            print('warn: Unexpected', value)
+
+        return ir_ast.For(
+            value=value,
+            generator=self.visit(node.iter),
+            body=ir_ast.Block(body),
+        )
 
     def visit_Slice(self, node):
         print('warn: Unsupported', node)

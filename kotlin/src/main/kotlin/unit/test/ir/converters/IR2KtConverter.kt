@@ -221,7 +221,15 @@ class IR2KtConverter {
                 }
             }
             is Node.Expr.For -> {
-                TODO()
+                KNode.Expr.For(
+                        anns = listOf(),
+                        vars = listOf(),
+                        inExpr = visit(node.generator),
+                        body = KNode.Expr.Brace(
+                                params = listOf(),
+                                block = visit(node.body),
+                        ),
+                )
             }
             is Node.Expr.Name -> {
                 KNode.Expr.Name(node.name)
