@@ -13,4 +13,4 @@ class JsonDumper:
 
     def dumpf(self, path, object):
         with open(path, 'w') as f:
-            json.dump(object, f)
+            json.dump(object, f, indent=2)
