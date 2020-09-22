@@ -81,8 +81,8 @@ class IR2KtConverter {
                                             ref = KNode.TypeRef.Simple(
                                                     pieces = listOf(
                                                             KNode.TypeRef.Simple.Piece(
-                                                                name = it.field.type ?: "Any",
-                                                                typeParams = listOf()
+                                                                    name = it.field.type ?: "Any",
+                                                                    typeParams = listOf()
                                                             )
                                                     )
                                             )
