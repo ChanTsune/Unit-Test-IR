@@ -99,13 +99,13 @@ sealed class Node {
             sealed class Case : IR() {
                 @Serializable
                 class MethodSet(
-                        val target: Expr,
                         val name: String,
                         val params: IList<Param>,
                 ) : Case() {
                     @Serializable
                     class Param(
                             val name: String,
+                            val receiver: Expr,
                             val args: Map<String, Expr>,
                             val excepted: Expr,
                             val message: String?

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any, List, Dict, Optional
 
-from .nodes import Node, Decl
+from .nodes import Node, Decl, Expr
 
 
 class IR(Decl):
@@ -28,19 +28,31 @@ class Case(IR):
 
 
 @dataclass
-class CaseSet(Case):
-    target: Node
-    call: str
-    params: List[Any]
-    kind: Any
+class CaseMethodSet(Case):
+
+    @dataclass
+    class Param:
+        receiver: Expr
+        args: Dict[str, Expr]
+        excepted: Expr
+        message: Optional[str]
+
+        def serialize(self):
+            return {
+                'Node': 'Param',
+                'Receiver': self.receiver.serialize(),
+                'Args': self.args,
+                'Excepted': self.excepted.serialize(),
+                'Message': self.message
+            }
+    name: str
+    params: List[Param]
 
     def serialize(self):
         return {
-            'Node': 'CaseSet',
-            'Target':self.target.serialize(),
-            'Call': self.call,
+            'Node': 'MethodSet',
+            'Name': self.name,
             'Params': [i.serialize() for i in self.params],
-            'Kind': self.kind.name,
         }
 
 
