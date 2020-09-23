@@ -90,14 +90,12 @@ class AssertKind:
 class AssertEqual(AssertKind):
     excepted: Node
     actual: Node
-    message: str
+    message: Optional[str]
 
     def serialize(self):
         return {
-            'Assert': {
-                'Kind': self.kind,
-                'Excepted': self.excepted.serialize(),
-                'Actual': self.actual.serialize(),
-                'Message': self.message,
-            }
+            'Node': 'Equal',
+            'Excepted': self.excepted.serialize(),
+            'Actual': self.actual.serialize(),
+            'Message': self.message,
         }
