@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class Node {
+    interface IR
     @Serializable
     @SerialName("File")
     data class File(
@@ -87,66 +88,13 @@ sealed class Node {
         ) : Decl()
 
         @Serializable
-        sealed class IR : Decl() {
-            @Serializable
-            class Suite(
-                    val setUp: IList<Node>, // Expr
-                    val cases: IList<Case>,
-                    val tearDown: IList<Node> // Expr
-            ) : IR()
-
-            @Serializable
-            sealed class Case : IR() {
-                @Serializable
-                class MethodSet(
-                        val name: String,
-                        val params: IList<Param>,
-                ) : Case() {
-                    @Serializable
-                    class Param(
-                            val name: String,
-                            val receiver: Expr,
-                            val args: Map<String, Expr>,
-                            val excepted: Expr,
-                            val message: String?
-                    )
-                }
-                @Serializable
-                class FunctionSet(
-                        val name: String,
-                        val params: IList<Param>,
-                ) : Case() {
-                    @Serializable
-                    class Param(
-                            val name: String,
-                            val args: Map<String, Expr>,
-                            val excepted: Expr,
-                            val message: String?
-                    )
-                }
-
-                @Serializable
-                class CaseExpr(
-                        val name: String,
-                        val expr: IList<Node>, // Expr
-                        val asserts: IList<Assert>
-                ) : Case()
-            }
-
-            @Serializable
-            class Assert(
-                    val kind: Kind
-            ) : IR() {
-                @Serializable
-                sealed class Kind {
-                    class AssertEqual(
-                            val excepted: Node,
-                            val actual: Node,
-                            val message: String?
-                    ) : Kind()
-                }
-            }
-        }
+        @SerialName("Suite")
+        class Suite(
+                val name: String,
+                val setUp: IList<Expr>,
+                val cases: IList<Expr.Case>,
+                val tearDown: IList<Expr>,
+        ) : Decl(), IR
     }
 
     @Serializable
@@ -302,6 +250,58 @@ sealed class Node {
                     val body: Block
             ) : Expr()
         }
+        @Serializable
+        sealed class Case : Expr(), IR {
+            @Serializable
+            class MethodSet(
+                    val name: String,
+                    val params: IList<Param>,
+            ) : Case() {
+                @Serializable
+                class Param(
+                        val name: String,
+                        val receiver: Expr,
+                        val args: Map<String, Expr>,
+                        val excepted: Expr,
+                        val message: String?
+                )
+            }
+            @Serializable
+            class FunctionSet(
+                    val name: String,
+                    val params: IList<Param>,
+            ) : Case() {
+                @Serializable
+                class Param(
+                        val name: String,
+                        val args: Map<String, Expr>,
+                        val excepted: Expr,
+                        val message: String?
+                )
+            }
+
+            @Serializable
+            class CaseExpr(
+                    val name: String,
+                    val expr: IList<Node>, // Expr
+                    val asserts: IList<Assert>
+            ) : Case()
+        }
+
+        @Serializable
+        class Assert(
+                val kind: Kind
+        ) : Expr(), IR {
+            @Serializable
+            sealed class Kind {
+                class AssertEqual(
+                        val excepted: Node,
+                        val actual: Node,
+                        val message: String?
+                ) : Kind()
+            }
+        }
+
     }
 }
 

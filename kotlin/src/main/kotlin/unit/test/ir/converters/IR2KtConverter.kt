@@ -98,9 +98,6 @@ class IR2KtConverter {
             is Node.Decl.Var -> {
                 TODO()
             }
-            is Node.Decl.IR -> {
-                TODO()
-            }
             else -> {
                 throw Exception("This branch will never execute! but given $node")
             }

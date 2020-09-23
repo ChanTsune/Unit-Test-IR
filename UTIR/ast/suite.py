@@ -4,12 +4,18 @@ from typing import Any, List, Dict, Optional
 from .nodes import Node, Decl, Expr
 
 
-class IR(Decl):
+class IR:
     pass
 
+class IRDecl(IR, Decl):
+    pass
+
+class IRExpr(IR, Expr):
+    pass
 
 @dataclass
-class Suite(IR):
+class Suite(IRDecl):
+    name: str
     set_up: List[Node]
     cases: List[Any]
     tear_down: List[Node]
@@ -17,13 +23,14 @@ class Suite(IR):
     def serialize(self):
         return {
             'Node': 'Suite',
+            'Name': self.name,
             'SetUp': [i.serialize() for i in self.set_up],
             'Cases': [i.serialize() for i in self.cases],
             'TearDown': [i.serialize() for i in self.tear_down],
         }
 
 
-class Case(IR):
+class Case(IRExpr):
     pass
 
 
@@ -59,20 +66,18 @@ class CaseMethodSet(Case):
 @dataclass
 class CaseExpr(Case):
     name: str
-    expr: List[Node]
-    asserts: List[Node]
+    expr: List[Expr]
 
     def serialize(self):
         return {
             'Node': 'CaseExpr',
             'Name': self.name,
             'Expr': [i.serialize() for i in self.expr],
-            'Asserts': [i.serialize() for i in self.asserts],
         }
 
 
 @dataclass
-class Assert(IR):
+class Assert(IRExpr):
     """UTIR Assert"""
     kind: Any
 
@@ -82,7 +87,7 @@ class Assert(IR):
         }
 
 
-class AssertKind:
+class AssertKind(IRExpr):
     pass
 
 
