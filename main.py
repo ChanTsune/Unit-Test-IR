@@ -3,18 +3,13 @@ from UTIR import ast
 from UTIR import serializer
 from UTIR import dumper
 from UTIR import generator
-from UTIR.visitor import NodeVisitor
+from UTIR.transformer import DefaultIRTransformer
 
 
-class SampleVisitor(NodeVisitor):
+class MyIRTransformer(DefaultIRTransformer):
 
-    def visit(self, node):
-        print("pre", type(node))
-        super().visit(node)
-        print("post", type(node))
-
-    def visit_Name(self, node):
-        print(node.name, type(node))
+    def is_target_class(self, node):
+        return False
 
 
 def main(argv):
@@ -30,6 +25,7 @@ def _main(argv):
 
     class MyCode2IR(Code2IR):
         py_ast_transformer_classes = [MyTransformer]
+        ir_ast_transformer_classes = [MyIRTransformer]
         ir_ast_dumper_class = JsonDumper
 
     code2ir = MyCode2IR()
