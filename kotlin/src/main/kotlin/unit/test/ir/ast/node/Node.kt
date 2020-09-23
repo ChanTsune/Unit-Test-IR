@@ -90,9 +90,13 @@ sealed class Node {
         @Serializable
         @SerialName("Suite")
         class Suite(
+                @SerialName("Name")
                 val name: String,
+                @SerialName("SetUp")
                 val setUp: IList<Expr>,
+                @SerialName("Cases")
                 val cases: IList<Expr.Case>,
+                @SerialName("TearDown")
                 val tearDown: IList<Expr>,
         ) : Decl(), IR
     }
