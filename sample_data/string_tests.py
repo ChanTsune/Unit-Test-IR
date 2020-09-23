@@ -999,7 +999,7 @@ class BaseTest:
         self.checkraises(TypeError, 'abc', 'splitlines', 42, 42)
 
 
-class CommonTest(BaseTest):
+# class CommonTest(BaseTest):
     # This testcase contains tests that can be used in all
     # stringlike classes. Currently this is str and UserString.
 
@@ -1031,7 +1031,7 @@ class CommonTest(BaseTest):
                         '\u019b\u1d00\u1d86\u0221\u1fb7', 'capitalize')
 
 
-class MixinStrUnicodeUserStringTest:
+# class MixinStrUnicodeUserStringTest:
     # additional tests that only work for
     # stringlike objects, i.e. str, UserString
 
@@ -1415,7 +1415,7 @@ class MixinStrUnicodeUserStringTest:
         self.checkequal(10, "...\u043c......<", "find", "<")
 
 
-class MixinStrUnicodeTest:
+# class MixinStrUnicodeTest:
     # Additional tests that only work with str.
 
     def test_bug1001011(self):
