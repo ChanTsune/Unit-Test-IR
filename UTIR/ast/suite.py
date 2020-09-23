@@ -14,6 +14,14 @@ class Suite(IR):
     cases: List[Any]
     tear_down: List[Node]
 
+    def serialize(self):
+        return {
+            'Node': 'Suite',
+            'SetUp': [i.serialize() for i in self.set_up],
+            'Cases': [i.serialize() for i in self.cases],
+            'TearDown': [i.serialize() for i in self.tear_down],
+        }
+
 
 class Case(IR):
     pass
@@ -26,6 +34,15 @@ class CaseSet(Case):
     params: List[Any]
     kind: Any
 
+    def serialize(self):
+        return {
+            'Node': 'CaseSet',
+            'Target':self.target.serialize(),
+            'Call': self.call,
+            'Params': [i.serialize() for i in self.params],
+            'Kind': self.kind.name,
+        }
+
 
 @dataclass
 class CaseExpr(Case):
@@ -33,11 +50,24 @@ class CaseExpr(Case):
     expr: List[Node]
     asserts: List[Node]
 
+    def serialize(self):
+        return {
+            'Node': 'CaseExpr',
+            'Name': self.name,
+            'Expr': [i.serialize() for i in self.expr],
+            'Asserts': [i.serialize() for i in self.asserts],
+        }
+
 
 @dataclass
 class Assert(IR):
     """UTIR Assert"""
     kind: Any
+
+    def serialize(self):
+        return {
+            'Kind': self.kind.serialize(),
+        }
 
 
 class AssertKind:
