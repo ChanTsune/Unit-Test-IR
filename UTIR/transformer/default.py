@@ -16,6 +16,6 @@ class DefaultIRTransformer(NodeTransformer):
 
     def visit_Class(self, node):
         if self._is_target_class(node):
-            print('TODO: CVT:', node)
+            print('TODO: CVT:', node.name)
             return node
         return node
