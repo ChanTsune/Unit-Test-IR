@@ -283,8 +283,7 @@ sealed class Node {
             @Serializable
             class CaseExpr(
                     val name: String,
-                    val expr: IList<Node>, // Expr
-                    val asserts: IList<Assert>
+                    val expr: IList<Expr>,
             ) : Case()
         }
 
