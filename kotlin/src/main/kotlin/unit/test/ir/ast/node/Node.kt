@@ -98,30 +98,31 @@ sealed class Node {
             @Serializable
             sealed class Case : IR() {
                 @Serializable
-                class Set(
-                        val target: Node,
-                        val call: String,
-                        val params: IList<Params>,
-                        val kind: Kind
+                class MethodSet(
+                        val target: Expr,
+                        val name: String,
+                        val params: IList<Param>,
                 ) : Case() {
                     @Serializable
-                    class Params(
+                    class Param(
                             val name: String,
-                            val args: Map<String, Node>,
-                            val excepted: Node,
-                            val actual: Node,
+                            val args: Map<String, Expr>,
+                            val excepted: Expr,
                             val message: String?
                     )
-
-                    enum class Kind {
-                        METHOD,
-                        MEMBER,
-                        FUNCTION,
-                        BIN_OP,
-                        UNARY_OP;
-
-                        companion object : EnumExtension<Kind>
-                    }
+                }
+                @Serializable
+                class FunctionSet(
+                        val name: String,
+                        val params: IList<Param>,
+                ) : Case() {
+                    @Serializable
+                    class Param(
+                            val name: String,
+                            val args: Map<String, Expr>,
+                            val excepted: Expr,
+                            val message: String?
+                    )
                 }
 
                 @Serializable
