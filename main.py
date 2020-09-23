@@ -9,7 +9,7 @@ from UTIR.transformer import DefaultIRTransformer
 class MyIRTransformer(DefaultIRTransformer):
 
     def is_target_class(self, node):
-        return False
+        return node.name == 'BaseTest'
 
 
 def main(argv):
