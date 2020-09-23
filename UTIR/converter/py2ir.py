@@ -156,7 +156,8 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return None
 
     def visit_For(self, node):
-        print('warn: Unsupported for node else stmt.', node.orelse)
+        if len(node.orelse):
+            print('warn: Unsupported for node else stmt.', node.orelse)
         body = [self.visit(i) for i in node.body]
         body = filterNull(body)
         body = [self._wrap_for_block(i) for i in body]
