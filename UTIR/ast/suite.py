@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, List, Dict, Optional
 
-from .nodes import Node, Decl, Expr
+from .nodes import Block, Node, Decl, Expr
 
 
 class IR:
@@ -64,15 +64,15 @@ class CaseMethodSet(Case):
 
 
 @dataclass
-class CaseExpr(Case):
+class CaseBlock(Case):
     name: str
-    expr: List[Expr]
+    body: Block
 
     def serialize(self):
         return {
-            'Node': 'CaseExpr',
+            'Node': 'CaseBlock',
             'Name': self.name,
-            'Expr': [i.serialize() for i in self.expr],
+            'Body': self.body.serialize(),
         }
 
 
@@ -83,6 +83,7 @@ class Assert(IRExpr):
 
     def serialize(self):
         return {
+            'Node': 'Assert',
             'Kind': self.kind.serialize(),
         }
 

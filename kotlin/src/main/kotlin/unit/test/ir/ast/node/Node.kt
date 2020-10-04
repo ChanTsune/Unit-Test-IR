@@ -257,12 +257,12 @@ sealed class Node {
         @Serializable
         sealed class Case : Expr(), IR {
             @Serializable
-            class MethodSet(
+            data class MethodSet(
                     val name: String,
                     val params: IList<Param>,
             ) : Case() {
                 @Serializable
-                class Param(
+                data class Param(
                         val name: String,
                         val receiver: Expr,
                         val args: Map<String, Expr>,
@@ -271,12 +271,12 @@ sealed class Node {
                 )
             }
             @Serializable
-            class FunctionSet(
+            data class FunctionSet(
                     val name: String,
                     val params: IList<Param>,
             ) : Case() {
                 @Serializable
-                class Param(
+                data class Param(
                         val name: String,
                         val args: Map<String, Expr>,
                         val excepted: Expr,
@@ -285,21 +285,31 @@ sealed class Node {
             }
 
             @Serializable
-            class CaseExpr(
+            @SerialName("CaseBlock")
+            data class CaseBlock(
+                    @SerialName("Name")
                     val name: String,
-                    val expr: IList<Expr>,
+                    @SerialName("Body")
+                    val body: Block,
             ) : Case()
         }
 
         @Serializable
-        class Assert(
+        @SerialName("Assert")
+        data class Assert(
+                @SerialName("Kind")
                 val kind: Kind
         ) : Expr(), IR {
             @Serializable
             sealed class Kind {
-                class AssertEqual(
-                        val excepted: Node,
-                        val actual: Node,
+                @Serializable
+                @SerialName("Equal")
+                data class AssertEqual(
+                        @SerialName("Excepted")
+                        val excepted: Expr,
+                        @SerialName("Actual")
+                        val actual: Expr,
+                        @SerialName("Message")
                         val message: String?
                 ) : Kind()
             }

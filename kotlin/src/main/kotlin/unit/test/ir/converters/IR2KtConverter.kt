@@ -98,9 +98,53 @@ class IR2KtConverter {
             is Node.Decl.Var -> {
                 TODO()
             }
+            is Node.Decl.Suite -> {
+                visit(node)
+            }
             else -> {
                 throw Exception("This branch will never execute! but given $node")
             }
+        }
+    }
+
+    private fun visit(node: Node.Decl.Suite): KNode.Decl {
+        node.setUp // TODO:
+        node.tearDown // TODO:
+        return KNode.Decl.Structured(
+                mods = listOf(),
+                form = KNode.Decl.Structured.Form.CLASS,
+                name = node.name,
+                typeParams = listOf(),
+                primaryConstructor = null,
+                parentAnns = listOf(),
+                parents = listOf(),
+                typeConstraints = listOf(),
+                members = node.cases.map { visit(it) }
+        )
+    }
+
+    private fun visit(node: Node.Expr.Case): KNode.Decl.Func {
+        return when(node) {
+            is Node.Expr.Case.CaseBlock ->
+                KNode.Decl.Func(
+                    mods = listOf(KNode.Modifier.AnnotationSet(
+                            target = null,
+                            anns = listOf(KNode.Modifier.AnnotationSet.Annotation(
+                                    names = listOf("Test"),
+                                    typeArgs = listOf(),
+                                    args = listOf(),
+                            ))
+                    )),
+                    typeParams = listOf(),
+                    receiverType = null,
+                    name = node.name,
+                    paramTypeParams = listOf(),
+                    params = listOf(),
+                    type = null,
+                    typeConstraints = listOf(),
+                    body = KNode.Decl.Func.Body.Block(visit(node.body))
+                )
+            else -> TODO()
         }
     }
 
@@ -327,6 +371,42 @@ class IR2KtConverter {
                                         token = KNode.Expr.UnaryOp.Token.NEG
                                 ),
                                 prefix = true
+                        )
+                    }
+                }
+            }
+            is Node.Expr.Assert -> {
+                when (node.kind) {
+                    is Node.Expr.Assert.Kind.AssertEqual -> {
+                        KNode.Expr.Call(
+                                expr = KNode.Expr.Name(name = "assertEquals"),
+                                typeArgs = listOf(),
+                                args = mutableListOf(
+                                        KNode.ValueArg(
+                                                name = null,
+                                            asterisk = false,
+                                                expr = visit(node.kind.excepted)
+                                        ),
+                                        KNode.ValueArg(
+                                                name = null,
+                                        asterisk = false,
+                                        expr = visit(node.kind.actual)
+                                        )
+                                ).apply {
+                                    node.kind.message?.let {
+                                        add(KNode.ValueArg(
+                                                    name = null,
+                                                    asterisk = false,
+                                                    expr = visit(Node.Expr.Constant(
+                                                            kind = Node.Expr.Constant.Kind.STRING,
+                                                            value = it
+                                                        )
+                                                    )
+                                            )
+                                        )
+                                    }
+                                },
+                                lambda = null
                         )
                     }
                 }
