@@ -17,7 +17,8 @@ import java.nio.file.Paths
 fun main(args: Array<String>) {
     val code = """
         package foo
-
+        
+        @Serializable
         fun baz(a:String) {
           for(i in listOf(1)) {
             println(i)
