@@ -175,9 +175,12 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         )
 
     def visit_Slice(self, node):
-        print('warn: Unsupported', node)
-        print(node.upper, node.step, node.lower)
-        return self.Unsupported()
+        args = [node.lower, node.upper, node.step]
+        args = [ir_ast.Constant(kind=ir_ast.ConstantKind.NULL, value="NULL") if i is None else self.visit(i) for i in args]
+        return ir_ast.Call(
+            value=ir_ast.Name('slice'),
+            args=[ir_ast.Call.Arg(name=None, value=i) for i in args]
+        )
 
     def visit_Tuple(self, node):
         return ir_ast.Tuple(
