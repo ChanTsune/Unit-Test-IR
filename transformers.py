@@ -2,6 +2,15 @@ import ast
 from ast import NodeTransformer
 
 
+class InlineTransformer(NodeTransformer):
+
+    def visit_Call(self, node):
+        if isinstance(node.func, ast.Name):
+            if node.func.id == 'EQ':
+                node.func = ast.Attribute(
+                    value=ast.Name('self'), attr='checkequal')
+        return node
+
 class MyTransformer(NodeTransformer):
 
     def visit_Call(self, node):

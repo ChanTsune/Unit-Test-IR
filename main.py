@@ -4,6 +4,7 @@ from UTIR import serializer
 from UTIR import dumper
 from UTIR import generator
 from UTIR.transformer import DefaultIRTransformer
+from UTIR.transformer import NodeTransformer
 
 
 class MyIRTransformer(DefaultIRTransformer):
@@ -21,10 +22,10 @@ def main(argv):
 def _main(argv):
     from UTIR import Code2IR, IR2Code
     from UTIR.dumper import JsonDumper
-    from transformers import MyTransformer
+    from transformers import MyTransformer, InlineTransformer
 
     class MyCode2IR(Code2IR):
-        py_ast_transformer_classes = [MyTransformer]
+        py_ast_transformer_classes = [InlineTransformer, MyTransformer]
         ir_ast_transformer_classes = [MyIRTransformer]
         ir_ast_dumper_class = JsonDumper
 
