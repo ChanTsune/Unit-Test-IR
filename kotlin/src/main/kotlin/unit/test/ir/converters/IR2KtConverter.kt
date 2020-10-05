@@ -236,7 +236,7 @@ class IR2KtConverter {
                     }
                     Node.Expr.Constant.Kind.NULL -> {
                         KNode.Expr.Const(
-                                value = "",
+                                value = "null",
                                 form = KNode.Expr.Const.Form.NULL
                         )
                     }
