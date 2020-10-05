@@ -33,7 +33,6 @@ class DefaultIRTransformer(NodeTransformer):
                                 kind=ast.AssertEqual(
                                     excepted=args[0],
                                     actual=args[1],
-                                    message=None,
                                 )
                             )
                         elif len(node.args) == 3:
@@ -41,7 +40,7 @@ class DefaultIRTransformer(NodeTransformer):
                                 kind=ast.AssertEqual(
                                     excepted=args[0],
                                     actual=args[1],
-                                    message=args[2],
+                                    message=args[2], # TODO: support
                                 )
                             )
                     print(f'TODO: ~~ {node.value.right.name}')
