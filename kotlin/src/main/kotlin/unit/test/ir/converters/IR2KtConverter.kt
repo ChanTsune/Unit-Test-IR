@@ -262,9 +262,17 @@ class IR2KtConverter {
                 }
             }
             is Node.Expr.For -> {
+                fun visit(node:Node.Decl.Var): KNode.Decl.Property.Var {
+                    return KNode.Decl.Property.Var(
+                            name = node.name,
+                            type = node.type?.let { KNode.Type(mods = listOf(), ref=KNode.TypeRef.Simple(
+                                    pieces = listOf(KNode.TypeRef.Simple.Piece(node.type, listOf()))
+                            )) }
+                    )
+                }
                 KNode.Expr.For(
                         anns = listOf(),
-                        vars = listOf(),
+                        vars = listOf(visit(node.value)),
                         inExpr = visit(node.generator),
                         body = KNode.Expr.Brace(
                                 params = listOf(),
