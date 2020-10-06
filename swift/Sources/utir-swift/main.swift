@@ -33,7 +33,7 @@ class MyVisitor: SyntaxAnyVisitor {
 }
 
 
-func main(_ argv: [String]) {
+func _main(_ argv: [String]) {
     do {
         print(FileManager.default.currentDirectoryPath)
         let file = "/Users/tsunekwataiki/Documents/GitHub/Unit-Test-IR/swift/Sources/utir-swift/main.swift"
@@ -44,6 +44,30 @@ func main(_ argv: [String]) {
         print(incremented)
     } catch {
         print(error)
+    }
+}
+
+extension Syntax {
+    func write(to: URL,atomically: Bool, encoding: String.Encoding) throws {
+        var text = ""
+        write(to: &text)
+        try text.write(to: to, atomically: atomically, encoding: encoding)
+    }
+}
+
+func main(_ argv: [String]) {
+    print(argv)
+    let file = File(body: [])
+    if let syntax = IR2SWConverter().visit(file) {
+        print(syntax)
+        if argv.count >= 2 {
+            let writePath = argv[1]
+            do {
+                try syntax.write(to: URL(fileURLWithPath: writePath), atomically: false, encoding: .utf8)
+            } catch {
+                print(error)
+            }
+        }
     }
 }
 

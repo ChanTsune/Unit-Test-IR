@@ -6,9 +6,21 @@
 //
 
 import SwiftSyntax
+import SwiftSyntaxBuilder
+
 
 class IR2SWConverter {
-    func visit(_ node: Syntax) {
-
+    func visit(_ node: Node) -> Syntax? {
+        switch node {
+        case is File:
+            let fileNode = node as! File
+            print(fileNode)
+            return SourceFile {
+                Import("XCTest")
+            }.buildSyntax(format: Format(), leadingTrivia: .zero)
+        default:
+            print("unsupported node", node)
+        }
+        return nil
     }
 }
