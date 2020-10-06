@@ -95,11 +95,11 @@ struct Assert: Expr, IR {
     var kind: AssertKind
 }
 
-protocol AssertKind: IR { }
+protocol AssertKind: Expr, IR { }
 
 struct AssertEqual: AssertKind {
-    var excepted: Node
-    var actual: Node
+    var excepted: Expr
+    var actual: Expr
     var message: String?
 }
 
