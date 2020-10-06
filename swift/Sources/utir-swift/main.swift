@@ -47,14 +47,6 @@ func _main(_ argv: [String]) {
     }
 }
 
-extension Syntax {
-    func write(to: URL,atomically: Bool, encoding: String.Encoding) throws {
-        var text = ""
-        write(to: &text)
-        try text.write(to: to, atomically: atomically, encoding: encoding)
-    }
-}
-
 func main(_ argv: [String]) {
     print(argv)
     let file = File(body: [])
