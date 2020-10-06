@@ -17,7 +17,7 @@ struct File: Node {
 }
 
 struct Block: Node {
-    var body:[Stmt]
+    var body: [Stmt]
 }
 
 protocol Stmt: Node { }
@@ -55,21 +55,21 @@ struct Class: Decl {
     var fields: [Decl]
 }
 
-protocol IR: Decl { }
+protocol IR { }
 
-struct Suite: IR {
+struct Suite: Decl, IR {
     var setUp: [Expr]
     var cases: [Case]
     var tearDown: [Expr]
 }
-protocol Case: IR { }
+protocol Case: Expr { }
 
 struct Set: Case {
-    var target: Node
+    var target: Expr
     var call: String
     var params: [Params]
     var kind: Kind
-    enum Kind {
+    enum Kind: String, Codable {
         case METHOD
         case MEMBER
         case FUNCTION
@@ -91,7 +91,7 @@ struct CaseExpr: Case {
     var asserts: [Assert]
 }
 
-struct Assert: IR {
+struct Assert: Expr, IR {
     var kind: AssertKind
 }
 
@@ -113,7 +113,7 @@ struct Constant: Expr {
     var kind: Kind
     var value: String
 
-    enum Kind {
+    enum Kind: String, Codable {
         case STRING
         case BYTES
         case INTEGER
@@ -136,7 +136,7 @@ struct BinOp: Expr {
     var kind: Kind
     var left: Expr
 
-    enum Kind {
+    enum Kind: String, Codable {
         case DOT
         case ASSIGN
         case ADD
@@ -152,7 +152,7 @@ struct UnaryOp: Expr {
     var kind: Kind
     var value: Expr
 
-    enum Kind {
+    enum Kind: String, Codable {
         case PLUS
         case MINUS
     }
