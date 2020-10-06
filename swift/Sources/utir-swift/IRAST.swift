@@ -13,19 +13,20 @@ protocol Node: AST { }
 
 struct File: Node {
     var body: [Decl]
+    var version: Int
 }
 
 struct Block: Node {
     var body:[Stmt]
 }
 
-protocol Stmt { }
+protocol Stmt: Node { }
 
 struct StmtDecl: Stmt {
     var decl: Decl
 }
 
-struct StmtExpr {
+struct StmtExpr: Stmt {
     var expr: Expr
 }
 
