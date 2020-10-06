@@ -15,7 +15,9 @@ struct File: Node {
     var body: [Decl]
 }
 
-protocol Block: Node { }
+struct Block: Node {
+    var body:[Stmt]
+}
 
 protocol Stmt { }
 
@@ -55,9 +57,9 @@ struct Class: Decl {
 protocol IR: Decl { }
 
 struct Suite: IR {
-    var setUp: [Node] // Expr
+    var setUp: [Expr]
     var cases: [Case]
-    var tearDown: [Node] // Expr
+    var tearDown: [Expr]
 }
 protocol Case: IR { }
 
@@ -76,15 +78,15 @@ struct Set: Case {
 }
 struct Params: IR {
     var name: String
-    var args: [String: Node]
-    var excepted: Node
-    var actual: Node
+    var args: [String: Expr]
+    var excepted: Expr
+    var actual: Expr
     var message: String?
 }
 
 struct CaseExpr: Case {
     var name: String
-    var expr: [Node] // Expr
+    var expr: [Expr]
     var asserts: [Assert]
 }
 
