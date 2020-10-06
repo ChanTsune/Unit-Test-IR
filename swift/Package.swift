@@ -25,6 +25,7 @@ let package = Package(
         ),
         .testTarget(
             name: "utir-swiftTests",
-            dependencies: ["utir-swift"]),
+            dependencies: ["utir-swift"]
+        ),
     ]
 )
