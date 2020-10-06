@@ -17,7 +17,12 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "utir-swift",
-            dependencies: ["SwiftSyntax"]),
+            dependencies: [
+                "SwiftSyntax",
+                .product(name: "SwiftSyntaxBuilder", package: "SwiftSyntax"),
+                "Yams",
+            ]
+        ),
         .testTarget(
             name: "utir-swiftTests",
             dependencies: ["utir-swift"]),
