@@ -7,9 +7,24 @@
 
 import Foundation
 
-protocol AST { }
+protocol AST: Codable { }
 
 protocol Node: AST { }
+extension Node {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Self.self) {
+            self = x
+            return
+        }
+        throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Instruction"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
+    }
+}
 
 struct File: Node {
     var body: [Decl]
@@ -21,6 +36,21 @@ struct Block: Node {
 }
 
 protocol Stmt: Node { }
+extension Stmt {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Self.self) {
+            self = x
+            return
+        }
+        throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Instruction"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
+    }
+}
 
 struct StmtDecl: Stmt {
     var decl: Decl
@@ -31,6 +61,21 @@ struct StmtExpr: Stmt {
 }
 
 protocol Decl: Node { }
+extension Decl {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Self.self) {
+            self = x
+            return
+        }
+        throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Instruction"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
+    }
+}
 
 struct Var: Decl {
     var name: String
@@ -104,6 +149,21 @@ struct AssertEqual: AssertKind {
 }
 
 protocol Expr: Node { }
+extension Expr {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Self.self) {
+            self = x
+            return
+        }
+        throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Instruction"))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
+    }
+}
 
 struct Name: Expr {
     var name: String
