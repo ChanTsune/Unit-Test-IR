@@ -1,4 +1,5 @@
 import SwiftSyntax
+import Yams
 import Foundation
 
 /// AddOneToIntegerLiterals will visit each token in the Syntax tree, and
@@ -49,16 +50,19 @@ func _main(_ argv: [String]) {
 
 func main(_ argv: [String]) {
     print(argv)
-    let file = File(body: [], version: 1)
-    if let syntax = IR2SWConverter().visit(file) {
-        print(syntax)
-        if argv.count >= 2 {
-            let writePath = argv[1]
-            do {
-                try syntax.write(to: URL(fileURLWithPath: writePath), atomically: false, encoding: .utf8)
-            } catch {
-                print(error)
+    if argv.count >= 3 {
+        let inputFilePath = argv[1]
+        let outputFilePath = argv[2]
+        let decodeer = YAMLDecoder()
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: inputFilePath))
+            let file = try decodeer.decode(File.self, from: data)
+            if let syntax = IR2SWConverter().visit(file) {
+                print(syntax)
+                try syntax.write(to: URL(fileURLWithPath: outputFilePath), atomically: false, encoding: .utf8)
             }
+        } catch {
+            print(error)
         }
     }
 }
