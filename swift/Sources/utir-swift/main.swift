@@ -49,7 +49,7 @@ func _main(_ argv: [String]) {
 
 func main(_ argv: [String]) {
     print(argv)
-    let file = File(body: [])
+    let file = File(body: [], version: 1)
     if let syntax = IR2SWConverter().visit(file) {
         print(syntax)
         if argv.count >= 2 {
