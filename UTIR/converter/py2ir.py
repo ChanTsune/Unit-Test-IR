@@ -241,9 +241,31 @@ class PyAST2IRASTConverter(PyNodeTransformer):
                             self.visit(node.right))
 
     def visit_Compare(self, node):
-        print('warn: Unsupported', node)
-        print(node.comparators, node.left, node.ops)
-        return self.Unsupported()
+        def opkind_map(node):
+            if isinstance(node, py_ast.In):
+                return ir_ast.BinOpKind.IN
+            elif isinstance(node, py_ast.NotEq):
+                return ir_ast.BinOpKind.NOT_EQUAL
+            else:
+                raise Exception('Unsupported BinOp kind', node.ops)
+        if isinstance(node.ops, list):
+            if len(node.ops) == 1:
+                if isinstance(node.comparators, list) and len(node.comparators) == 1:
+                    return ir_ast.BinOp(
+                        self.visit(node.left),
+                        opkind_map(node.ops[0]),
+                        self.visit(node.comparators[0]),
+                    )
+            print('~~~~warn: Unsupported', node)
+            print(node.comparators, node.left, node.ops)
+            return self.Unsupported()
+        else:
+            op_kind = opkind_map(node.ops)
+        return ir_ast.BinOp(
+            self.visit(node.left),
+            op_kind,
+            self.visit(node.comparators),
+        )
 
     def visit_AugAssign(self, node):
         if isinstance(node.op, py_ast.Add):
