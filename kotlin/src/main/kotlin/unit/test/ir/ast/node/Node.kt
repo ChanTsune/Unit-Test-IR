@@ -165,6 +165,8 @@ sealed class Node {
                 MOD,
                 LEFT_SHIFT,
                 RIGHT_SHIFT,
+                NOT_EQUAL,
+                IN,
                 ;
 
                 companion object : EnumExtension<Kind>
