@@ -8,5 +8,7 @@ ir_gen:
 run_kotlin: ir_gen
 	cd ./kotlin && ./gradlew run --args="../${OUTPUT}"
 
-run_swift: ir_gen
+run_swift_only:
 	cd ./swift && swift run utir-swift ../${OUTPUT} ../test_string.swift
+
+run_swift: ir_gen run_swift_only
