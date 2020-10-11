@@ -10,10 +10,9 @@ import SwiftSyntaxBuilder
 
 
 class IR2SWConverter {
-    func visit(_ node: Node) -> Syntax? {
+    func visit(_ node: TopLevelNode) -> Syntax? {
         switch node {
-        case is File:
-            let fileNode = node as! File
+        case .file(let fileNode):
             print(fileNode)
             return SourceFile {
                 Import("XCTest")

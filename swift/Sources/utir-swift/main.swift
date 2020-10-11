@@ -56,14 +56,24 @@ func main(_ argv: [String]) {
         let decodeer = YAMLDecoder()
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: inputFilePath))
-            let file = try decodeer.decode(File.self, from: data)
-            if let syntax = IR2SWConverter().visit(file) {
-                print(syntax)
-                try syntax.write(to: URL(fileURLWithPath: outputFilePath), atomically: false, encoding: .utf8)
+            let file = try decodeer.decode(TopLevelNode.self, from: data)
+            switch file {
+            case .file(let x):
+                let topLevel = TopLevelNode.file(x)
+                if let syntax = IR2SWConverter().visit(topLevel) {
+                    print(syntax)
+                    try syntax.write(to: URL(fileURLWithPath: outputFilePath), atomically: false, encoding: .utf8)
+                }
+            default:
+                print("default")
             }
         } catch {
             print(error)
         }
+        let encoder = YAMLEncoder()
+        let t:TopLevelNode = .file(.init(body: [], version: 1))
+        let v = try? encoder.encode(t)
+        print(v)
     }
 }
 
