@@ -11,8 +11,17 @@ class IR2KtConverter {
             is Node.File -> {
                 KNode.File(
                         anns = listOf(),
-                        pkg = null,
-                        imports = listOf(),
+                        pkg = KNode.Package(
+                                mods = listOf(),
+                                names = listOf("com","github","unit","ir","generated"),
+                        ),
+                        imports = listOf(
+                                KNode.Import(
+                                        names = listOf("kotlin","test"),
+                                        wildcard = true,
+                                        alias = null
+                                )
+                        ),
                         decls = node.body.map { visit(it) }
                 )
             }
