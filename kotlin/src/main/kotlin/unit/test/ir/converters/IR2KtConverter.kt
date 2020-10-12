@@ -207,6 +207,16 @@ class IR2KtConverter {
                                     str = "shr"
                             )
                         }
+                        Node.Expr.BinOp.Kind.NOT_EQUAL -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.NEQ
+                            )
+                        }
+                        Node.Expr.BinOp.Kind.IN -> {
+                            KNode.Expr.BinaryOp.Oper.Token(
+                                    token = KNode.Expr.BinaryOp.Token.IN
+                            )
+                        }
                     }
                 }
                 KNode.Expr.BinaryOp(
