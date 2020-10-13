@@ -120,7 +120,32 @@ class IR2SWConverter {
         return nil
     }
     func visit(_ node: Var) -> DeclSyntax? {
-        return nil
+        let source = SyntaxFactory.makeVariableDecl(
+            attributes: nil,
+            modifiers: nil,
+            letOrVarKeyword: SyntaxFactory.makeLetKeyword(),
+            bindings: SyntaxFactory.makePatternBindingList([])
+                .appending(SyntaxFactory.makePatternBinding(
+                    pattern: PatternSyntax(IdentifierPatternSyntax {
+                        $0.useIdentifier(SyntaxFactory.makeIdentifier(node.name))
+                    }),
+                    typeAnnotation: nil,
+                    initializer: InitializerClauseSyntax {
+                        $0.useEqual(SyntaxFactory.makeEqualToken())
+                        if let nodeExpr = node.expr {
+                            if let expr = visit(nodeExpr) {
+                                $0.useValue(expr)
+                            } else {
+                                print("Skipped \(nodeExpr)")
+                            }
+                        }
+                    },
+                    accessor: nil,
+                    trailingComma: nil
+                    )
+                )
+        )
+        return DeclSyntax(source)
     }
     //MARK:- Expr
     func visit(_ node: Expr) -> ExprSyntax? {
