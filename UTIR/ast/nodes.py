@@ -186,6 +186,8 @@ class BinOpKind(Enum):
     MOD = 'MOD'
     LEFT_SHIFT = 'LEFT_SHIFT'
     RIGHT_SHIFT = 'RIGHT_SHIFT'
+    IN = 'IN'
+    NOT_EQUAL = 'NOT_EQUAL'
 
 
 @dataclass
