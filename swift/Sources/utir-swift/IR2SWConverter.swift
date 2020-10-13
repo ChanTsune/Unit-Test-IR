@@ -80,7 +80,7 @@ class IR2SWConverter {
                     if let decl = visit(decl) {
                         let member = SyntaxFactory
                             .makeMemberDeclListItem(decl: decl, semicolon: nil)
-                          .withLeadingTrivia(.newlines(1) + format._makeIndent())
+                            .withLeadingTrivia(.newlines(1) + format._makeIndent())
                         $0.addMember(member)
                     } else {
                         print("Skipped \(decl)")
@@ -99,24 +99,24 @@ class IR2SWConverter {
                 $0.useBody(body)
             }
             $0.useSignature(SyntaxFactory.makeFunctionSignature(
-                                input: ParameterClauseSyntax {
-                                    $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
-                                    $0.useRightParen(SyntaxFactory.makeRightParenToken())
-                                    for p in node.args {
-                                        if let param = visit(p) {
-                                            $0.addParameter(param)
-                                        } else {
-                                            print("Skipped \(p)")
-                                        }
-                                    }
-                                },
-                                throwsOrRethrowsKeyword: nil,
-                                output: nil)
+                input: ParameterClauseSyntax {
+                    $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+                    $0.useRightParen(SyntaxFactory.makeRightParenToken())
+                    for p in node.args {
+                        if let param = visit(p) {
+                            $0.addParameter(param)
+                        } else {
+                            print("Skipped \(p)")
+                        }
+                    }
+                },
+                throwsOrRethrowsKeyword: nil,
+                output: nil)
             )
         }
         return DeclSyntax(source)
     }
-    func visit(_ node:Func.Arg) -> FunctionParameterSyntax? {
+    func visit(_ node: Func.Arg) -> FunctionParameterSyntax? {
         return nil
     }
     func visit(_ node: Var) -> DeclSyntax? {
