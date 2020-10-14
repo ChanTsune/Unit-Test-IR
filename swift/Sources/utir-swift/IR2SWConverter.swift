@@ -42,7 +42,7 @@ class IR2SWConverter {
     func visit(_ node: Block) -> CodeBlockSyntax? {
         return CodeBlockSyntax {
             $0.useLeftBrace(SyntaxFactory.makeLeftBraceToken())
-            $0.useRightBrace(SyntaxFactory.makeRightBraceToken())
+            $0.useRightBrace(SyntaxFactory.makeRightBraceToken().withLeadingTrivia(.newlines(1)))
         }
     }
     func visit(_ node: Decl) -> DeclSyntax? {
@@ -73,7 +73,7 @@ class IR2SWConverter {
                     SyntaxFactory.makeToken(.leftBrace, presence: .present).withLeadingTrivia(.spaces(1))
                 )
                 $0.useRightBrace(
-                    SyntaxFactory.makeToken(.rightBrace, presence: .present).withLeadingTrivia(.spaces(1))
+                    SyntaxFactory.makeToken(.rightBrace, presence: .present).withLeadingTrivia(.spaces(1) + .newlines(1))
                 )
                 let format = Format()
                 for decl in node.fields {
@@ -102,9 +102,13 @@ class IR2SWConverter {
                 input: ParameterClauseSyntax {
                     $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
                     $0.useRightParen(SyntaxFactory.makeRightParenToken())
-                    for p in node.args {
+                    for (i, p) in node.args.enumerated() {
                         if let param = visit(p) {
-                            $0.addParameter(param)
+                            if i == node.args.count-1 {
+                                $0.addParameter(param.withTrailingComma(nil))
+                            } else {
+                                $0.addParameter(param)
+                            }
                         } else {
                             print("Skipped \(p)")
                         }
@@ -117,7 +121,22 @@ class IR2SWConverter {
         return DeclSyntax(source)
     }
     func visit(_ node: Func.Arg) -> FunctionParameterSyntax? {
-        return nil
+        let field = node.field
+        return SyntaxFactory.makeFunctionParameter(
+            attributes: nil,
+            firstName: SyntaxFactory.makeIdentifier(node.field.name),
+            secondName: SyntaxFactory.makeIdentifier(node.field.name).withLeadingTrivia(.spaces(1)),
+            colon: SyntaxFactory.makeColonToken(),
+            type: SyntaxFactory.makeTypeIdentifier(node.field.type ?? "Any"),
+            ellipsis: nil,// SyntaxFactory.makeEllipsisToken()
+            defaultArgument: field.expr != nil ? InitializerClauseSyntax {
+                $0.useEqual(SyntaxFactory.makeEqualToken())
+                if let e = field.expr, let expr = visit(e) {
+                    $0.useValue(expr)
+                }
+            } : nil,
+            trailingComma: SyntaxFactory.makeCommaToken() // TODO: comma
+        )
     }
     func visit(_ node: Var) -> DeclSyntax? {
         let source = SyntaxFactory.makeVariableDecl(
