@@ -43,8 +43,28 @@ class IR2SWConverter {
         return CodeBlockSyntax {
             $0.useLeftBrace(SyntaxFactory.makeLeftBraceToken())
             $0.useRightBrace(SyntaxFactory.makeRightBraceToken().withLeadingTrivia(.newlines(1)))
+            for stmt in node.body {
+                if let stmt = visit(stmt) {
+                    $0.addStatement(SyntaxFactory.makeCodeBlockItem(
+                        item: stmt,
+                        semicolon: nil,
+                        errorTokens: nil
+                    ))
+                } else {
+                    print("Skipped \(stmt)")
+                }
+            }
         }
     }
+    func visit(_ node:Stmt) -> Syntax? {
+        switch node {
+        case .decl(let x):
+            return Syntax(visit(x.decl))
+        case .expr(let x):
+            return Syntax(visit(x.expr))
+        }
+    }
+    //MARK:- Decl
     func visit(_ node: Decl) -> DeclSyntax? {
         switch node {
         case .class_(let x):
@@ -57,7 +77,6 @@ class IR2SWConverter {
             return visit(x)
         }
     }
-    //MARK:- Decl
     func visit(_ node: Suite) -> DeclSyntax? {
         return Struct(node.name) {
 
