@@ -306,10 +306,6 @@ extension Expr {
             self = .call(x)
             return
         }
-        if let x = try? container.decode(Throw.self) {
-            self = .throw_(x)
-            return
-        }
         if let x = try? container.decode(Return.self) {
             self = .return_(x)
             return
@@ -340,6 +336,10 @@ extension Expr {
         }
         if let x = try? container.decode(Constant.self) {
             self = .constant(x)
+            return
+        }
+        if let x = try? container.decode(Throw.self) {
+            self = .throw_(x)
             return
         }
         throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
