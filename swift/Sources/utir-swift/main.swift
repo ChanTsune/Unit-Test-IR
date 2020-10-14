@@ -70,10 +70,6 @@ func main(_ argv: [String]) {
         } catch {
             print(error)
         }
-        let encoder = YAMLEncoder()
-        let t:TopLevelNode = .file(.init(body: [], version: 1))
-        let v = try? encoder.encode(t)
-        print(v)
     }
 }
 
