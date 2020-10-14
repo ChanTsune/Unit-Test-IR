@@ -189,15 +189,15 @@ class IR2SWConverter {
     func visit(_ node: Expr) -> ExprSyntax? {
         switch node {
         case .name(let x):
-            return nil
+            return visit(x)
         case .constant(let x):
-            return nil
+            return visit(x)
         case .list(let x):
             return nil
         case .tuple(let x):
             return nil
         case .binOp(let x):
-            return nil
+            return visit(x)
         case .unaryOp(let x):
             return nil
         case .subscript_(let x):
@@ -216,6 +216,88 @@ class IR2SWConverter {
             return nil
         case .assert(let x):
             return nil
+        }
+    }
+    func visit(_ node: BinOp) -> ExprSyntax? {
+        if node.kind == .DOT {
+            switch node.right {
+            case .name(let x):
+                return ExprSyntax(SyntaxFactory.makeMemberAccessExpr(
+                    base: visit(node.left),
+                    dot: SyntaxFactory.makeIdentifier("."), // TODO: dot
+                    name: SyntaxFactory.makeIdentifier(x.name),
+                    declNameArguments: nil
+                ))
+            default:
+                fatalError("dot op right must be Name class! but \(node.right) was recived.")
+            }
+        }
+        var binList:[ExprSyntax] = []
+        if let left = visit(node.left) {
+            binList.append(left)
+        } else {
+            print("Skipped \(node.left)")
+        }
+        switch node.kind {
+        case .ADD:
+            let binOp = BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("+").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }
+            binList.append(ExprSyntax(binOp))
+        case .SUB:
+            let binOp = BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("-").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }
+            binList.append(ExprSyntax(binOp))
+        case .ASSIGN:
+            binList.append(ExprSyntax(AssignmentExprSyntax {
+                $0.useAssignToken(
+                    SyntaxFactory.makeToken(.equal, presence: .present).withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        default:
+            let binOp = BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("UNSUPPORTED").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }
+            binList.append(ExprSyntax(binOp))
+        }
+        if let right = visit(node.right) {
+            binList.append(right)
+        } else {
+            print("Skipped \(node.right)")
+        }
+        return ExprSyntax(SyntaxFactory.makeSequenceExpr(elements: SyntaxFactory.makeExprList(binList)).withLeadingTrivia(.newlines(1)))
+    }
+    func visit(_ node: Name) -> ExprSyntax? {
+        let source = SyntaxFactory.makeIdentifierExpr(
+            identifier: SyntaxFactory.makeIdentifier(node.name),
+            declNameArguments: nil
+        )
+        return ExprSyntax(source)
+    }
+    func visit(_ node:Constant) -> ExprSyntax? {
+        switch node.kind {
+        case .STRING, .BYTES:
+            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value))
+        case .INTEGER:
+            return ExprSyntax(SyntaxFactory.makeIntegerLiteralExpr(digits: SyntaxFactory.makeIntegerLiteral(node.value)))
+        case .FLOAT:
+            return ExprSyntax(SyntaxFactory.makeFloatLiteralExpr(floatingDigits: SyntaxFactory.makeFloatingLiteral(node.value)))
+        case .BOOLEAN:
+            return ExprSyntax(SyntaxFactory.makeBooleanLiteralExpr(
+                                booleanLiteral: SyntaxFactory.makeToken(
+                                    node.value.lowercased() == "true" ? .trueKeyword : .falseKeyword,
+                                    presence: .missing
+                                )
+            ))
+        case .NULL:
+            return ExprSyntax(SyntaxFactory.makeNilLiteralExpr(nilKeyword: SyntaxFactory.makeNilKeyword()))
         }
     }
 }
