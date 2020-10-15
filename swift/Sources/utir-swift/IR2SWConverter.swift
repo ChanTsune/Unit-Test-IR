@@ -224,7 +224,7 @@ class IR2SWConverter {
             case .name(let x):
                 return ExprSyntax(SyntaxFactory.makeMemberAccessExpr(
                     base: visit(node.left),
-                    dot: SyntaxFactory.makeToken(.period, presence: .present),
+                    dot: SyntaxFactory.makePeriodToken(),
                     name: SyntaxFactory.makeIdentifier(x.name),
                     declNameArguments: nil
                 ))
