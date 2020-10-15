@@ -42,8 +42,6 @@ func _main(_ argv: [String]) {
         let url = URL(fileURLWithPath: file)
         let sourceFile = try SyntaxParser.parse(url)
         MyVisitor().walk(sourceFile)
-        let incremented = AddOneToIntegerLiterals().visit(sourceFile)
-        print(incremented)
     } catch {
         print(error)
     }
@@ -57,27 +55,20 @@ func main(_ argv: [String]) {
         let decodeer = YAMLDecoder()
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: inputFilePath))
-            let file = try decodeer.decode(TopLevelNode.self, from: data)
-            switch file {
-            case .file(let x):
-                let topLevel = TopLevelNode.file(x)
-                if let syntax = IR2SWConverter().visit(topLevel) {
-                    print(syntax)
-                    let outputURL = URL(fileURLWithPath: outputFilePath)
-                    do {
-                        try syntax.write(to: outputURL, atomically: false, encoding: .utf8)
-                        let linter = SwiftLinter.init(configuration: .init(), diagnosticEngine: .init())
-                        try linter.lint(syntax: syntax.as(SourceFileSyntax.self)!, assumingFileURL: .init(fileURLWithPath: "source"))
-                        let formatter = SwiftFormatter.init(configuration: .init())
-                        var txt = ""
-                        try formatter.format(syntax: syntax.as(SourceFileSyntax.self)!, assumingFileURL: nil, to: &txt)
-                        try txt.write(to: outputURL, atomically: false, encoding: .utf8)
-                    } catch {
-                        print(error)
-                    }
+            let file = try decodeer.decode(File.self, from: data)
+            if let syntax = IR2SWConverter().visit(file) {
+                let outputURL = URL(fileURLWithPath: outputFilePath)
+                do {
+                    try Syntax(syntax).write(to: outputURL, atomically: false, encoding: .utf8)
+                    let linter = SwiftLinter.init(configuration: .init(), diagnosticEngine: .init())
+                    try linter.lint(syntax: syntax, assumingFileURL: .init(fileURLWithPath: "source"))
+                    let formatter = SwiftFormatter.init(configuration: .init())
+                    var txt = ""
+                    try formatter.format(syntax: syntax, assumingFileURL: nil, to: &txt)
+                    try txt.write(to: outputURL, atomically: false, encoding: .utf8)
+                } catch {
+                    print(error)
                 }
-            default:
-                print("default")
             }
         } catch {
             print(error)
