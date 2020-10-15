@@ -56,7 +56,7 @@ class IR2SWConverter {
             }
         }
     }
-    func visit(_ node:Stmt) -> Syntax? {
+    func visit(_ node: Stmt) -> Syntax? {
         switch node {
         case .decl(let x):
             return Syntax(visit(x.decl))
@@ -96,6 +96,7 @@ class IR2SWConverter {
                 )
                 let format = Format()
                 for decl in node.fields {
+                    print("~~\(node.name)~~")
                     if let decl = visit(decl) {
                         let member = SyntaxFactory
                             .makeMemberDeclListItem(decl: decl, semicolon: nil)
@@ -123,7 +124,7 @@ class IR2SWConverter {
                     $0.useRightParen(SyntaxFactory.makeRightParenToken())
                     for (i, p) in node.args.enumerated() {
                         if let param = visit(p) {
-                            if i == node.args.count-1 {
+                            if i == node.args.count - 1 {
                                 $0.addParameter(param.withTrailingComma(nil))
                             } else {
                                 $0.addParameter(param)
@@ -147,13 +148,13 @@ class IR2SWConverter {
             secondName: SyntaxFactory.makeIdentifier(node.field.name).withLeadingTrivia(.spaces(1)),
             colon: SyntaxFactory.makeColonToken(),
             type: SyntaxFactory.makeTypeIdentifier(node.field.type ?? "Any"),
-            ellipsis: nil,// SyntaxFactory.makeEllipsisToken()
+            ellipsis: nil, // SyntaxFactory.makeEllipsisToken()
             defaultArgument: field.expr != nil ? InitializerClauseSyntax {
                 $0.useEqual(SyntaxFactory.makeEqualToken())
                 if let e = field.expr, let expr = visit(e) {
                     $0.useValue(expr)
                 }
-            } : nil,
+            }: nil,
             trailingComma: SyntaxFactory.makeCommaToken() // TODO: comma
         )
     }
@@ -193,29 +194,29 @@ class IR2SWConverter {
         case .constant(let x):
             return visit(x)
         case .list(let x):
-            return nil
+            return visit(x)
         case .tuple(let x):
-            return nil
+            return visit(x)
         case .binOp(let x):
             return visit(x)
         case .unaryOp(let x):
-            return nil
+            return visit(x)
         case .subscript_(let x):
-            return nil
+            return visit(x)
         case .call(let x):
-            return nil
+            return visit(x)
         case .throw_(let x):
-            return nil
+            return visit(x)
         case .return_(let x):
-            return nil
+            return visit(x)
         case .for_(let x):
-            return nil
+            return visit(x)
         case .try_(let x):
-            return nil
+            return visit(x)
         case .cases(let x):
-            return nil
+            return visit(x)
         case .assert(let x):
-            return nil
+            return visit(x)
         }
     }
     func visit(_ node: BinOp) -> ExprSyntax? {
@@ -232,7 +233,7 @@ class IR2SWConverter {
                 fatalError("dot op right must be Name class! but \(node.right) was recived.")
             }
         }
-        var binList:[ExprSyntax] = []
+        var binList: [ExprSyntax] = []
         if let left = visit(node.left) {
             binList.append(left)
         } else {
@@ -281,7 +282,7 @@ class IR2SWConverter {
         )
         return ExprSyntax(source)
     }
-    func visit(_ node:Constant) -> ExprSyntax? {
+    func visit(_ node: Constant) -> ExprSyntax? {
         switch node.kind {
         case .STRING, .BYTES:
             return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value))
@@ -291,13 +292,56 @@ class IR2SWConverter {
             return ExprSyntax(SyntaxFactory.makeFloatLiteralExpr(floatingDigits: SyntaxFactory.makeFloatingLiteral(node.value)))
         case .BOOLEAN:
             return ExprSyntax(SyntaxFactory.makeBooleanLiteralExpr(
-                                booleanLiteral: SyntaxFactory.makeToken(
-                                    node.value.lowercased() == "true" ? .trueKeyword : .falseKeyword,
-                                    presence: .missing
-                                )
+                booleanLiteral: SyntaxFactory.makeToken(
+                    node.value.lowercased() == "true" ? .trueKeyword : .falseKeyword,
+                    presence: .missing
+                )
             ))
         case .NULL:
             return ExprSyntax(SyntaxFactory.makeNilLiteralExpr(nilKeyword: SyntaxFactory.makeNilKeyword()))
         }
     }
+    func visit(_ node: List) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Tuple) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: UnaryOp) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Subscript) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Call) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Throw) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Return) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: For) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Try) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Case) -> ExprSyntax? {
+        switch node {
+        case .caseBlock(let x):
+            return visit(x)
+        }
+    }
+    func visit(_ node: CaseBlock) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Assert) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: AssertEqual) -> ExprSyntax? {
+        return nil
+    }
+
 }
