@@ -376,13 +376,47 @@ class IR2SWConverter {
         return nil
     }
     func visit(_ node: UnaryOp) -> ExprSyntax? {
-        return nil
+        // TODO: postfix op
+        return ExprSyntax(PrefixOperatorExprSyntax {
+            switch node.kind {
+            case .MINUS:
+                $0.useOperatorToken(SyntaxFactory.makePrefixOperator("-"))
+            case .PLUS:
+                $0.useOperatorToken(SyntaxFactory.makePrefixOperator("+"))
+            }
+            if let expr = visit(node.value) {
+                $0.usePostfixExpression(expr)
+            } else {
+                print("Skipped \(node.value)")
+            }
+            
+        })
     }
     func visit(_ node: Subscript) -> ExprSyntax? {
         return nil
     }
     func visit(_ node: Call) -> ExprSyntax? {
-        return nil
+        return ExprSyntax(FunctionCallExprSyntax {
+            $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+            $0.useRightParen(SyntaxFactory.makeRightParenToken())
+            if let expr = visit(node.value) {
+                $0.useCalledExpression(expr)
+            } else {
+                print("Skipped \(node.value)")
+            }
+            for (i, arg) in node.args.enumerated() {
+                $0.addArgument(TupleExprElementSyntax {
+                    if let expr = visit(arg.value) {
+                        $0.useExpression(expr)
+                    } else {
+                        print("Skipped \(arg.value)")
+                    }
+                    if node.args.count - 1 != i {
+                        $0.useTrailingComma(SyntaxFactory.makeCommaToken())
+                    }
+                })
+            }
+        })
     }
     func visit(_ node: Throw) -> ExprSyntax? {
         return nil
@@ -397,10 +431,35 @@ class IR2SWConverter {
         return nil
     }
     func visit(_ node: Assert) -> ExprSyntax? {
-        return nil
+        switch node.kind {
+        case .equal(let x):
+            return visit(x)
+        }
     }
     func visit(_ node: AssertEqual) -> ExprSyntax? {
-        return nil
+        return ExprSyntax(FunctionCallExprSyntax {
+            $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+            $0.useRightParen(SyntaxFactory.makeRightParenToken())
+            $0.useCalledExpression(
+                ExprSyntax(SyntaxFactory.makeIdentifierExpr(
+                    identifier: SyntaxFactory.makeIdentifier("XCTAssertEqual"),
+                    declNameArguments: nil
+                ))
+            )
+            let args = [node.actual, node.excepted]
+            for (i, arg) in args.enumerated() {
+                $0.addArgument(TupleExprElementSyntax {
+                    if let expr = visit(arg) {
+                        $0.useExpression(expr)
+                    } else {
+                        print("Skipped \(arg)")
+                    }
+                    if args.count - 1 != i {
+                        $0.useTrailingComma(SyntaxFactory.makeCommaToken())
+                    }
+                })
+            }
+        })
     }
 
 }
