@@ -13,7 +13,7 @@ class IR2SWConverter {
     func visit(_ node: TopLevelNode) -> Syntax? {
         switch node {
         case .file(let x):
-            return visit(x)
+            return Syntax(visit(x))
         case .block(let x):
             return Syntax(visit(x))
         case .decl(let x):
@@ -22,22 +22,21 @@ class IR2SWConverter {
             return Syntax(visit(x))
         }
     }
-    func visit(_ node: File) -> Syntax? {
-        var source = SourceFileSyntax {
+    func visit(_ node: File) -> SourceFileSyntax? {
+        return SourceFileSyntax {
             $0.addStatement(CodeBlockItemSyntax {
                 $0.useItem(Import("XCTest").buildSyntax(format: Format(), leadingTrivia: .zero))
             }.withTrailingTrivia(.newlines(2)))
-        }
-        for n in node.body {
-            if let n = visit(n) {
-                source = source.addStatement(CodeBlockItemSyntax {
-                    $0.useItem(Syntax(n))
-                })
-            } else {
-                print("Skipped \(n)")
+            for n in node.body {
+                if let n = visit(n) {
+                    $0.addStatement(CodeBlockItemSyntax {
+                        $0.useItem(Syntax(n))
+                    })
+                } else {
+                    print("Skipped \(n)")
+                }
             }
         }
-        return Syntax(source)
     }
     func visit(_ node: Block) -> CodeBlockSyntax? {
         return CodeBlockSyntax {
