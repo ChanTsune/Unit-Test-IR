@@ -9,6 +9,8 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // (SwiftSyntax)[https://github.com/apple/swift-syntax]
         .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", .exact("0.50300.0")),
+        // (SwiftFormat)[https://github.com/apple/swift-format]
+        .package(name: "swift-format", url: "https://github.com/apple/swift-format.git", .exact("0.50300.0")),
         // (Yams)[https://github.com/jpsim/Yams]
         .package(name: "Yams", url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
     ],
@@ -21,6 +23,7 @@ let package = Package(
                 "SwiftSyntax",
                 .product(name: "SwiftSyntaxBuilder", package: "SwiftSyntax"),
                 "Yams",
+                .product(name: "SwiftFormat", package: "swift-format"),
             ]
         ),
         .testTarget(
