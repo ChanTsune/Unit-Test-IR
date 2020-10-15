@@ -1,4 +1,5 @@
 import SwiftSyntax
+import SwiftFormat
 import Yams
 import Foundation
 
@@ -62,7 +63,18 @@ func main(_ argv: [String]) {
                 let topLevel = TopLevelNode.file(x)
                 if let syntax = IR2SWConverter().visit(topLevel) {
                     print(syntax)
-                    try syntax.write(to: URL(fileURLWithPath: outputFilePath), atomically: false, encoding: .utf8)
+                    let outputURL = URL(fileURLWithPath: outputFilePath)
+                    do {
+                        try syntax.write(to: outputURL, atomically: false, encoding: .utf8)
+                        let linter = SwiftLinter.init(configuration: .init(), diagnosticEngine: .init())
+                        try linter.lint(syntax: syntax.as(SourceFileSyntax.self)!, assumingFileURL: .init(fileURLWithPath: "source"))
+                        let formatter = SwiftFormatter.init(configuration: .init())
+                        var txt = ""
+                        try formatter.format(syntax: syntax.as(SourceFileSyntax.self)!, assumingFileURL: nil, to: &txt)
+                        try txt.write(to: outputURL, atomically: false, encoding: .utf8)
+                    } catch {
+                        print(error)
+                    }
                 }
             default:
                 print("default")
