@@ -94,6 +94,16 @@ class IR2SWConverter {
                     SyntaxFactory.makeToken(.rightBrace, presence: .present).withLeadingTrivia(.spaces(1) + .newlines(1))
                 )
                 let format = Format()
+                for f in node.constractors {
+                    if let decl = visit(f) {
+                        let member = SyntaxFactory
+                            .makeMemberDeclListItem(decl: decl, semicolon: nil)
+                            .withLeadingTrivia(.newlines(1) + format._makeIndent())
+                        $0.addMember(member)
+                    } else {
+                        print("Skipped \(f)")
+                    }
+                }
                 for decl in node.fields {
                     print("~~\(node.name)~~")
                     if let decl = visit(decl) {
