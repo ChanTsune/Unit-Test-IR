@@ -343,7 +343,7 @@ class IR2SWConverter {
     func visit(_ node: Constant) -> ExprSyntax? {
         switch node.kind {
         case .STRING, .BYTES:
-            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value))
+            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value.escapeForWrite()))
         case .INTEGER:
             return ExprSyntax(SyntaxFactory.makeIntegerLiteralExpr(digits: SyntaxFactory.makeIntegerLiteral(node.value)))
         case .FLOAT:
