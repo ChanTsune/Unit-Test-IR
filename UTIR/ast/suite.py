@@ -30,7 +30,7 @@ class Suite(IRDecl):
         }
 
 
-class Case(IRExpr):
+class Case(IRDecl):
     pass
 
 

@@ -74,6 +74,8 @@ class IR2SWConverter {
             return visit(x)
         case .var_(let x):
             return visit(x)
+        case .cases(let x):
+            return visit(x)
         }
     }
     func visit(_ node: Suite) -> DeclSyntax? {
@@ -222,8 +224,6 @@ class IR2SWConverter {
             return visit(x)
         case .try_(let x):
             return visit(x)
-        case .cases(let x):
-            return visit(x)
         case .assert(let x):
             return visit(x)
         }
@@ -347,13 +347,13 @@ class IR2SWConverter {
     func visit(_ node: Try) -> ExprSyntax? {
         return nil
     }
-    func visit(_ node: Case) -> ExprSyntax? {
+    func visit(_ node: Case) -> DeclSyntax? {
         switch node {
         case .caseBlock(let x):
             return visit(x)
         }
     }
-    func visit(_ node: CaseBlock) -> ExprSyntax? {
+    func visit(_ node: CaseBlock) -> DeclSyntax? {
         return nil
     }
     func visit(_ node: Assert) -> ExprSyntax? {

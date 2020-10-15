@@ -153,6 +153,7 @@ enum Decl: Codable {
     case func_(Func)
     case class_(Class)
     case suite(Suite)
+    case cases(Case)
 }
 extension Decl {
     init(from decoder: Decoder) throws {
@@ -174,6 +175,11 @@ extension Decl {
             return
         }
         print("exec decl not suite.")
+        if let x = try? container.decode(Case.self) {
+            self = .cases(x)
+            return
+        }
+        print("exec decl not case.")
         if let x = try? container.decode(Var.self) {
             self = .var_(x)
             return
@@ -192,6 +198,8 @@ extension Decl {
         case .class_(let x):
             try container.encode(x)
         case .suite(let x):
+            try container.encode(x)
+        case .cases(let x):
             try container.encode(x)
         }
     }
@@ -279,7 +287,6 @@ indirect enum Expr: Codable {
     case return_(Return)
     case for_(For)
     case try_(Try)
-    case cases(Case)
     case assert(Assert)
 }
 extension Expr {
@@ -288,10 +295,6 @@ extension Expr {
 
         if let x = try? container.decode(Assert.self) {
             self = .assert(x)
-            return
-        }
-        if let x = try? container.decode(Case.self) {
-            self = .cases(x)
             return
         }
         if let x = try? container.decode(UnaryOp.self) {
@@ -371,8 +374,6 @@ extension Expr {
         case .for_(let x):
             try container.encode(x)
         case .try_(let x):
-            try container.encode(x)
-        case .cases(let x):
             try container.encode(x)
         case .assert(let x):
             try container.encode(x)

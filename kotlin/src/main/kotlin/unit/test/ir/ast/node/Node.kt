@@ -95,10 +95,50 @@ sealed class Node {
                 @SerialName("SetUp")
                 val setUp: IList<Expr>,
                 @SerialName("Cases")
-                val cases: IList<Expr.Case>,
+                val cases: IList<Case>,
                 @SerialName("TearDown")
                 val tearDown: IList<Expr>,
         ) : Decl(), IR
+        @Serializable
+        sealed class Case : Decl(), IR {
+            @Serializable
+            data class MethodSet(
+                    val name: String,
+                    val params: IList<Param>,
+            ) : Case() {
+                @Serializable
+                data class Param(
+                        val name: String,
+                        val receiver: Expr,
+                        val args: Map<String, Expr>,
+                        val excepted: Expr,
+                        val message: String?
+                )
+            }
+            @Serializable
+            data class FunctionSet(
+                    val name: String,
+                    val params: IList<Param>,
+            ) : Case() {
+                @Serializable
+                data class Param(
+                        val name: String,
+                        val args: Map<String, Expr>,
+                        val excepted: Expr,
+                        val message: String?
+                )
+            }
+
+            @Serializable
+            @SerialName("CaseBlock")
+            data class CaseBlock(
+                    @SerialName("Name")
+                    val name: String,
+                    @SerialName("Body")
+                    val body: Block,
+            ) : Case()
+        }
+
     }
 
     @Serializable
@@ -256,46 +296,6 @@ sealed class Node {
                     val body: Block
             ) : Expr()
         }
-        @Serializable
-        sealed class Case : Expr(), IR {
-            @Serializable
-            data class MethodSet(
-                    val name: String,
-                    val params: IList<Param>,
-            ) : Case() {
-                @Serializable
-                data class Param(
-                        val name: String,
-                        val receiver: Expr,
-                        val args: Map<String, Expr>,
-                        val excepted: Expr,
-                        val message: String?
-                )
-            }
-            @Serializable
-            data class FunctionSet(
-                    val name: String,
-                    val params: IList<Param>,
-            ) : Case() {
-                @Serializable
-                data class Param(
-                        val name: String,
-                        val args: Map<String, Expr>,
-                        val excepted: Expr,
-                        val message: String?
-                )
-            }
-
-            @Serializable
-            @SerialName("CaseBlock")
-            data class CaseBlock(
-                    @SerialName("Name")
-                    val name: String,
-                    @SerialName("Body")
-                    val body: Block,
-            ) : Case()
-        }
-
         @Serializable
         @SerialName("Assert")
         data class Assert(

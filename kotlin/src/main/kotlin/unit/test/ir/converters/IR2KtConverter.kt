@@ -110,6 +110,9 @@ class IR2KtConverter {
             is Node.Decl.Suite -> {
                 visit(node)
             }
+            is Node.Decl.Case -> {
+                visit(node)
+            }
             else -> {
                 throw Exception("This branch will never execute! but given $node")
             }
@@ -132,9 +135,9 @@ class IR2KtConverter {
         )
     }
 
-    private fun visit(node: Node.Expr.Case): KNode.Decl.Func {
+    private fun visit(node: Node.Decl.Case): KNode.Decl.Func {
         return when(node) {
-            is Node.Expr.Case.CaseBlock ->
+            is Node.Decl.Case.CaseBlock ->
                 KNode.Decl.Func(
                     mods = listOf(KNode.Modifier.AnnotationSet(
                             target = null,
