@@ -301,7 +301,17 @@ class IR2SWConverter {
         }
     }
     func visit(_ node: List) -> ExprSyntax? {
-        return nil
+        return ExprSyntax(ArrayExprSyntax {
+            $0.useLeftSquare(SyntaxFactory.makeLeftSquareBracketToken())
+            for (i,item) in node.values.enumerated() {
+                if let item = visit(item) {
+                    $0.addElement(SyntaxFactory.makeArrayElement(expression: item, trailingComma: i != (node.values.count - 1) ? SyntaxFactory.makeCommaToken() : nil))
+                } else {
+                    print("Skipped \(item)")
+                }
+            }
+            $0.useRightSquare(SyntaxFactory.makeRightSquareBracketToken())
+        })
     }
     func visit(_ node: Tuple) -> ExprSyntax? {
         return nil
