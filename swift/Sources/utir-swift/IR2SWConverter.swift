@@ -79,9 +79,32 @@ class IR2SWConverter {
         }
     }
     func visit(_ node: Suite) -> DeclSyntax? {
-        return Struct(node.name) {
-
-        }.buildDecl(format: Format(), leadingTrivia: .newlines(1))
+        // TODO: "XCTestCase"
+        let classKeyword = SyntaxFactory.makeClassKeyword().withTrailingTrivia(.spaces(1))
+        let source = ClassDeclSyntax {
+            $0.useClassKeyword(classKeyword)
+            $0.useIdentifier(SyntaxFactory.makeIdentifier(node.name))
+            $0.useMembers(MemberDeclBlockSyntax {
+                $0.useLeftBrace(
+                    SyntaxFactory.makeToken(.leftBrace, presence: .present).withLeadingTrivia(.spaces(1))
+                )
+                $0.useRightBrace(
+                    SyntaxFactory.makeToken(.rightBrace, presence: .present).withLeadingTrivia(.spaces(1) + .newlines(1))
+                )
+                let format = Format()
+                for c in node.cases {
+                    if let decl = visit(c) {
+                        let member = SyntaxFactory
+                            .makeMemberDeclListItem(decl: decl, semicolon: nil)
+                            .withLeadingTrivia(.newlines(1) + format._makeIndent())
+                        $0.addMember(member)
+                    } else {
+                        print("Skipped \(c)")
+                    }
+                }
+            })
+        }.withLeadingTrivia(.newlines(1))
+        return DeclSyntax(source)
     }
     func visit(_ node: Class) -> DeclSyntax? {
         let classKeyword = SyntaxFactory.makeClassKeyword().withTrailingTrivia(.spaces(1))
@@ -197,6 +220,32 @@ class IR2SWConverter {
         )
         return DeclSyntax(source)
     }
+    func visit(_ node: Case) -> DeclSyntax? {
+        switch node {
+        case .caseBlock(let x):
+            return visit(x)
+        }
+    }
+    func visit(_ node: CaseBlock) -> DeclSyntax? {
+        let funcKeyword = SyntaxFactory.makeFuncKeyword().withTrailingTrivia(.spaces(1))
+        let source = FunctionDeclSyntax {
+            $0.useFuncKeyword(funcKeyword)
+            $0.useIdentifier(SyntaxFactory.makeIdentifier(node.name))
+            if let body = visit(node.body) {
+                $0.useBody(body)
+            }
+            $0.useSignature(SyntaxFactory.makeFunctionSignature(
+                input: ParameterClauseSyntax {
+                    $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+                    $0.useRightParen(SyntaxFactory.makeRightParenToken())
+                },
+                throwsOrRethrowsKeyword: SyntaxFactory.makeThrowsKeyword(),
+                output: nil)
+            )
+        }
+        return DeclSyntax(source)
+    }
+
     //MARK:- Expr
     func visit(_ node: Expr) -> ExprSyntax? {
         switch node {
@@ -345,15 +394,6 @@ class IR2SWConverter {
         return nil
     }
     func visit(_ node: Try) -> ExprSyntax? {
-        return nil
-    }
-    func visit(_ node: Case) -> DeclSyntax? {
-        switch node {
-        case .caseBlock(let x):
-            return visit(x)
-        }
-    }
-    func visit(_ node: CaseBlock) -> DeclSyntax? {
         return nil
     }
     func visit(_ node: Assert) -> ExprSyntax? {
