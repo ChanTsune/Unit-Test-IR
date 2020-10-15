@@ -144,11 +144,11 @@ class IR2SWConverter {
         let field = node.field
         return SyntaxFactory.makeFunctionParameter(
             attributes: nil,
-            firstName: SyntaxFactory.makeIdentifier(node.field.name),
+            firstName: SyntaxFactory.makeToken(.wildcardKeyword, presence: .present),
             secondName: SyntaxFactory.makeIdentifier(node.field.name).withLeadingTrivia(.spaces(1)),
             colon: SyntaxFactory.makeColonToken(),
             type: SyntaxFactory.makeTypeIdentifier(node.field.type ?? "Any"),
-            ellipsis: nil, // SyntaxFactory.makeEllipsisToken()
+            ellipsis: node.vararg ? SyntaxFactory.makeEllipsisToken() : nil,
             defaultArgument: field.expr != nil ? InitializerClauseSyntax {
                 $0.useEqual(SyntaxFactory.makeEqualToken())
                 if let e = field.expr, let expr = visit(e) {
@@ -225,7 +225,7 @@ class IR2SWConverter {
             case .name(let x):
                 return ExprSyntax(SyntaxFactory.makeMemberAccessExpr(
                     base: visit(node.left),
-                    dot: SyntaxFactory.makeIdentifier("."), // TODO: dot
+                    dot: SyntaxFactory.makeToken(.period, presence: .present),
                     name: SyntaxFactory.makeIdentifier(x.name),
                     declNameArguments: nil
                 ))
