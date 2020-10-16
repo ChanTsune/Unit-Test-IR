@@ -309,12 +309,12 @@ extension Expr {
             self = .call(x)
             return
         }
-        if let x = try? container.decode(Return.self) {
-            self = .return_(x)
-            return
-        }
         if let x = try? container.decode(For.self) {
             self = .for_(x)
+            return
+        }
+        if let x = try? container.decode(Return.self) {
+            self = .return_(x)
             return
         }
         if let x = try? container.decode(Try.self) {
