@@ -13,6 +13,7 @@ let package = Package(
         .package(name: "swift-format", url: "https://github.com/apple/swift-format.git", .exact("0.50300.0")),
         // (Yams)[https://github.com/jpsim/Yams]
         .package(name: "Yams", url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
+        .package(url: "https://github.com/ChanTsune/SwiftyPyString.git", from: "2.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -24,6 +25,7 @@ let package = Package(
                 .product(name: "SwiftSyntaxBuilder", package: "SwiftSyntax"),
                 "Yams",
                 .product(name: "SwiftFormat", package: "swift-format"),
+                "SwiftyPyString",
             ]
         ),
         .testTarget(

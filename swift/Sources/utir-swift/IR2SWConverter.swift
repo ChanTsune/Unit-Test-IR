@@ -7,6 +7,7 @@
 
 import SwiftSyntax
 import SwiftSyntaxBuilder
+import SwiftyPyString
 
 
 class IR2SWConverter {
@@ -174,7 +175,6 @@ class IR2SWConverter {
                     }
                 }
                 for decl in node.fields {
-                    print("~~\(node.name)~~")
                     if let decl = visit(decl) {
                         let member = SyntaxFactory
                             .makeMemberDeclListItem(decl: decl, semicolon: nil)
@@ -404,7 +404,7 @@ class IR2SWConverter {
     func visit(_ node: Constant) -> ExprSyntax? {
         switch node.kind {
         case .STRING, .BYTES:
-            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value.escapeForWrite()))
+            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value.debugDescription[1,-1]))
         case .INTEGER:
             return ExprSyntax(SyntaxFactory.makeIntegerLiteralExpr(digits: SyntaxFactory.makeIntegerLiteral(node.value)))
         case .FLOAT:

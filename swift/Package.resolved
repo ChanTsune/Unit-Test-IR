@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "SwiftyPyString",
+        "repositoryURL": "https://github.com/ChanTsune/SwiftyPyString.git",
+        "state": {
+          "branch": null,
+          "revision": "653b495db85e79eaee21945dc098b279c9a88b8f",
+          "version": "2.0.0"
+        }
+      },
+      {
         "package": "Yams",
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
