@@ -38,6 +38,46 @@ sealed class Node {
                     @SerialName("Expr")
                     val expr: Node.Expr
             ) : Stmt()
+            @Serializable
+            @SerialName("Return")
+            data class Return(
+                    @SerialName("Value")
+                    val value: Node.Expr
+            ) : Stmt()
+
+            @Serializable
+            @SerialName("For")
+            data class For(
+                    @SerialName("Value")
+                    val value: Node.Decl.Var,
+                    @SerialName("Generator")
+                    val generator: Node.Expr,
+                    @SerialName("Body")
+                    val body: Block
+            ) : Stmt()
+            @Serializable
+            @SerialName("Throw")
+            data class Throw(
+                    @SerialName("Value")
+                    val value: Node.Expr
+            ) : Stmt()
+            @Serializable
+            @SerialName("Try")
+            data class Try(
+                    @SerialName("Body")
+                    val body: Block,
+                    val catch: Catch
+            ) : Stmt() {
+                @Serializable
+                @SerialName("Catch")
+                data class Catch(
+                        @SerialName("Type")
+                        val type: String,
+                        @SerialName("Body")
+                        val body: Block,
+                        val catch: Catch?
+                ) : Stmt()
+            }
         }
     }
 
@@ -254,47 +294,6 @@ sealed class Node {
                     @SerialName("Value")
                     val value: Expr
             )
-        }
-
-        @Serializable
-        @SerialName("Throw")
-        data class Throw(
-                @SerialName("Value")
-                val value: Expr
-        ) : Expr()
-
-        @Serializable
-        @SerialName("Return")
-        data class Return(
-                @SerialName("Value")
-                val value: Expr
-        ) : Expr()
-
-        @Serializable
-        @SerialName("For")
-        data class For(
-                @SerialName("Value")
-                val value: Decl.Var,
-                @SerialName("Generator")
-                val generator: Expr,
-                @SerialName("Body")
-                val body: Block
-        ) : Expr()
-
-        @Serializable
-        @SerialName("Try")
-        data class Try(
-                @SerialName("Body")
-                val body: Block
-        ) : Expr() {
-            @Serializable
-            @SerialName("Catch")
-            data class Catch(
-                    @SerialName("Type")
-                    val type: String,
-                    @SerialName("Body")
-                    val body: Block
-            ) : Expr()
         }
         @Serializable
         @SerialName("Assert")

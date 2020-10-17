@@ -262,7 +262,7 @@ class Call(Expr):
 
 
 @dataclass
-class Throw(Expr):
+class Throw(Stmt):
     value: Expr
 
     def serialize(self):
@@ -273,7 +273,7 @@ class Throw(Expr):
 
 
 @dataclass
-class Return(Expr):
+class Return(Stmt):
     value: Expr
 
     def serialize(self):
@@ -284,7 +284,7 @@ class Return(Expr):
 
 
 @dataclass
-class For(Expr):
+class For(Stmt):
     value: Var
     generator: Expr
     body: Block
@@ -299,7 +299,7 @@ class For(Expr):
 
 
 @dataclass
-class Try(Expr):
+class Try(Stmt):
     body: Block
 
     def serialize(self):
@@ -310,7 +310,7 @@ class Try(Expr):
 
 
 @dataclass
-class Catch(Expr):
+class Catch(Stmt):
     type: str
     body: Block
 

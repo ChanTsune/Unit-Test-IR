@@ -8,50 +8,93 @@ import kastree.ast.Node as KNode
 class IR2KtConverter {
     fun visit(node: Node): KNode {
         return when (node) {
-            is Node.File -> {
-                KNode.File(
-                        anns = listOf(),
-                        pkg = KNode.Package(
-                                mods = listOf(),
-                                names = listOf("com","github","unit","ir","generated"),
-                        ),
-                        imports = listOf(
-                                KNode.Import(
-                                        names = listOf("kotlin","test"),
-                                        wildcard = true,
-                                        alias = null
-                                )
-                        ),
-                        decls = node.body.map { visit(it) }
-                )
-            }
-            is Node.Block -> {
-                visit(node)
-            }
-            is Node.Decl -> {
-                visit(node)
-            }
-            is Node.Expr -> {
-                visit(node)
-            }
+            is Node.File -> visit(node)
+            is Node.Block -> visit(node)
+            is Node.Decl -> visit(node)
+            is Node.Expr -> visit(node)
         }
+    }
+
+    private fun visit(node: Node.File): KNode.File {
+        return KNode.File(
+                anns = listOf(),
+                pkg = KNode.Package(
+                        mods = listOf(),
+                        names = listOf("com", "github", "unit", "ir", "generated"),
+                ),
+                imports = listOf(
+                        KNode.Import(
+                                names = listOf("kotlin", "test"),
+                                wildcard = true,
+                                alias = null
+                        )
+                ),
+                decls = node.body.map { visit(it) }
+        )
     }
 
     private fun visit(node: Node.Block): KNode.Block {
         return KNode.Block(
-                stmts = node.body.map { visit(it) }
+                stmts = node.body.map {
+                    when (it) {
+                        is Node.Block.Stmt.Decl -> visit(it)
+                        is Node.Block.Stmt.Expr -> visit(it)
+                        else -> visit(it)
+                    }
+                }
         )
     }
 
-    private fun visit(node: Node.Block.Stmt): KNode.Stmt {
+    private fun visit(node: Node.Block.Stmt.Decl): KNode.Stmt.Decl {
+        return KNode.Stmt.Decl(visit(node.decl))
+    }
+
+    private fun visit(node: Node.Block.Stmt.Expr): KNode.Stmt.Expr {
+        return KNode.Stmt.Expr(visit(node.expr))
+    }
+
+    private fun visit(node: Node.Block.Stmt): KNode.Stmt.Expr {
         return when (node) {
-            is Node.Block.Stmt.Decl -> {
-                KNode.Stmt.Decl(visit(node.decl))
+            is Node.Block.Stmt.Throw -> {
+                TODO()
             }
-            is Node.Block.Stmt.Expr -> {
-                KNode.Stmt.Expr(visit(node.expr))
+            is Node.Block.Stmt.Try -> {
+                TODO()
             }
+            is Node.Block.Stmt.For -> visit(node)
+            is Node.Block.Stmt.Return -> visit(node)
+
+            else -> throw Error("never execution branch executed!! Passed $node")
         }
+    }
+
+    private fun visit(node: Node.Block.Stmt.Return): KNode.Stmt.Expr {
+        return KNode.Stmt.Expr(KNode.Expr.Return(
+                label = null,
+                expr = visit(node.value)
+        ))
+    }
+
+    private fun visit(node: Node.Block.Stmt.For): KNode.Stmt.Expr {
+        fun visit(node: Node.Decl.Var): KNode.Decl.Property.Var {
+            return KNode.Decl.Property.Var(
+                    name = node.name,
+                    type = node.type?.let {
+                        KNode.Type(mods = listOf(), ref = KNode.TypeRef.Simple(
+                                pieces = listOf(KNode.TypeRef.Simple.Piece(node.type, listOf()))
+                        ))
+                    }
+            )
+        }
+        return KNode.Stmt.Expr(KNode.Expr.For(
+                anns = listOf(),
+                vars = listOf(visit(node.value)),
+                inExpr = visit(node.generator),
+                body = KNode.Expr.Brace(
+                        params = listOf(),
+                        block = visit(node.body),
+                ),
+        ))
     }
 
     private fun visit(node: Node.Decl): KNode.Decl {
@@ -136,25 +179,25 @@ class IR2KtConverter {
     }
 
     private fun visit(node: Node.Decl.Case): KNode.Decl.Func {
-        return when(node) {
+        return when (node) {
             is Node.Decl.Case.CaseBlock ->
                 KNode.Decl.Func(
-                    mods = listOf(KNode.Modifier.AnnotationSet(
-                            target = null,
-                            anns = listOf(KNode.Modifier.AnnotationSet.Annotation(
-                                    names = listOf("Test"),
-                                    typeArgs = listOf(),
-                                    args = listOf(),
-                            ))
-                    )),
-                    typeParams = listOf(),
-                    receiverType = null,
-                    name = node.name,
-                    paramTypeParams = listOf(),
-                    params = listOf(),
-                    type = null,
-                    typeConstraints = listOf(),
-                    body = KNode.Decl.Func.Body.Block(visit(node.body))
+                        mods = listOf(KNode.Modifier.AnnotationSet(
+                                target = null,
+                                anns = listOf(KNode.Modifier.AnnotationSet.Annotation(
+                                        names = listOf("Test"),
+                                        typeArgs = listOf(),
+                                        args = listOf(),
+                                ))
+                        )),
+                        typeParams = listOf(),
+                        receiverType = null,
+                        name = node.name,
+                        paramTypeParams = listOf(),
+                        params = listOf(),
+                        type = null,
+                        typeConstraints = listOf(),
+                        body = KNode.Decl.Func.Body.Block(visit(node.body))
                 )
             else -> TODO()
         }
@@ -283,45 +326,14 @@ class IR2KtConverter {
                     }
                 }
             }
-            is Node.Expr.For -> {
-                fun visit(node:Node.Decl.Var): KNode.Decl.Property.Var {
-                    return KNode.Decl.Property.Var(
-                            name = node.name,
-                            type = node.type?.let { KNode.Type(mods = listOf(), ref=KNode.TypeRef.Simple(
-                                    pieces = listOf(KNode.TypeRef.Simple.Piece(node.type, listOf()))
-                            )) }
-                    )
-                }
-                KNode.Expr.For(
-                        anns = listOf(),
-                        vars = listOf(visit(node.value)),
-                        inExpr = visit(node.generator),
-                        body = KNode.Expr.Brace(
-                                params = listOf(),
-                                block = visit(node.body),
-                        ),
-                )
-            }
             is Node.Expr.Name -> {
                 KNode.Expr.Name(node.name)
-            }
-            is Node.Expr.Return -> {
-                KNode.Expr.Return(
-                        label = null,
-                        expr = visit(node.value)
-                )
             }
             is Node.Expr.Subscript -> {
                 KNode.Expr.ArrayAccess(
                         expr = visit(node.value),
                         indices = listOf(visit(node.index))
                 )
-            }
-            is Node.Expr.Throw -> {
-                TODO()
-            }
-            is Node.Expr.Try -> {
-                TODO()
             }
             is Node.Expr.Tuple -> {
                 when (node.values.size) {
@@ -414,30 +426,73 @@ class IR2KtConverter {
                                 args = mutableListOf(
                                         KNode.ValueArg(
                                                 name = null,
-                                            asterisk = false,
+                                                asterisk = false,
                                                 expr = visit(node.kind.excepted)
                                         ),
                                         KNode.ValueArg(
                                                 name = null,
-                                        asterisk = false,
-                                        expr = visit(node.kind.actual)
+                                                asterisk = false,
+                                                expr = visit(node.kind.actual)
                                         )
                                 ).apply {
                                     node.kind.message?.let {
                                         add(KNode.ValueArg(
-                                                    name = null,
-                                                    asterisk = false,
-                                                    expr = visit(Node.Expr.Constant(
-                                                            kind = Node.Expr.Constant.Kind.STRING,
-                                                            value = it
-                                                        )
-                                                    )
-                                            )
+                                                name = null,
+                                                asterisk = false,
+                                                expr = visit(Node.Expr.Constant(
+                                                        kind = Node.Expr.Constant.Kind.STRING,
+                                                        value = it
+                                                )
+                                                )
+                                        )
                                         )
                                     }
                                 },
                                 lambda = null
                         )
+                    }
+                    is Node.Expr.Assert.Kind.AssertFailure -> {
+                        if (node.kind.error != null) {
+                            KNode.Expr.Call(
+                                    expr = KNode.Expr.Name(name = "assertFailsWith"),
+                                    typeArgs = listOf(KNode.Type(
+                                            mods = listOf(),
+                                            ref = KNode.TypeRef.Simple(
+                                                    pieces = listOf(KNode.TypeRef.Simple.Piece(
+                                                            name = node.kind.error,
+                                                            typeParams = listOf()
+                                                    ))
+                                            )
+                                    )),
+                                    args = mutableListOf(),
+                                    lambda = KNode.Expr.Call.TrailLambda(
+                                            anns = listOf(),
+                                            label = null,
+                                            func = KNode.Expr.Brace(
+                                                    params = listOf(),
+                                                    block = KNode.Block(
+                                                            stmts = listOf()
+                                                    )
+                                            )
+                                    )
+                            )
+                        } else {
+                            KNode.Expr.Call(
+                                    expr = KNode.Expr.Name(name = "assertFails"),
+                                    typeArgs = listOf(),
+                                    args = mutableListOf(),
+                                    lambda = KNode.Expr.Call.TrailLambda(
+                                            anns = listOf(),
+                                            label = null,
+                                            func = KNode.Expr.Brace(
+                                                    params = listOf(),
+                                                    block = KNode.Block(
+                                                            stmts = listOf()
+                                                    )
+                                            )
+                                    )
+                            )
+                        }
                     }
                 }
             }

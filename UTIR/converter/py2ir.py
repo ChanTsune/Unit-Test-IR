@@ -16,6 +16,8 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             return ir_ast.StmtDecl(node)
         elif isinstance(node, ir_ast.Expr):
             return ir_ast.StmtExpr(node)
+        elif isinstance(node, ir_ast.Stmt):
+            return node
         raise Exception('Excepted Decl or Expr, but %s' %
                         node.__class__.__name__)
 

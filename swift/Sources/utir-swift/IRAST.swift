@@ -102,6 +102,10 @@ struct Block: CodableNode {
 enum Stmt: Codable {
     case decl(StmtDecl)
     case expr(StmtExpr)
+    case throw_(Throw)
+    case return_(Return)
+    case for_(For)
+    case try_(Try)
 }
 
 struct StmtDecl: CodableNode {
@@ -134,6 +138,22 @@ extension Stmt {
             self = .expr(x)
             return
         }
+        if let x = try? container.decode(For.self) {
+            self = .for_(x)
+            return
+        }
+        if let x = try? container.decode(Return.self) {
+            self = .return_(x)
+            return
+        }
+        if let x = try? container.decode(Try.self) {
+            self = .try_(x)
+            return
+        }
+        if let x = try? container.decode(Throw.self) {
+            self = .throw_(x)
+            return
+        }
         throw DecodingError.typeMismatch(Stmt.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
@@ -143,6 +163,14 @@ extension Stmt {
         case .decl(let x):
             try container.encode(x)
         case .expr(let x):
+            try container.encode(x)
+        case .throw_(let x):
+            try container.encode(x)
+        case .return_(let x):
+            try container.encode(x)
+        case .for_(let x):
+            try container.encode(x)
+        case .try_(let x):
             try container.encode(x)
         }
     }
@@ -283,10 +311,6 @@ indirect enum Expr: Codable {
     case unaryOp(UnaryOp)
     case subscript_(Subscript)
     case call(Call)
-    case throw_(Throw)
-    case return_(Return)
-    case for_(For)
-    case try_(Try)
     case assert(Assert)
 }
 extension Expr {
@@ -309,18 +333,6 @@ extension Expr {
             self = .call(x)
             return
         }
-        if let x = try? container.decode(For.self) {
-            self = .for_(x)
-            return
-        }
-        if let x = try? container.decode(Return.self) {
-            self = .return_(x)
-            return
-        }
-        if let x = try? container.decode(Try.self) {
-            self = .try_(x)
-            return
-        }
         if let x = try? container.decode(List.self) {
             self = .list(x)
             return
@@ -339,10 +351,6 @@ extension Expr {
         }
         if let x = try? container.decode(Constant.self) {
             self = .constant(x)
-            return
-        }
-        if let x = try? container.decode(Throw.self) {
-            self = .throw_(x)
             return
         }
         throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
@@ -366,14 +374,6 @@ extension Expr {
         case .subscript_(let x):
             try container.encode(x)
         case .call(let x):
-            try container.encode(x)
-        case .throw_(let x):
-            try container.encode(x)
-        case .return_(let x):
-            try container.encode(x)
-        case .for_(let x):
-            try container.encode(x)
-        case .try_(let x):
             try container.encode(x)
         case .assert(let x):
             try container.encode(x)
@@ -536,18 +536,22 @@ struct For: CodableNode {
 struct Try: CodableNode {
     var node = "Try"
     var body: Block
+    var catch_: Catch
     enum CodingKeys: String, CodingKey {
         case node = "Node"
         case body = "Body"
+        case catch_ = "Catch"
     }
-    struct Catch: CodableNode {
+    class Catch: CodableNode { // TODO:
         var node = "Catch"
         var type: String
         var body: Block
+        var catch_: Catch? = nil
         enum CodingKeys: String, CodingKey {
             case node = "Node"
             case type = "Type"
             case body = "Body"
+            case catch_ = "Catch"
         }
     }
 }

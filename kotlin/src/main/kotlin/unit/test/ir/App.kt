@@ -4,7 +4,6 @@
 package unit.test.ir
 
 import kastree.ast.Visitor
-import kastree.ast.Node as KNode
 import kastree.ast.Writer
 import kotlinx.serialization.json.Json
 import unit.test.ir.ast.node.Node
@@ -71,25 +70,6 @@ fun main(args: Array<String>) {
             } catch (e: Throwable) {
                 println(e.message)
                 e.stackTrace.map { println(it) }
-            }
-        }.apply {
-            val fileNode = Node.File(mutableListOf<Node.Decl>().apply{
-                add(Node.Decl.Func(
-                        name="SampleFunction",
-                        args= mutableListOf<Node.Decl.Func.Arg>(),
-                        body = Node.Block(mutableListOf<Node.Block.Stmt>().apply {
-                            add(Node.Block.Stmt.Expr(
-                                    expr = Node.Expr.Return(
-                                            value = Node.Expr.Constant(Node.Expr.Constant.Kind.STRING,"文字列")
-                                    )
-                                )
-                            )
-                        }),
-                    )
-                )
-            },0)
-            encodeToString(Node.serializer(), fileNode).run {
-                println(this)
             }
         }
     } catch (e: Throwable) {

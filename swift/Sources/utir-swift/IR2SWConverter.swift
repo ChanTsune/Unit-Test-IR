@@ -61,7 +61,51 @@ class IR2SWConverter {
             return Syntax(visit(x.decl))
         case .expr(let x):
             return Syntax(visit(x.expr))
+        case .throw_(let x):
+            return Syntax(visit(x))
+        case .return_(let x):
+            return Syntax(visit(x))
+        case .for_(let x):
+            return Syntax(visit(x))
+        case .try_(let x):
+            return Syntax(visit(x))
         }
+    }
+    func visit(_ node: Throw) -> ExprSyntax? {
+        return nil
+    }
+    func visit(_ node: Return) -> StmtSyntax? {
+        return StmtSyntax(ReturnStmtSyntax {
+            $0.useReturnKeyword(SyntaxFactory.makeReturnKeyword())
+            if let expr = visit(node.value) {
+                $0.useExpression(expr)
+            } else {
+                print("Skipped \(node.value)")
+            }
+        })
+    }
+    func visit(_ node: For) -> StmtSyntax? {
+        return StmtSyntax(ForInStmtSyntax {
+            $0.useForKeyword(SyntaxFactory.makeForKeyword())
+            $0.useInKeyword(SyntaxFactory.makeInKeyword())
+            if let body = visit(node.body) {
+                $0.useBody(body)
+            } else {
+                print("Skipped \(node.body)")
+            }
+            if let sequence = visit(node.generator) {
+                $0.useSequenceExpr(sequence)
+            } else {
+                print("Skipped \(node.generator)")
+            }
+            $0.usePattern(PatternSyntax(SyntaxFactory.makeIdentifierPattern(identifier: SyntaxFactory.makeIdentifier(node.value.name))))
+        })
+    }
+    func visit(_ node: Try) -> StmtSyntax? {
+        return StmtSyntax(DoStmtSyntax {
+            $0.useDoKeyword(SyntaxFactory.makeDoKeyword())
+            print("Skipped \(node.body)")
+        })
     }
     //MARK:- Decl
     func visit(_ node: Decl) -> DeclSyntax? {
@@ -265,14 +309,6 @@ class IR2SWConverter {
             return visit(x)
         case .call(let x):
             return visit(x)
-        case .throw_(let x):
-            return visit(x)
-        case .return_(let x):
-            return visit(x)
-        case .for_(let x):
-            return visit(x)
-        case .try_(let x):
-            return visit(x)
         case .assert(let x):
             return visit(x)
         }
@@ -457,18 +493,6 @@ class IR2SWConverter {
                 })
             }
         })
-    }
-    func visit(_ node: Throw) -> ExprSyntax? {
-        return nil
-    }
-    func visit(_ node: Return) -> ExprSyntax? {
-        return nil
-    }
-    func visit(_ node: For) -> ExprSyntax? {
-        return nil
-    }
-    func visit(_ node: Try) -> ExprSyntax? {
-        return nil
     }
     func visit(_ node: Assert) -> ExprSyntax? {
         switch node.kind {
