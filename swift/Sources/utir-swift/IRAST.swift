@@ -22,19 +22,6 @@ protocol UTIRNode {
 class NodeNotMatchError: Error { }
 typealias CodableNode = UTIRNode & Codable & ClassNameGettable
 
-extension SingleValueDecodingContainer {
-    func decode<T>(_ type: T.Type) throws -> T where T: CodableNode {
-        print("\(type)")
-        let n = try decode(type)
-        print("\(type):\(n.node)")
-//        if !n.className.hasSuffix(n.node) {
-//            print("Exec this point.:: \(type):\(n.node)")
-//            throw NodeNotMatchError()
-//        }
-        return n
-    }
-}
-
 
 enum TopLevelNode: Codable {
     case file(File)
