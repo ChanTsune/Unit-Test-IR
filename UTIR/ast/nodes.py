@@ -301,22 +301,25 @@ class For(Stmt):
 @dataclass
 class Try(Stmt):
     body: Block
+    catch: Any
+
+    @dataclass
+    class Catch(Stmt):
+        type: str
+        body: Block
+        catch: Optional[Any]
+
+        def serialize(self):
+            return {
+                'Node': 'Catch',
+                'Type': self.type,
+                'Body': self.body.serialize(),
+                'Catch': None if self.catch is None else self.catch.serialize(),
+            }
 
     def serialize(self):
         return {
             'Node': 'Try',
             'Body': self.body.serialize(),
-        }
-
-
-@dataclass
-class Catch(Stmt):
-    type: str
-    body: Block
-
-    def serialize(self):
-        return {
-            'Node': 'Catch',
-            'Type': self.type,
-            'Body': self.body.serialize(),
+            'Catch': self.catch.serialize(),
         }
