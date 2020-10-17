@@ -312,19 +312,44 @@ class IR2SWConverter {
                 )
             }
             binList.append(ExprSyntax(binOp))
+        case .MUL:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("*").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        case .DIV:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("/").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        case .MOD:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("%").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        case .LEFT_SHIFT:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("<<").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        case .RIGHT_SHIFT:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator(">>").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
         case .ASSIGN:
             binList.append(ExprSyntax(AssignmentExprSyntax {
                 $0.useAssignToken(
                     SyntaxFactory.makeToken(.equal, presence: .present).withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
                 )
             }))
-        default:
-            let binOp = BinaryOperatorExprSyntax {
-                $0.useOperatorToken(
-                    SyntaxFactory.makeBinaryOperator("UNSUPPORTED").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
-                )
-            }
-            binList.append(ExprSyntax(binOp))
+        case .DOT:
+            fatalError("never execution branch \(node.kind) executed.")
         }
         if let right = visit(node.right) {
             binList.append(right)
@@ -393,7 +418,22 @@ class IR2SWConverter {
         })
     }
     func visit(_ node: Subscript) -> ExprSyntax? {
-        return nil
+        return ExprSyntax(SubscriptExprSyntax {
+            $0.useLeftBracket(SyntaxFactory.makeLeftBraceToken())
+            $0.useRightBracket(SyntaxFactory.makeRightBraceToken())
+            if let expr = visit(node.value) {
+                $0.useCalledExpression(expr)
+            } else {
+                print("Skipped \(node.value)")
+            }
+            if let expr = visit(node.index) {
+                $0.addArgument(TupleExprElementSyntax {
+                    $0.useExpression(expr)
+                })
+            } else {
+                print("Skipped \(node.index)")
+            }
+        })
     }
     func visit(_ node: Call) -> ExprSyntax? {
         return ExprSyntax(FunctionCallExprSyntax {
