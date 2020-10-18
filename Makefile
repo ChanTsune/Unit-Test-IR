@@ -9,6 +9,9 @@ run_kotlin: ir_gen
 	cd ./kotlin && ./gradlew run --args="../${OUTPUT}"
 
 run_swift_only:
-	cd ./swift && swift run utir-swift ../${OUTPUT} ../test_string.swift
+	cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift
 
 run_swift: ir_gen run_swift_only
+
+run_ocaml_only:
+	cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml
