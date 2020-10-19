@@ -4,7 +4,7 @@ type node =
 | Decl of decl 
 | Expr of expr
 
-and file = {file_version: int; file_body: stmt list}
+and file = {file_version: int; file_body: decl list}
 and block = {block_body: stmt list}
 
 and stmt =
