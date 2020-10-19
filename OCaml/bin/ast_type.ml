@@ -4,7 +4,7 @@ type node =
 | Decl of decl 
 | Expr of expr
 
-and file = {file_version: int; file_body: int list}
+and file = {file_version: int; file_body: stmt list}
 and block = {block_body: stmt list}
 
 and stmt =
@@ -20,7 +20,7 @@ and return = {return_value: expr}
 and for_ = {for_value: var; for_generator: expr; for_body: block}
 and throw = {throw_value: expr}
 and try_ = {try_block: block; try_catch: catch}
-and catch = {catch_block: block; catch_catch: catch}
+and catch = {catch_block: block; catch_catch: catch option}
 
 and decl =
   Var of var
