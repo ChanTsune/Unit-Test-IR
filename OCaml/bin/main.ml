@@ -39,10 +39,10 @@ let rec parse_node (y:Yaml.value) =
   | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as file node" y
 
 and parse_block o =
-  let c = match get_dict_node_param "Body" o with
+  let body = match get_dict_node_param "Body" o with
   | _, `A a -> a |> List.map parse_stmt
   | _ -> raise (Invalid_argument "Dose not match as block node")
-  in {block_body = c}
+  in {block_body = body}
 and parse_stmt y =
 match y with
   | `O o -> begin
@@ -58,11 +58,59 @@ match y with
    end
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as stmt node" y
 
+and parse_var o =
+  let name = match get_dict_node_param "Name" o with
+  | _,`String s -> s
+  | _ -> raise TypeError in
+  let type_ = match get_dict_node_param "Type" o with
+  | _,`String s -> Some s
+  | _ -> None in
+  let value = match get_dict_node_param "Value" o with
+  | _,`O o -> Some (parse_expr (`O o))
+  | _ -> None in
+   {var_name=name; var_type=type_; var_value=value}
+
+and parse_func_arg o =
+   let field = match get_dict_node_param "Field" o with
+   |_,`O o -> parse_var o
+   |_ -> raise TypeError in
+   let vararg = match get_dict_node_param "Vararg" o with
+   |_,`Bool b -> b
+   |_ -> raise TypeError in
+   {arg_field=field; arg_vararg=vararg}
+
+and parse_func o =
+  let name = match get_dict_node_param "Name" o with
+  | _,`String s -> s
+  | _ -> raise TypeError in
+  let args = match get_dict_node_param "Args" o with
+  |_, `A a -> a |> List.map (fun x -> match x with| `O o -> parse_func_arg o|_ -> raise TypeError)
+  | _ -> raise TypeError in
+  let body = match get_dict_node_param "Body" o with
+  |_, `O o -> parse_block o
+  |_ -> raise TypeError in
+  {func_name=name; func_args=args; func_body=body}
 and parse_decl y =
 match y with
   | `O o -> begin
     let node_type = get_node_type o in
     match node_type with
+    | "Var" -> Var (parse_var o)
+    | "Func" -> Func (parse_func o)
+    | "Class" ->
+      let name = match get_dict_node_param "Name" o with
+       | _,`String s -> s
+       | _ -> raise TypeError in
+      let bases = match get_dict_node_param "Bases" o with
+        | _,`A a -> a |> List.map (fun x -> match x with| `String s -> s |_ -> raise TypeError)
+        | _ -> raise TypeError in
+      let constractors = match get_dict_node_param "Constractors" o with
+      | _, `A a -> a |> List.map (fun x -> match x with| `O o -> parse_func o|_ -> raise TypeError)
+      | _ -> raise TypeError in
+      let fields = match get_dict_node_param "Fields" o with
+      | _, `A a -> a |> List.map parse_decl
+      |_ -> raise TypeError in
+      Class {class_name=name; class_bases=bases; class_constractors=constractors; class_fields=fields}
     | "Suite" ->
       let name = match get_dict_node_param "Name" o with
        | _,`String s -> s
