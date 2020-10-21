@@ -54,6 +54,14 @@ match y with
     | "Decl" ->
       let _, decl = get_dict_node_param "Decl" o in
       DeclStmt {decl = parse_decl decl}
+    | "Return" ->
+      let _, v = get_dict_node_param "Value" o in
+      Return {return_value = parse_expr v}
+    | "For" ->
+      let v = match get_dict_node_param "Value" o with|_,`O o -> o|_ -> raise TypeError in
+      let _,g = get_dict_node_param "Generator" o in
+      let b = match get_dict_node_param "Body" o with|_,`O o -> o|_ -> raise TypeError in
+      For {for_value = parse_var v; for_generator = parse_expr g; for_body = parse_block b}
     | _ -> raise_ir_parse_error "Dose not match as any stmt node" y
    end
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as stmt node" y
@@ -116,13 +124,13 @@ match y with
        | _,`String s -> s
        | _ -> raise TypeError in
       let setup = match get_dict_node_param "SetUp" o with
-       | _,`A a -> List.map parse_expr a
+       | _,`A a -> a |> List.map parse_expr
        | _ -> raise TypeError in
       let cases = match get_dict_node_param "Cases" o with
       | _, `A a -> a |> List.map parse_decl |> List.map case_of_decl
       | _ -> raise TypeError in
       let tear_down = match get_dict_node_param "TearDown" o with
-      | _, `A a -> List.map parse_expr a
+      | _, `A a -> a |> List.map parse_expr 
       | _ -> raise TypeError in
       Suite {suite_name = name; suite_set_up = setup; suite_cases = cases; suite_tear_down = tear_down}
     | "CaseBlock" ->
@@ -142,7 +150,26 @@ match y with
   | `O o -> begin
     let node_type = get_node_type o in
     match node_type with
-    |_ -> raise_ir_parse_error "Dose not match as any expr node" y
+    |"Constant" ->
+    let kind = match get_dict_node_param "Kind" o with
+    | _,`String "STRING" -> String
+    | _,`String "INTEGER" -> Integer
+    |_ -> Null in
+    let value = match get_dict_node_param "Value" o with
+    |_,`String s -> s
+    |_ -> raise TypeError in
+      Constant { constant_kind = kind; constant_value = value}
+    |"BinOp" ->
+    let kind = match get_dict_node_param "Kind" o with
+    |_,`String "ASSIGN" -> Assign
+    |_ -> raise Not_found in
+    let _,left = get_dict_node_param "Left" o in
+    let left = parse_expr left in
+    let _,r = get_dict_node_param "Right" o in
+    let right = parse_expr r in
+    BinOp {binop_left=left; binop_right=right; binop_kind=kind}
+    | _ -> Constant { constant_kind = Null; constant_value = "null"}
+      (* |_ -> raise_ir_parse_error "Dose not match as any expr node" y *)
    end
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as any expr node" y
 
