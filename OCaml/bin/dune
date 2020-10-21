@@ -1,4 +1,11 @@
 (executable
  (public_name utir)
  (name main)
- (libraries utir yaml yaml.unix bos))
+ (libraries
+  utir
+  yaml
+  yaml.unix
+  bos
+  compiler-libs.common
+  )
+ )
