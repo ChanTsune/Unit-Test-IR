@@ -15,3 +15,5 @@ run_swift: ir_gen run_swift_only
 
 run_ocaml_only:
 	cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml
+
+run_ocaml: ir_gen run_ocaml_only
