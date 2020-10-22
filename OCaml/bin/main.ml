@@ -1,4 +1,5 @@
 include Ast_type
+include Utils
 open Parsetree
 open Asttypes
 
@@ -197,9 +198,10 @@ let parse y =
   let parsed = Yaml_unix.of_file_exn inputFile in
   let a = parse_node parsed
   in
-  let _ = a in
-  let () = Yaml.pp Format.std_formatter parsed in
-  let _ = Bos.OS.File.write outputFile "" in 
+  let ocaml_structures = Convert.convert a in
+  let () = print_ast_as_code ocaml_structures in
+  let str = Ocaml_common.Pprintast.string_of_structure ocaml_structures in
+  let _ = Bos.OS.File.write outputFile str in
   ()
 
 
@@ -216,10 +218,4 @@ let main argc argv =
 let () = main (Array.length Sys.argv) Sys.argv
 
 
-let print_ast_as_code s =
-  let str = Ocaml_common.Pprintast.string_of_structure s in
-  print_endline str
-
-let print_ast s =
-  Printast.structure 0 Format.std_formatter s
 
