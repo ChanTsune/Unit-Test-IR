@@ -6,6 +6,6 @@
   yaml
   yaml.unix
   bos
-  compiler-libs.common
+  ocaml-compiler-libs.common
   )
  )

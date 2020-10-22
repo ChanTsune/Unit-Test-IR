@@ -1,4 +1,6 @@
 include Ast_type
+open Parsetree
+open Asttypes
 
 exception TypeError
 
@@ -212,3 +214,12 @@ let main argc argv =
     end
 
 let () = main (Array.length Sys.argv) Sys.argv
+
+
+let print_ast_as_code s =
+  let str = Ocaml_common.Pprintast.string_of_structure s in
+  print_endline str
+
+let print_ast s =
+  Printast.structure 0 Format.std_formatter s
+
