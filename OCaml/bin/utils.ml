@@ -1,4 +1,5 @@
 open Parsetree
+open Asttypes
 
 let print_yaml y =
   Yaml.pp Format.std_formatter y
@@ -15,6 +16,31 @@ let make_structure_item ?(loc=Location.none) pstr = {
   pstr_desc = pstr;
   pstr_loc = loc;
 }
+
+let make_module_binding ?(attrs=[]) ?(loc=Location.none) ?(name={ txt = ""; loc = Location.none; }) module_expr =
+    {
+     pmb_name=name;
+     pmb_expr = module_expr;
+     pmb_attributes=attrs;
+     pmb_loc=loc;
+    }
+
+let make_module_expr ?(attrs=[]) ?(loc=Location.none) mod_desc = {
+  pmod_desc = mod_desc;
+  pmod_loc =loc;
+  pmod_attributes = attrs;
+}
+
+let make_open_infos ?(attrs=[]) ?(loc=Location.none) open_expr override_flag =
+    {
+     popen_expr=open_expr;
+     popen_override = override_flag;
+     popen_loc=loc;
+     popen_attributes=attrs;
+    }
+
+let make_open_declaration ?(attrs=[]) ?(loc=Location.none) (open_expr:module_expr) override_flag :open_declaration =
+  make_open_infos ~attrs:attrs ~loc:loc open_expr override_flag
 
 let make_value_binding ?(attrs=[]) ?(loc=Location.none) ptn expr = {
     pvb_pat = ptn;
