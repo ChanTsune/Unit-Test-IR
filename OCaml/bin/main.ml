@@ -1,7 +1,5 @@
 include Ast_type
 include Utils
-open Parsetree
-open Asttypes
 
 exception TypeError
 
@@ -200,6 +198,7 @@ let parse y =
   in
   let ocaml_structures = Convert.convert a in
   let () = print_ast_as_code ocaml_structures in
+  let () = print_ast ocaml_structures in
   let str = Ocaml_common.Pprintast.string_of_structure ocaml_structures in
   let _ = Bos.OS.File.write outputFile str in
   ()
