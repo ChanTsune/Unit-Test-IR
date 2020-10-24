@@ -11,6 +11,10 @@ let print_ast_as_code s =
 let print_ast s =
   Printast.structure 0 Format.std_formatter s
 
+let make_loc ?(loc=Location.none) txt = {
+  txt=txt;
+  loc=loc
+}
 
 let make_structure_item ?(loc=Location.none) pstr = {
   pstr_desc = pstr;
@@ -62,3 +66,26 @@ let make_expression ?(attrs=[]) ?(loc=Location.none) ?(loc_stack=[]) exp_desc = 
   pexp_loc_stack = loc_stack;
   pexp_attributes = attrs;
 }
+
+let make_list_expression expr_desc_list =
+  let join = make_loc (Longident.parse "::") in
+  let braket = (Pexp_construct ((make_loc (Longident.parse "[]")), None)) in
+
+  let rec iter list result =
+    match list with
+    | hd::tl -> iter tl (
+      Pexp_construct (
+        join,
+        Some (make_expression (
+          Pexp_tuple [
+                  make_expression hd;
+                  make_expression result;
+                  ]
+          )
+        )
+      )
+     )
+    |[]-> result
+  in
+  let list = iter expr_desc_list braket in
+  make_expression list
