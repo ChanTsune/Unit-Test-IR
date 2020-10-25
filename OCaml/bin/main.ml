@@ -20,7 +20,7 @@ let convert_and_write input output =
 
 let main argc argv =
   if argc < 3 then
-    exit 1
+    exit_with "too few arguments. must be bigger than 2"
   else
     begin
       let input = (Array.get argv 1) in

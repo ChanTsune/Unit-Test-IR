@@ -10,7 +10,13 @@ let raise_ir_parse_error msg y =
 let case_of_decl decl = match decl with| Case c -> c |_ -> raise TypeError
 
 let get_dict_node_param key y =
-  List.find (fun x -> let (k,v) = x in print_endline (k ^"=="^ key); print_yaml v; k = key) y
+  List.find (fun x -> let (k,v) = x in
+  let _ = v in
+   (* print_endline (k ^"=="^ key);
+   print_yaml v; *)
+   k = key
+   )
+  y
 
 let get_dict_node_value key y = let _,v = get_dict_node_param key y in v
 
@@ -150,18 +156,22 @@ match y with
       |_ -> raise TypeError in
       Class {class_name=name; class_bases=bases; class_constractors=constractors; class_fields=fields}
     | "Suite" ->
-      let name = match get_dict_node_param "Name" o with
-       | _,`String s -> s
-       | _ -> raise TypeError in
-      let setup = match get_dict_node_param "SetUp" o with
-       | _,`A a -> a |> List.map parse_expr
-       | _ -> raise TypeError in
-      let cases = match get_dict_node_param "Cases" o with
-      | _, `A a -> a |> List.map parse_decl |> List.map case_of_decl
-      | _ -> raise TypeError in
-      let tear_down = match get_dict_node_param "TearDown" o with
-      | _, `A a -> a |> List.map parse_expr 
-      | _ -> raise TypeError in
+      let name = get_dict_node_value "Name" o 
+      |> string_of_yaml_value_exn 
+      in
+      let setup = get_dict_node_value "SetUp" o 
+      |> list_of_yaml_value_exn 
+      |> List.map parse_expr 
+      in
+      let cases = get_dict_node_value "Cases" o 
+      |> list_of_yaml_value_exn 
+      |> List.map parse_decl 
+      |> List.map case_of_decl
+      in
+      let tear_down = get_dict_node_value "TearDown" o 
+      |> list_of_yaml_value_exn 
+      |> List.map parse_expr
+      in
       Suite {suite_name = name; suite_set_up = setup; suite_cases = cases; suite_tear_down = tear_down}
     | "CaseBlock" ->
       let name = match get_dict_node_param "Name" o with
@@ -175,16 +185,30 @@ match y with
    end
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as any decl node" y
 
+and parse_name o = 
+let name = get_dict_node_value "Name" o |> string_of_yaml_value_exn in
+Name {name_name=name}
+
+and parse_call o = 
+  let value = get_dict_node_value "Value" o in
+  let args = get_dict_node_value "Args" o 
+  |> list_of_yaml_value_exn
+  |> List.map object_of_yaml_value_exn
+  |> List.map parse_call_args
+  in
+  Call {call_value=parse_expr value;call_args=args}
+
+and parse_call_args o =
+let name = get_dict_node_value "Name" o |> string_of_yaml_value in
+let value = get_dict_node_value "Value" o in
+{call_arg_name= name;call_arg_value= parse_expr value}
+
 and parse_expr y =
 match y with
   | `O o -> begin
     let node_type = get_node_type o in
     match node_type with
-    |"Name" -> begin
-              match get_dict_node_param "Name" o with
-              |_,`String n -> Name {name_name=n}
-              |_ -> raise TypeError
-              end
+    |"Name" -> parse_name o
     |"Constant" ->
     let kind = match get_dict_node_param "Kind" o with
     | _,`String "STRING" -> String
@@ -213,6 +237,7 @@ match y with
     let r = get_dict_node_value "Right" o in
     let right = parse_expr r in
     BinOp {binop_left=left; binop_right=right; binop_kind=kind}
+    |"Call" -> parse_call o
     |"Assert" -> parse_assert o
     | x -> let _ = print_endline ("Unsuppoted expr " ^ x) in
       Constant { constant_kind = Null; constant_value = "null"}
@@ -234,5 +259,5 @@ and parse_assert_kind o =
     let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
     Equal {assert_equal_excepted=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
   end
-  | x -> let _ = print_endline ("Unsupported assert " ^ x) in exit 1
+  | x -> exit_with ("Unsupported assert " ^ x)
 }

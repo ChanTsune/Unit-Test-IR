@@ -24,9 +24,19 @@ and decl_node_to n =
   | Suite s -> suite_node_to s
   | Case c -> case_node_to c
 
-and var_node_to n = let _ = n in exit_with "Var node"
-and func_node_to n = let _ = n in exit_with "Func node"
-and class_node_to n = let _ = n in exit_with "Class node"
+and var_node_to n =
+  let _ = n in
+  let _ = print_endline "Var node skipped!!" in
+  make_structure_item (Pstr_value (Nonrecursive, []))
+and func_node_to n =
+  let _ = n in
+  let _ = print_endline "Func node skipped!!" in
+  make_structure_item (Pstr_value (Nonrecursive, []))
+and class_node_to n =
+let _ = n in
+let _ = print_endline "Class node skipped!!" in
+make_structure_item (Pstr_class [])
+
 and suite_node_to n =
   let expr_desc_list = n.suite_cases
    |> List.map case_node_to_value_binding
@@ -77,12 +87,30 @@ and block_node_to n =
 and stmt_node_to n:expression =
 match n with
 | ExprStmt e -> expr_node_to e.expr
-| DeclStmt _ -> exit_with "stm node"
-| Return _ -> exit_with "return node"
-| For _ -> exit_with "for node"
+| DeclStmt d -> decl_node_as_expr d.decl
+| Return r -> return_node_to r
+| For f -> for_node_to f
 | Throw _ -> exit_with "throw node"
 | Try _ -> exit_with "try node"
 | Catch _ -> exit_with "catch node"
+
+
+and decl_node_as_expr n = 
+let _ = n in
+match decl_node_to n with
+|_ -> make_expression (Pexp_ident (make_loc (Longident.parse "decl?")))
+
+
+
+and for_node_to n =
+let _ = n in
+let _ = print_endline "for node skipped!!" in
+make_expression (Pexp_ident (make_loc (Longident.parse "_for_node_")))
+
+and return_node_to n =
+let _ = n in
+let _ = print_endline "return node skipped!!" in
+make_expression (Pexp_ident (make_loc (Longident.parse "_return_node_")))
 
 and expr_node_to n =
 match n with
@@ -124,10 +152,28 @@ and binop_node_to n =
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]))
-  | _ -> let _ = n in exit_with "binop reached!!"
+  | Sub ->
+    make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "-")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Dot
+  | Mul
+  | Div
+  | Mod
+  | Left_shift
+  | Right_shift
+  | Not_equal
+  | In ->
+      make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "?????")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+
 and unaryop_node_to n = let _ = n in exit_with "unaryop reached!!"
 and subscript_node_to n = let _ = n in exit_with "subscript reached!!"
-and call_node_to n = let _ = n in exit_with "call reached!!"
+and call_node_to n = let _ = n in let _ = print_endline "call skipped!!" in
+make_expression (Pexp_ident (make_loc (Longident.parse "")))
 
 and assert_node_to n =
 match n.assert_kind with
