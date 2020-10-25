@@ -195,13 +195,22 @@ match y with
     |_ -> raise TypeError in
       Constant { constant_kind = kind; constant_value = value}
     |"BinOp" ->
-    let kind = match get_dict_node_value "Kind" o with
-    |`String "ASSIGN" -> Assign
-    |`String "ADD" -> Add
+    let kind = match get_dict_node_value "Kind" o |> string_of_yaml_value_exn with
+    | "ASSIGN" -> Assign
+    | "ADD" -> Add
+    | "SUB" -> Sub
+    | "MUL" -> Mul
+    | "DIV" -> Div
+    | "MOD" -> Mod
+    | "DOT" -> Dot
+    | "LEFT_SHIFT" -> Left_shift
+    | "RIGHT_SHIFT" -> Right_shift
+    | "NOT_EQUAL" -> Not_equal
+    | "IN" -> In
     |_ -> raise Not_found in
-    let _,left = get_dict_node_param "Left" o in
+    let left = get_dict_node_value "Left" o in
     let left = parse_expr left in
-    let _,r = get_dict_node_param "Right" o in
+    let r = get_dict_node_value "Right" o in
     let right = parse_expr r in
     BinOp {binop_left=left; binop_right=right; binop_kind=kind}
     |"Assert" -> parse_assert o
