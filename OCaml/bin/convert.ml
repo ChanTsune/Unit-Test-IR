@@ -10,7 +10,7 @@ let rec convert n:structure =
 
 and file_node_to n =
   let x = Longident.parse "Ounit2" in
-  let m = (Pmod_ident {txt=x; loc=Location.none}) in
+  let m = Pmod_ident (make_loc x) in
   let m_exp = make_module_expr m in
   let opn = make_open_declaration m_exp Fresh in
   make_structure_item (Pstr_open opn) ::
