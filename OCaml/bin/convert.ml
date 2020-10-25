@@ -119,6 +119,11 @@ and binop_node_to n =
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]))
+  | Add ->
+    make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "+")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
   | _ -> let _ = n in let _ = print_endline "binop reached!!" in exit 1
 and unaryop_node_to n = let _ = n in let _ = print_endline "unaryop reached!!" in exit 1
 and subscript_node_to n = let _ = n in let _ = print_endline "subscript reached!!" in exit 1
@@ -128,4 +133,8 @@ and assert_node_to n =
 match n.assert_kind with
 | Equal e -> assert_equal_node_to e
 
-and assert_equal_node_to n = let _ = n in let _ = print_endline "assert Equal reached!!" in exit 1
+and assert_equal_node_to n = 
+make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "assert_equal")))),[
+  (Nolabel, expr_node_to n.assert_equal_actual);
+  (Nolabel, expr_node_to n.assert_equal_excepted);
+]))

@@ -10,7 +10,7 @@ let raise_ir_parse_error msg y =
 let case_of_decl decl = match decl with| Case c -> c |_ -> raise TypeError
 
 let get_dict_node_param key y =
-  List.find (fun x -> let (k,_) = x in let _ = print_endline (k ^"=="^ key) in k = key) y
+  List.find (fun x -> let (k,v) = x in print_endline (k ^"=="^ key); print_yaml v; k = key) y
 
 let get_dict_node_value key y = let _,v = get_dict_node_param key y in v
 
@@ -38,7 +38,7 @@ let float_of_yaml_value y =
 
 let object_of_yaml_value y =
   match y with
-  |`String s -> Some s
+  |`O o -> Some o
   |_ -> None
 
 let string_of_yaml_value_exn y = unwrap (string_of_yaml_value y)
@@ -59,15 +59,11 @@ let rec parse_node (y:Yaml.value) =
   | `O o -> begin
     let node_type = get_node_type o in
     if node_type = "File" then
-      let _, v = get_dict_node_param "Version" o in
-      let v = match v with
-      | `Float f -> int_of_float f
-      | _ -> raise (Invalid_argument "Dose not match as file node") in
-      let _, b = get_dict_node_param "Body" o in
-      let c = match b with
-       | `A a -> List.map parse_decl a
-       | _ -> raise (Invalid_argument "Dose not match as file node") in
-      File {file_version = v;file_body = c}
+      let v = get_dict_node_value "Version" o in
+      let v = int_of_float (float_of_yaml_value_exn v) in
+      let b = get_dict_node_value "Body" o 
+      |> list_of_yaml_value_exn |> List.map parse_decl in
+      File {file_version = v;file_body = b}
     else if node_type = "Block" then
       Block (parse_block o)
     else
@@ -76,32 +72,29 @@ let rec parse_node (y:Yaml.value) =
   | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as file node" y
 
 and parse_block o =
-  let body = match get_dict_node_param "Body" o with
-  | _, `A a -> a |> List.map parse_stmt
-  | _ -> raise (Invalid_argument "Dose not match as block node")
+  let body = get_dict_node_value "Body" o
+  |> list_of_yaml_value_exn
+  |> List.map object_of_yaml_value_exn
+  |> List.map parse_stmt
   in {block_body = body}
-and parse_stmt y =
-match y with
-  | `O o -> begin
+and parse_stmt o =
     let node_type = get_node_type o in
     match node_type with
     | "Expr" ->
-      let _,expr = get_dict_node_param "Expr" o in
+      let expr = get_dict_node_value "Expr" o in
       ExprStmt {expr = parse_expr expr}
     | "Decl" ->
-      let _, decl = get_dict_node_param "Decl" o in
+      let decl = get_dict_node_value "Decl" o in
       DeclStmt {decl = parse_decl decl}
     | "Return" ->
-      let _, v = get_dict_node_param "Value" o in
+      let v = get_dict_node_value "Value" o in
       Return {return_value = parse_expr v}
     | "For" ->
-      let v = match get_dict_node_param "Value" o with|_,`O o -> o|_ -> raise TypeError in
-      let _,g = get_dict_node_param "Generator" o in
-      let b = match get_dict_node_param "Body" o with|_,`O o -> o|_ -> raise TypeError in
+      let v = get_dict_node_value "Value" o |> object_of_yaml_value_exn in
+      let g = get_dict_node_value "Generator" o in
+      let b = get_dict_node_value "Body" o |> object_of_yaml_value_exn in
       For {for_value = parse_var v; for_generator = parse_expr g; for_body = parse_block b}
-    | _ -> raise_ir_parse_error "Dose not match as any stmt node" y
-   end
-| _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as stmt node" y
+    | _ -> raise_ir_parse_error "Dose not match as any stmt node" (`O o)
 
 and parse_var o =
   let name = match get_dict_node_param "Name" o with
@@ -202,8 +195,9 @@ match y with
     |_ -> raise TypeError in
       Constant { constant_kind = kind; constant_value = value}
     |"BinOp" ->
-    let kind = match get_dict_node_param "Kind" o with
-    |_,`String "ASSIGN" -> Assign
+    let kind = match get_dict_node_value "Kind" o with
+    |`String "ASSIGN" -> Assign
+    |`String "ADD" -> Add
     |_ -> raise Not_found in
     let _,left = get_dict_node_param "Left" o in
     let left = parse_expr left in
@@ -218,34 +212,18 @@ match y with
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as any expr node" y
 
 and parse_assert o =
-  let _,k = get_dict_node_param "Kind" o in
+  let k = get_dict_node_value "Kind" o
+  |> object_of_yaml_value_exn in
   Assert (parse_assert_kind k)
 
 and parse_assert_kind o =
-match o with
-| `O o ->
   {assert_kind = match get_node_type o with
   | "Equal" -> 
   begin
-    let _,e = get_dict_node_param "Excepted" o in
-    let _,a = get_dict_node_param "Actual" o in
-    let msg = match get_dict_node_param "Message" o with |_,`String s -> Some s | _ -> None in
+    let e = get_dict_node_value "Excepted" o in
+    let a = get_dict_node_value "Actual" o in
+    let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
     Equal {assert_equal_excepted=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
   end
   | x -> let _ = print_endline ("Unsupported assert " ^ x) in exit 1
 }
-| _ -> exit 1
-
-let parse y =
-  match y with
-  | `Null -> Constant { constant_kind = Null; constant_value = "null"}
-  | `String s -> Constant {constant_kind = String; constant_value = s}
-  | `Bool b -> Constant {constant_kind = Boolean; constant_value = string_of_bool b}
-  | `Float f -> Constant {constant_kind = Float; constant_value = string_of_float f}
-  | `O o -> begin 
-    if List.exists (fun x -> let (k,_) = x in k = "Node") o then
-      Constant { constant_kind = Null; constant_value = "null"}
-    else
-      Constant { constant_kind = Null; constant_value = "null"}
-    end
-  | `A _ -> exit 2
