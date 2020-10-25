@@ -68,6 +68,7 @@ let make_expression ?(attrs=[]) ?(loc=Location.none) ?(loc_stack=[]) exp_desc = 
 }
 
 let make_list_expression expr_desc_list =
+  let expr_desc_list = expr_desc_list |> List.rev in
   let join = make_loc (Longident.parse "::") in
   let braket = (Pexp_construct ((make_loc (Longident.parse "[]")), None)) in
 
@@ -89,3 +90,5 @@ let make_list_expression expr_desc_list =
   in
   let list = iter expr_desc_list braket in
   make_expression list
+
+let unit_expression = make_expression (Pexp_construct (make_loc (Longident.parse "()"), None))
