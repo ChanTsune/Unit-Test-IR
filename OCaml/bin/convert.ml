@@ -3,7 +3,7 @@ include Utils
 open Parsetree
 open Asttypes
 
-let rec convert n:structure =
+let rec structure_of_ir_node n:structure =
   match n with
   | File f -> file_node_to f
   | _ -> exit 1

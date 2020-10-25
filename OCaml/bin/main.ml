@@ -10,7 +10,7 @@ let convert_and_write input output =
   let a = parse_node parsed
   in
   let _ = a in let _ = outputFile in
-  let ocaml_structures = Convert.convert a in
+  let ocaml_structures = Convert.structure_of_ir_node a in
   let () = print_ast_as_code ocaml_structures in
   let () = print_ast ocaml_structures in
   let str = Ocaml_common.Pprintast.string_of_structure ocaml_structures in
