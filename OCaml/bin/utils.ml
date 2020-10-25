@@ -11,6 +11,8 @@ let print_ast_as_code s =
 let print_ast s =
   Printast.structure 0 Format.std_formatter s
 
+let exit_with msg = print_endline msg ;exit 1
+
 let make_loc ?(loc=Location.none) txt = {
   txt=txt;
   loc=loc

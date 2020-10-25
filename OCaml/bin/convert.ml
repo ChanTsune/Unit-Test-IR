@@ -6,7 +6,7 @@ open Asttypes
 let rec structure_of_ir_node n:structure =
   match n with
   | File f -> file_node_to f
-  | _ -> exit 1
+  | _ -> exit_with "structure_of_ir_node"
 
 and file_node_to n =
   let x = Longident.parse "Ounit2" in
@@ -24,9 +24,9 @@ and decl_node_to n =
   | Suite s -> suite_node_to s
   | Case c -> case_node_to c
 
-and var_node_to n = let _ = n in exit 1
-and func_node_to n = let _ = n in exit 1
-and class_node_to n = let _ = n in exit 1
+and var_node_to n = let _ = n in exit_with "Var node"
+and func_node_to n = let _ = n in exit_with "Func node"
+and class_node_to n = let _ = n in exit_with "Class node"
 and suite_node_to n =
   let expr_desc_list = n.suite_cases
    |> List.map case_node_to_value_binding
@@ -45,7 +45,7 @@ and suite_node_to n =
 
   and case_node_to n =
 match n with
-| CaseBlock _ -> exit 1
+| CaseBlock _ -> exit_with "case node"
 
 and case_node_to_value_binding n =
   match n with
@@ -77,12 +77,12 @@ and block_node_to n =
 and stmt_node_to n:expression =
 match n with
 | ExprStmt e -> expr_node_to e.expr
-| DeclStmt _ -> exit 1
-| Return _ -> exit 1
-| For _ -> exit 1
-| Throw _ -> exit 1
-| Try _ -> exit 1
-| Catch _ -> exit 1
+| DeclStmt _ -> exit_with "stm node"
+| Return _ -> exit_with "return node"
+| For _ -> exit_with "for node"
+| Throw _ -> exit_with "throw node"
+| Try _ -> exit_with "try node"
+| Catch _ -> exit_with "catch node"
 
 and expr_node_to n =
 match n with
@@ -110,8 +110,8 @@ match n.constant_kind with
   let _ = print_endline ("const " ^ n.constant_value ^ "reached!!") in
  make_expression (Pexp_constant (Pconst_integer (n.constant_value, None)))
  
- and list_node_to n = let _ = n in let _ = print_endline "list reached!!" in exit 1
-and tuple_node_to n = let _ = n in let _ = print_endline "tuple reached!!" in exit 1
+ and list_node_to n = let _ = n in exit_with "list reached!!"
+and tuple_node_to n = let _ = n in exit_with "tuple reached!!"
 and binop_node_to n =
   match n.binop_kind with
   | Assign ->
@@ -124,10 +124,10 @@ and binop_node_to n =
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]))
-  | _ -> let _ = n in let _ = print_endline "binop reached!!" in exit 1
-and unaryop_node_to n = let _ = n in let _ = print_endline "unaryop reached!!" in exit 1
-and subscript_node_to n = let _ = n in let _ = print_endline "subscript reached!!" in exit 1
-and call_node_to n = let _ = n in let _ = print_endline "call reached!!" in exit 1
+  | _ -> let _ = n in exit_with "binop reached!!"
+and unaryop_node_to n = let _ = n in exit_with "unaryop reached!!"
+and subscript_node_to n = let _ = n in exit_with "subscript reached!!"
+and call_node_to n = let _ = n in exit_with "call reached!!"
 
 and assert_node_to n =
 match n.assert_kind with
