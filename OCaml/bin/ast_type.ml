@@ -61,4 +61,4 @@ and call = {call_value: expr; call_args: call_arg list}
 and call_arg = {call_arg_name: string option;call_arg_value: expr}
 and assert_ = {assert_kind: assert_kind}
 and assert_kind = Equal of assert_equal
-and assert_equal = {assert_equal_excepted:expr; assert_equal_actual:expr; assert_equal_message: string}
+and assert_equal = {assert_equal_excepted:expr; assert_equal_actual:expr; assert_equal_message: string option}
