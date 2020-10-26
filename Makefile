@@ -5,8 +5,10 @@ OUTPUT=sample_data/test_sample.json
 ir_gen:
 	python main.py ${INPUT} ${OUTPUT}
 
-run_kotlin: ir_gen
+run_kotlin_only:
 	cd ./kotlin && ./gradlew run --args="../${OUTPUT}"
+
+run_kotlin: ir_gen run_kotlin_only
 
 run_swift_only:
 	cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift
