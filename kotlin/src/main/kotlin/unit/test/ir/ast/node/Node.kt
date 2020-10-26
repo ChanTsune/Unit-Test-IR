@@ -313,6 +313,16 @@ sealed class Node {
                         @SerialName("Message")
                         val message: String?
                 ) : Kind()
+                @Serializable
+                @SerialName("Failure")
+                data class AssertFailure(
+                        @SerialName("Error")
+                        val error: String?,
+                        @SerialName("Expr")
+                        val expr: Expr,
+                        @SerialName("Message")
+                        val message: String?
+                ) : Kind()
             }
         }
 
