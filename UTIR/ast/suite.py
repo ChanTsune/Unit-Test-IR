@@ -105,3 +105,17 @@ class AssertEqual(AssertKind):
             'Actual': self.actual.serialize(),
             'Message': self.message,
         }
+
+@dataclass
+class AssertFailure(AssertKind):
+    error: Optional[str]
+    expr: Expr
+    message: Optional[str] = None
+
+    def serialize(self):
+        return {
+            'Node': 'Failure',
+            'Error': self.error,
+            'Expr': self.expr.serialize(),
+            'Message': self.message,
+        }
