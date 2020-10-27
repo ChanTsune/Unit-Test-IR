@@ -224,12 +224,12 @@ struct Var: CodableNode {
     var node: String = "Var"
     var name: String
     var type: String?
-    var expr: Expr?
+    var value: Expr?
     enum CodingKeys: String, CodingKey {
         case node = "Node"
         case name = "Name"
         case type = "Type"
-        case expr = "Expr"
+        case value = "Value"
     }
 }
 

@@ -227,9 +227,9 @@ class IR2SWConverter {
             colon: SyntaxFactory.makeColonToken(),
             type: SyntaxFactory.makeTypeIdentifier(node.field.type ?? "Any"),
             ellipsis: node.vararg ? SyntaxFactory.makeEllipsisToken() : nil,
-            defaultArgument: field.expr != nil ? InitializerClauseSyntax {
+            defaultArgument: field.value != nil ? InitializerClauseSyntax {
                 $0.useEqual(SyntaxFactory.makeEqualToken())
-                if let e = field.expr, let expr = visit(e) {
+                if let e = field.value, let expr = visit(e) {
                     $0.useValue(expr)
                 }
             }: nil,
@@ -249,7 +249,7 @@ class IR2SWConverter {
                     typeAnnotation: nil,
                     initializer: InitializerClauseSyntax {
                         $0.useEqual(SyntaxFactory.makeEqualToken())
-                        if let nodeExpr = node.expr {
+                        if let nodeExpr = node.value {
                             if let expr = visit(nodeExpr) {
                                 $0.useValue(expr)
                             } else {
