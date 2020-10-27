@@ -455,8 +455,8 @@ class IR2SWConverter {
     }
     func visit(_ node: Subscript) -> ExprSyntax? {
         return ExprSyntax(SubscriptExprSyntax {
-            $0.useLeftBracket(SyntaxFactory.makeLeftBraceToken())
-            $0.useRightBracket(SyntaxFactory.makeRightBraceToken())
+            $0.useLeftBracket(SyntaxFactory.makeLeftSquareBracketToken())
+            $0.useRightBracket(SyntaxFactory.makeRightSquareBracketToken())
             if let expr = visit(node.value) {
                 $0.useCalledExpression(expr)
             } else {
