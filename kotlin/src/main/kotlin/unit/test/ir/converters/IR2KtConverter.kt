@@ -170,11 +170,11 @@ class IR2KtConverter {
                 receiverType = null,
                 vars = listOf(KNode.Decl.Property.Var(
                         name = node.name,
-                        type = node.type?.let { KNode.Type(
+                        type = node.type.let { KNode.Type(
                                 mods = listOf(),
                                 ref = KNode.TypeRef.Simple(
                                         pieces = listOf(KNode.TypeRef.Simple.Piece(
-                                                name = it,
+                                                name = if (it.isNullOrBlank()) "Any" else it,
                                                 typeParams = listOf()
                                         ))
                                 )
