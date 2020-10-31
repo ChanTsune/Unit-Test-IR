@@ -148,7 +148,7 @@ class IR2KtConverter {
                 )
             }
             is Node.Decl.Var -> {
-                TODO()
+                visit(node)
             }
             is Node.Decl.Suite -> {
                 visit(node)
@@ -160,6 +160,31 @@ class IR2KtConverter {
                 throw Exception("This branch will never execute! but given $node")
             }
         }
+    }
+
+    private fun visit(node: Node.Decl.Var): KNode.Decl.Property {
+        return KNode.Decl.Property(
+                mods = listOf(),
+                readOnly = false,
+                typeParams = listOf(),
+                receiverType = null,
+                vars = listOf(KNode.Decl.Property.Var(
+                        name = node.name,
+                        type = node.type?.let { KNode.Type(
+                                mods = listOf(),
+                                ref = KNode.TypeRef.Simple(
+                                        pieces = listOf(KNode.TypeRef.Simple.Piece(
+                                                name = it,
+                                                typeParams = listOf()
+                                        ))
+                                )
+                        ) },
+                )),
+                typeConstraints = listOf(),
+                delegated = false,
+                expr = node.value?.let { visit(it) },
+                accessors = null
+        )
     }
 
     private fun visit(node: Node.Decl.Suite): KNode.Decl {
