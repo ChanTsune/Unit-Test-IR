@@ -39,9 +39,9 @@ fun main(args: Array<String>) {
     try {
         val file = Parser.parseFile(code)
         Visitor.visit(file) { node, parentNode ->
-            println(node)
+//            println(node)
         }
-        println(Writer.write(file))
+//        println(Writer.write(file))
     } catch (e: Parser.ParseError){
         println(e)
     }
