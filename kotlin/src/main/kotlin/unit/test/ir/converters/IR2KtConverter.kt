@@ -101,7 +101,17 @@ class IR2KtConverter {
         return when (node) {
             is Node.Decl.Class -> {
                 fun visit(node: String): KNode.Decl.Structured.Parent {
-                    return TODO()
+                    return KNode.Decl.Structured.Parent.Type(
+                            type = KNode.TypeRef.Simple(
+                                    pieces = listOf(
+                                            KNode.TypeRef.Simple.Piece(
+                                                    name = node,
+                                                    typeParams = listOf()
+                                            )
+                                    )
+                            ),
+                            by = null,
+                    )
                 }
                 KNode.Decl.Structured(
                         mods = listOf(),
@@ -110,7 +120,7 @@ class IR2KtConverter {
                         typeParams = listOf(),
                         primaryConstructor = null,
                         parentAnns = listOf(),
-                        parents = listOf(), // TODO: node.bases.map { visit(it) },
+                        parents = node.bases.map { visit(it) },
                         typeConstraints = listOf(),
                         members = node.fields.map { visit(it) }
 
@@ -520,9 +530,6 @@ class IR2KtConverter {
                         }
                     }
                 }
-            }
-            else -> {
-                throw Exception("This branch will never execute! but given $node")
             }
         }
     }
