@@ -9,7 +9,6 @@ import kotlinx.serialization.json.Json
 import unit.test.ir.ast.node.Node
 import unit.test.ir.converters.IR2KtConverter
 import java.io.File
-import java.io.FileWriter
 import java.nio.file.Paths
 
 
@@ -60,11 +59,7 @@ fun main(args: Array<String>) {
                 decodeFromString(Node.serializer(), fileContent).let {
                     IR2KtConverter().visit(it).let {
                         val ktCode = Writer.write(it)
-                        val outputFile = File("../sample_data/test_sample.kt")
-                        FileWriter(outputFile).apply {
-                            write(ktCode)
-                            close()
-                        }
+                        File("../sample_data/test_sample.kt").writeText(ktCode)
                     }
                 }
             } catch (e: Throwable) {
