@@ -5,7 +5,7 @@ let print_yaml y =
   Yaml.pp Format.std_formatter y
 
 let print_ast_as_code s =
-  let str = Ocaml_common.Pprintast.string_of_structure s in
+  let str = Pprintast.string_of_structure s in
   print_endline str
 
 let print_ast s =
