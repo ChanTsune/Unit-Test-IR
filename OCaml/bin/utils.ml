@@ -94,3 +94,5 @@ let make_list_expression expr_desc_list =
   make_expression list
 
 let unit_expression = make_expression (Pexp_construct (make_loc (Longident.parse "()"), None))
+
+let unwrap v = match v with| Some s -> s| None -> raise (Invalid_argument "optional unwrap faied.")

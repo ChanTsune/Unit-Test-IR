@@ -20,8 +20,6 @@ let get_dict_node_param key y =
 
 let get_dict_node_value key y = let _,v = get_dict_node_param key y in v
 
-let unwrap v = match v with| Some s -> s| None -> raise (Invalid_argument "optional unwrap faied.")
-
 let string_of_yaml_value y =
   match y with
   |`String s -> Some s
