@@ -207,41 +207,77 @@ match y with
     let node_type = get_node_type o in
     match node_type with
     |"Name" -> parse_name o
-    |"Constant" ->
-    let kind = match get_dict_node_param "Kind" o with
-    | _,`String "STRING" -> String
-    | _,`String "INTEGER" -> Integer
-    |_ -> Null in
-    let value = match get_dict_node_param "Value" o with
-    |_,`String s -> s
-    |_ -> raise TypeError in
-      Constant { constant_kind = kind; constant_value = value}
-    |"BinOp" ->
-    let kind = match get_dict_node_value "Kind" o |> string_of_yaml_value_exn with
-    | "ASSIGN" -> Assign
-    | "ADD" -> Add
-    | "SUB" -> Sub
-    | "MUL" -> Mul
-    | "DIV" -> Div
-    | "MOD" -> Mod
-    | "DOT" -> Dot
-    | "LEFT_SHIFT" -> Left_shift
-    | "RIGHT_SHIFT" -> Right_shift
-    | "NOT_EQUAL" -> Not_equal
-    | "IN" -> In
-    |_ -> raise Not_found in
-    let left = get_dict_node_value "Left" o in
-    let left = parse_expr left in
-    let r = get_dict_node_value "Right" o in
-    let right = parse_expr r in
-    BinOp {binop_left=left; binop_right=right; binop_kind=kind}
+    |"Constant" -> parse_constant o
+    |"BinOp" -> parse_binop o
     |"Call" -> parse_call o
     |"Assert" -> parse_assert o
+    |"List" -> parse_list o
+    |"Tuple" -> parse_tuple o
+    |"UnaryOp" -> parse_unaryop o
+    |"Subscript" -> parse_subscript o
     | x -> let _ = print_endline ("Unsuppoted expr " ^ x) in
       Constant { constant_kind = Null; constant_value = "null"}
       (* |_ -> raise_ir_parse_error "Dose not match as any expr node" y *)
    end
 | _ -> raise_ir_parse_error "Invalid Yaml.value passed! Dose not match as any expr node" y
+
+and parse_list o =
+  let values = get_dict_node_value "Values" o
+    |> list_of_yaml_value_exn
+    |> List.map parse_expr
+    in
+  List {list_values=values}
+
+and parse_tuple o =
+  let values = get_dict_node_value "Values" o
+    |> list_of_yaml_value_exn
+    |> List.map parse_expr
+    in
+  Tuple {tuple_values=values}
+
+and parse_constant o =
+  let kind = match get_dict_node_param "Kind" o with
+  | _,`String "STRING" -> String
+  | _,`String "INTEGER" -> Integer
+  |_ -> Null in
+  let value = match get_dict_node_param "Value" o with
+  |_,`String s -> s
+  |_ -> raise TypeError in
+    Constant { constant_kind = kind; constant_value = value}
+
+and parse_binop o =
+  let kind = match get_dict_node_value "Kind" o |> string_of_yaml_value_exn with
+  | "ASSIGN" -> Assign
+  | "ADD" -> Add
+  | "SUB" -> Sub
+  | "MUL" -> Mul
+  | "DIV" -> Div
+  | "MOD" -> Mod
+  | "DOT" -> Dot
+  | "LEFT_SHIFT" -> Left_shift
+  | "RIGHT_SHIFT" -> Right_shift
+  | "NOT_EQUAL" -> Not_equal
+  | "IN" -> In
+  |_ -> raise Not_found in
+  let left = get_dict_node_value "Left" o in
+  let left = parse_expr left in
+  let r = get_dict_node_value "Right" o in
+  let right = parse_expr r in
+  BinOp {binop_left=left; binop_right=right; binop_kind=kind}
+
+and parse_unaryop o =
+  UnaryOp {
+    unaryop_value= get_dict_node_value "Value" o |> parse_expr;
+    unaryop_kind=match get_dict_node_value "Kind" o |> string_of_yaml_value_exn with
+    |"PLUS" -> Plus
+    |"MINUS" -> Minus
+    |x -> exit_with ("unaryop_kind" ^ x)
+    }
+and parse_subscript o =
+ Subscript {
+   subscript_value=get_dict_node_value "Value" o |> parse_expr;
+   subscript_index=get_dict_node_value "Index" o |> parse_expr;
+ }
 
 and parse_assert o =
   let k = get_dict_node_value "Kind" o
