@@ -12,7 +12,7 @@ and file_node_to n =
   let x = Longident.parse "Ounit2" in
   let m = Pmod_ident (make_loc x) in
   let m_exp = make_module_expr m in
-  let opn = make_open_declaration m_exp Fresh in
+  let opn = Ast_helper.Opn.mk m_exp in
   make_structure_item (Pstr_open opn) ::
   (n.file_body |> List.map decl_node_to)
 

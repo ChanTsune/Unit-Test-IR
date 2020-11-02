@@ -45,9 +45,6 @@ let make_open_infos ?(attrs=[]) ?(loc=Location.none) open_expr override_flag =
      popen_attributes=attrs;
     }
 
-let make_open_declaration ?(attrs=[]) ?(loc=Location.none) (open_expr:module_expr) override_flag :open_declaration =
-  make_open_infos ~attrs:attrs ~loc:loc open_expr override_flag
-
 let make_value_binding ?(attrs=[]) ?(loc=Location.none) ptn expr = {
     pvb_pat = ptn;
     pvb_expr = expr;
