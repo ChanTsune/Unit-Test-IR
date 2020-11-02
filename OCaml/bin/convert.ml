@@ -25,9 +25,10 @@ and decl_node_to n =
   | Case c -> case_node_to c
 
 and var_node_to n =
-  let _ = n in
-  let _ = print_endline "Var node skipped!!" in
-  make_structure_item (Pstr_value (Nonrecursive, []))
+  let value = unwrap n.var_value in
+  make_structure_item (Pstr_value (Nonrecursive, [
+    make_value_binding (Ast_helper.Pat.var (make_loc n.var_name)) (expr_node_to value)
+  ]))
 and func_node_to n =
   let _ = n in
   let _ = print_endline "Func node skipped!!" in
