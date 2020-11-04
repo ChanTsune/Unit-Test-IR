@@ -152,8 +152,17 @@ match n.constant_kind with
   let _ = print_endline ("const " ^ n.constant_value ^ "reached!!") in
  make_expression (Pexp_constant (Pconst_integer (n.constant_value, None)))
  
- and list_node_to n = let _ = n in exit_with "list reached!!"
-and tuple_node_to n = let _ = n in exit_with "tuple reached!!"
+and list_node_to n =
+  let exp_desc_list = n.list_values 
+  |> List.map expr_node_to 
+  |> List.map (fun x -> x.pexp_desc)
+  in
+ make_list_expression exp_desc_list
+and tuple_node_to n =
+  let exp_desc_list = n.tuple_values
+  |> List.map expr_node_to in
+  Ast_helper.Exp.tuple exp_desc_list
+
 and binop_node_to n =
   match n.binop_kind with
   | Assign ->
@@ -171,23 +180,63 @@ and binop_node_to n =
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]))
-  | Dot
-  | Mul
-  | Div
-  | Mod
-  | Left_shift
-  | Right_shift
-  | Not_equal
+  | Dot -> 
+      let name = match n.binop_right with
+      |Name n -> n.name_name
+      | _ -> raise (Invalid_argument "BinOp right node must be a Name node!") in
+      Ast_helper.Exp.send (expr_node_to n.binop_left) (make_loc name)
+  | Mul -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "*")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Div -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "/")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Mod -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "mod")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Left_shift -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "lsl")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Right_shift -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "lsr")))), [ (* TODO: asr 算術シフト・論理シフトの区別 *)
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
+  | Not_equal -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "<>")))), [
+      (Nolabel, expr_node_to n.binop_left);
+      (Nolabel, expr_node_to n.binop_right);
+    ]))
   | In ->
-      make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "?????")))), [
+      make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "List.mem")))), [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]))
 
-and unaryop_node_to n = let _ = n in exit_with "unaryop reached!!"
-and subscript_node_to n = let _ = n in exit_with "subscript reached!!"
-and call_node_to n = let _ = n in let _ = print_endline "call skipped!!" in
-make_expression (Pexp_ident (make_loc (Longident.parse "")))
+and unaryop_node_to n = match n.unaryop_kind with
+| Minus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [ (* TODO: ~- *)
+  (Nolabel, (expr_node_to n.unaryop_value))
+]
+| Plus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [ (* TODO: ~+ *)
+  (Nolabel, (expr_node_to n.unaryop_value))
+]
+and subscript_node_to n =
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.nth"))) [
+  (Nolabel, expr_node_to n.subscript_value);
+  (Nolabel, expr_node_to n.subscript_index);
+]
+
+and call_node_to n =
+Ast_helper.Exp.apply (expr_node_to n.call_value) (List.map call_arg_node_to n.call_args)
+
+and call_arg_node_to n = 
+let lab = match n.call_arg_name with
+| Some a -> Labelled a
+| None -> Nolabel in
+let exp = expr_node_to n.call_arg_value in
+lab, exp
 
 and assert_node_to n =
 match n.assert_kind with
