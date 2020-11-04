@@ -109,10 +109,16 @@ match n with
 | Catch _ -> exit_with "catch node"
 
 
-and decl_node_as_expr n = 
-let _ = n in
-match decl_node_to n with
-|_ -> make_expression (Pexp_ident (make_loc (Longident.parse "decl?")))
+and decl_node_as_expr n =
+let decl = decl_node_to n in
+match decl with
+| {pstr_desc = pstr;pstr_loc = _;} -> match pstr with
+|Pstr_value (rec_flag, vblist)-> 
+make_expression (Pexp_let (rec_flag, vblist, make_expression Pexp_unreachable))
+|Pstr_class _ -> 
+let () = print_endline "Unsupported class decl found in stmt." in
+ (Ast_helper.Exp.constant (Ast_helper.Const.string (Pprintast.string_of_structure [decl])))
+| _ -> exit_with "unsupported decl in stmt!"
 
 
 
@@ -124,7 +130,7 @@ make_expression (Pexp_ident (make_loc (Longident.parse "_for_node_")))
 and return_node_to n =
 let _ = n in
 let _ = print_endline "return node skipped!!" in
-make_expression (Pexp_ident (make_loc (Longident.parse "_return_node_")))
+expr_node_to n.return_value
 
 and expr_node_to n =
 match n with
