@@ -43,6 +43,15 @@ class DefaultIRTransformer(NodeTransformer):
                                     message=args[2], # TODO: support
                                 )
                             )
+                    elif node.value.right.name == 'assertRaises':
+                        args = [i.value for i in node.args]
+                        return ast.Assert(
+                            kind=ast.AssertFailure(
+                                error=args[0].name,
+                                func=args[1],
+                                args=args[2:],
+                            )
+                        )
                     print(f'TODO: ~~ {node.value.right.name}')
         return node
 
