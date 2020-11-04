@@ -498,6 +498,8 @@ class IR2SWConverter {
         switch node.kind {
         case .equal(let x):
             return visit(x)
+        case .failure(let x):
+            return visit(x)
         }
     }
     func visit(_ node: AssertEqual) -> ExprSyntax? {
@@ -523,6 +525,46 @@ class IR2SWConverter {
                     }
                 })
             }
+        })
+    }
+    func visit(_ node: AssertFailure) -> ExprSyntax? {
+        let callExpr = ExprSyntax(FunctionCallExprSyntax {
+            $0.useRightParen(SyntaxFactory.makeRightParenToken())
+            $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+            if let ex = visit(node.func_) {
+                $0.useCalledExpression(ex)
+            } else {
+                print("Skipped \(node.func_)")
+            }
+            for (i, arg) in node.args.enumerated() {
+                $0.addArgument(TupleExprElementSyntax {
+                    if let expr = visit(arg) {
+                        $0.useExpression(expr)
+                    } else {
+                        print("Skipped \(arg)")
+                    }
+                    if node.args.count - 1 != i {
+                        $0.useTrailingComma(SyntaxFactory.makeCommaToken())
+                    }
+                })
+            }
+            
+        })
+        return ExprSyntax(FunctionCallExprSyntax {
+            $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+            $0.useRightParen(SyntaxFactory.makeRightParenToken())
+            $0.useCalledExpression(
+                ExprSyntax(SyntaxFactory.makeIdentifierExpr(
+                    identifier: SyntaxFactory.makeIdentifier("XCTAssertThrowsError"),
+                    declNameArguments: nil
+                ))
+            )
+            $0.addArgument(TupleExprElementSyntax {
+                $0.useExpression(ExprSyntax(TryExprSyntax {
+                    $0.useTryKeyword(SyntaxFactory.makeTryKeyword())
+                    $0.useExpression(callExpr)
+                }))
+            })
         })
     }
 

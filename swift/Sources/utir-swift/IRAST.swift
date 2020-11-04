@@ -578,6 +578,7 @@ struct Assert: CodableNode, IR {
     var kind: AssertKind
     enum AssertKind: Codable {
         case equal(AssertEqual)
+        case failure(AssertFailure)
     }
     enum CodingKeys: String, CodingKey {
         case node = "Node"
@@ -591,6 +592,10 @@ extension Assert.AssertKind {
             self = .equal(x)
             return
         }
+        if let x = try? container.decode(AssertFailure.self) {
+            self = .failure(x)
+            return
+        }
         throw DecodingError.typeMismatch(Case.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
@@ -598,6 +603,8 @@ extension Assert.AssertKind {
         var container = encoder.singleValueContainer()
         switch self {
         case .equal(let x):
+            try container.encode(x)
+        case .failure(let x):
             try container.encode(x)
         }
     }
@@ -613,5 +620,19 @@ struct AssertEqual: CodableNode {
         case excepted = "Excepted"
         case actual = "Actual"
         case message = "Message"
+    }
+}
+
+struct AssertFailure: CodableNode {
+    var node: String = "Failure"
+    var error: String?
+    var func_: Expr
+    var args: [Expr]
+    
+    enum CodingKeys: String, CodingKey {
+        case node = "Node"
+        case error = "Error"
+        case func_ = "Func"
+        case args = "Args"
     }
 }
