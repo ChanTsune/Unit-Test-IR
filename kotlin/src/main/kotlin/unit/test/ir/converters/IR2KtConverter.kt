@@ -487,7 +487,39 @@ class IR2KtConverter {
                         )
                     }
                     is Node.Expr.Assert.Kind.AssertFailure -> {
-                        if (node.kind.error != null) {
+                        val lambda = KNode.Expr.Call.TrailLambda(
+                                anns = listOf(),
+                                label = null,
+                                func = KNode.Expr.Brace(
+                                        params = listOf(),
+                                        block = KNode.Block(
+                                                stmts = listOf(
+                                                        KNode.Stmt.Expr(
+                                                                expr=KNode.Expr.Call(
+                                                                        expr = visit(node.kind.func),
+                                                                        typeArgs = listOf(),
+                                                                        args = node.kind.args.map {
+                                                                            KNode.ValueArg(
+                                                                                    name = null,
+                                                                                    asterisk = false,
+                                                                                    expr = visit(it)
+                                                                            )
+                                                                        },
+                                                                        lambda = null,
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                        if (node.kind.error.isNullOrEmpty()) {
+                            KNode.Expr.Call(
+                                    expr = KNode.Expr.Name(name = "assertFails"),
+                                    typeArgs = listOf(),
+                                    args = mutableListOf(),
+                                    lambda = lambda
+                            )
+                        } else {
                             KNode.Expr.Call(
                                     expr = KNode.Expr.Name(name = "assertFailsWith"),
                                     typeArgs = listOf(KNode.Type(
@@ -500,32 +532,7 @@ class IR2KtConverter {
                                             )
                                     )),
                                     args = mutableListOf(),
-                                    lambda = KNode.Expr.Call.TrailLambda(
-                                            anns = listOf(),
-                                            label = null,
-                                            func = KNode.Expr.Brace(
-                                                    params = listOf(),
-                                                    block = KNode.Block(
-                                                            stmts = listOf()
-                                                    )
-                                            )
-                                    )
-                            )
-                        } else {
-                            KNode.Expr.Call(
-                                    expr = KNode.Expr.Name(name = "assertFails"),
-                                    typeArgs = listOf(),
-                                    args = mutableListOf(),
-                                    lambda = KNode.Expr.Call.TrailLambda(
-                                            anns = listOf(),
-                                            label = null,
-                                            func = KNode.Expr.Brace(
-                                                    params = listOf(),
-                                                    block = KNode.Block(
-                                                            stmts = listOf()
-                                                    )
-                                            )
-                                    )
+                                    lambda = lambda
                             )
                         }
                     }

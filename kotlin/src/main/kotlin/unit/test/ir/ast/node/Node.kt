@@ -318,8 +318,10 @@ sealed class Node {
                 data class AssertFailure(
                         @SerialName("Error")
                         val error: String?,
-                        @SerialName("Expr")
-                        val expr: Expr,
+                        @SerialName("Func")
+                        val func: Expr,
+                        @SerialName("Args")
+                        val args: IList<Expr>,
                         @SerialName("Message")
                         val message: String?
                 ) : Kind()
