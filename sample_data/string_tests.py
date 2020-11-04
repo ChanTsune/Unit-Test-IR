@@ -1240,8 +1240,7 @@ class BaseTest:
         self.checkequal('\x7f', "%c", '__mod__', 0x7f)
 
         for ordinal in (-100, 0x200000):
-            # unicode raises ValueError, str raises OverflowError
-            self.checkraises((ValueError, OverflowError), '%c', '__mod__', ordinal)
+            self.checkraises(OverflowError, '%c', '__mod__', ordinal)
 
         longvalue = sys.maxsize + 10
         slongvalue = str(longvalue)
