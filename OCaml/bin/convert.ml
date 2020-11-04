@@ -70,7 +70,7 @@ and case_block_node_to n =
   ])) in
   make_value_binding (make_pattern (Ppat_var (make_loc n.case_block_name))) case_expr
 
-and block_node_to n =
+and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
   let to_seqence list =
     let rec iter list expr =
       match list with
@@ -96,7 +96,7 @@ and block_node_to n =
     | hd::tl -> iter tl hd
     in
   let lst = n.block_body |> List.map stmt_node_to in
-    make_expression (Pexp_fun (Nolabel, (*expression option*) None, make_pattern Ppat_any , (to_seqence lst)))
+    make_expression (Pexp_fun (Nolabel, (*expression option*) None, pattern , (to_seqence lst)))
 
 and stmt_node_to n:expression =
 match n with
@@ -123,9 +123,11 @@ let () = print_endline "Unsupported class decl found in stmt." in
 
 
 and for_node_to n =
-let _ = n in
-let _ = print_endline "for node skipped!!" in
-make_expression (Pexp_ident (make_loc (Longident.parse "_for_node_")))
+let v = Ast_helper.Pat.var (make_loc n.for_value.var_name) in
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.iter"))) [
+  (Nolabel, block_node_to ~pattern:v n.for_body);
+  (Nolabel, expr_node_to n.for_generator);
+]
 
 and return_node_to n =
 let _ = n in
