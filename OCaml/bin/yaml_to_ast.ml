@@ -40,7 +40,7 @@ let float_of_yaml_value y =
   | `Float f -> Some f
   | _ -> None
 
-let object_of_yaml_value y =
+let object_of_yaml_value (y:Yaml.value) =
   match y with
   |`O o -> Some o
   |_ -> None
@@ -286,12 +286,23 @@ and parse_assert o =
 
 and parse_assert_kind o =
   {assert_kind = match get_node_type o with
-  | "Equal" -> 
-  begin
-    let e = get_dict_node_value "Excepted" o in
-    let a = get_dict_node_value "Actual" o in
-    let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
-    Equal {assert_equal_excepted=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
-  end
+  | "Equal" -> Equal (parse_assert_equal o)
+  | "Failure" -> Failure (parse_assert_failure o)
   | x -> exit_with ("Unsupported assert " ^ x)
 }
+
+and parse_assert_equal o =
+  let e = get_dict_node_value "Excepted" o in
+  let a = get_dict_node_value "Actual" o in
+  let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
+ {assert_equal_excepted=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
+
+and parse_assert_failure o =
+let error = get_dict_node_value "Error" o |> string_of_yaml_value in
+let func = get_dict_node_value "Func" o in
+let args = get_dict_node_value "Args" o |> list_of_yaml_value_exn in
+let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
+  {assert_failure_error=error;
+  assert_failure_func=parse_expr func;
+  assert_failure_args= args|> List.map parse_expr;
+  assert_failure_message=msg}

@@ -249,9 +249,27 @@ lab, exp
 and assert_node_to n =
 match n.assert_kind with
 | Equal e -> assert_equal_node_to e
+| Failure f -> assert_failure_node_to f
 
 and assert_equal_node_to n = 
 make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "assert_equal")))),[
   (Nolabel, expr_node_to n.assert_equal_actual);
   (Nolabel, expr_node_to n.assert_equal_excepted);
 ]))
+
+and assert_failure_node_to n =
+let e = match n.assert_failure_error with | Some s -> s| None -> "AnyError" in
+let args = n.assert_failure_args |> List.map expr_node_to |> List.map (fun x -> (Nolabel, x)) in
+let fnc = n.assert_failure_func |> expr_node_to in
+let f_call = Ast_helper.Exp.apply fnc args in
+let arg_f_call = Ast_helper.Exp.fun_ Nolabel None (Ast_helper.Pat.any ()) f_call in
+let opt_args =
+match n.assert_failure_message with
+| Some s -> [(Optional "msg" , Ast_helper.Exp.constant (Ast_helper.Const.string s))]
+| None -> []
+in
+(* let _ =  in *)
+let args = opt_args @ [(Nolabel, Ast_helper.Exp.construct (make_loc (Longident.parse e)) None); (Nolabel, arg_f_call)] in
+Ast_helper.Exp.apply ( Ast_helper.Exp.ident (make_loc (Longident.parse "assert_raises"))) args
+
+(* assert_raises ?msg="" (fun () -> f_call ) *)
