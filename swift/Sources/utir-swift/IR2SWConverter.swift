@@ -124,11 +124,16 @@ class IR2SWConverter {
         }
     }
     func visit(_ node: Suite) -> DeclSyntax? {
-        // TODO: "XCTestCase"
         let classKeyword = SyntaxFactory.makeClassKeyword().withTrailingTrivia(.spaces(1))
         let source = ClassDeclSyntax {
             $0.useClassKeyword(classKeyword)
             $0.useIdentifier(SyntaxFactory.makeIdentifier(node.name))
+            $0.useInheritanceClause(TypeInheritanceClauseSyntax {
+                $0.useColon(SyntaxFactory.makeColonToken())
+                $0.addInheritedType(InheritedTypeSyntax {
+                    $0.useTypeName(SyntaxFactory.makeTypeIdentifier("XCTestCase"))
+                })
+            })
             $0.useMembers(MemberDeclBlockSyntax {
                 $0.useLeftBrace(
                     SyntaxFactory.makeToken(.leftBrace, presence: .present).withLeadingTrivia(.spaces(1))
@@ -156,6 +161,20 @@ class IR2SWConverter {
         let source = ClassDeclSyntax {
             $0.useClassKeyword(classKeyword)
             $0.useIdentifier(SyntaxFactory.makeIdentifier(node.name))
+            if !node.bases.isEmpty {
+                $0.useInheritanceClause(TypeInheritanceClauseSyntax {
+                    $0.useColon(SyntaxFactory.makeColonToken())
+                    for (i, n) in node.bases.enumerated() {
+                        $0.addInheritedType(InheritedTypeSyntax {
+                            $0.useTypeName(SyntaxFactory.makeTypeIdentifier(n))
+                            if i != node.bases.count - 1 {
+                                $0.useTrailingComma(SyntaxFactory.makeCommaToken())
+                            }
+                        })
+                    }
+                })
+            }
+
             $0.useMembers(MemberDeclBlockSyntax {
                 $0.useLeftBrace(
                     SyntaxFactory.makeToken(.leftBrace, presence: .present).withLeadingTrivia(.spaces(1))
