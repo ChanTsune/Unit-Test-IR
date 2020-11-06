@@ -1,16 +1,5 @@
 package unit.test.ir
 
-val defaultEscapeMap = mapOf(
-        '\t' to "\\t",
-        '\n' to "\\n",
-        '\r' to "\\r",
-        '"' to "\\\"",
-        '\\' to "\\\\"
-)
+import org.apache.commons.lang.StringEscapeUtils
 
-fun String.escape(escapeMap: Map<Char, String> = defaultEscapeMap): String {
-    val self = this
-    return buildString {
-        self.map { append(escapeMap[it] ?: it) }
-    }
-}
+fun String.escape(): String = StringEscapeUtils.escapeJava(this)

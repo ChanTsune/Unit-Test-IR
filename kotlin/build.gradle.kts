@@ -40,6 +40,9 @@ dependencies {
     // [kaml](https://github.com/charleskorn/kaml)
     implementation("com.charleskorn.kaml:kaml:0.23.0")
 
+    // https://mvnrepository.com/artifact/commons-lang/commons-lang
+    implementation("commons-lang:commons-lang:2.6")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
