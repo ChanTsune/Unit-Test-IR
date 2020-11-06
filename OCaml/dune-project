@@ -1,1 +1,19 @@
 (lang dune 2.5)
+
+(name utir)
+(version 0.0.0)
+(generate_opam_files true)
+
+(package
+ (name utir)
+ (synopsis "")
+ (description "")
+ (depends
+  (ocaml (>= 4.09))
+  (dune (> 2.5))
+  (yaml (>= 2.1.0))
+  (bos (>= 0.2.0))
+  (ocaml-compiler-libs (>= 0.12.1))
+  (ounit2 :with-test)
+ )
+)
