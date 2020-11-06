@@ -21,6 +21,29 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         raise Exception('Excepted Decl or Expr, but %s' %
                         node.__class__.__name__)
 
+    def _assign_detect(self, lst):
+        """代入と宣言の区別"""
+        # TODO: support on python ast.
+        converted = []
+        d = {}
+        for i in lst:
+            if (isinstance(i, ir_ast.BinOp) 
+                and i.kind == ir_ast.BinOpKind.ASSIGN 
+                and isinstance(i.left, ir_ast.Name)
+                and i.left.name not in d.keys()
+                ):
+                converted.append(
+                    ir_ast.Var(
+                        name=i.left.name,
+                        type='',
+                        value=i.right
+                    )
+                )
+                d[i.left.name] = i.right
+            else:
+                converted.append(i)
+        return converted
+
     def visit(self, node):
         """Visit a node."""
         if not isinstance(node, py_ast.AST):
@@ -88,6 +111,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit_FunctionDef(self, node):
         raw_stmt = [self.visit(i) for i in node.body]
         raw_stmt = filterNull(raw_stmt) # TODO: filter
+        raw_stmt = self._assign_detect(raw_stmt)
         stmt = [self._wrap_for_block(i) for i in raw_stmt]
         return ir_ast.Func(node.name,
                            self.visit(node.args),
