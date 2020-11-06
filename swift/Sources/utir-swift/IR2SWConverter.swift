@@ -430,10 +430,7 @@ class IR2SWConverter {
             return ExprSyntax(SyntaxFactory.makeFloatLiteralExpr(floatingDigits: SyntaxFactory.makeFloatingLiteral(node.value)))
         case .BOOLEAN:
             return ExprSyntax(SyntaxFactory.makeBooleanLiteralExpr(
-                booleanLiteral: SyntaxFactory.makeToken(
-                    node.value.lowercased() == "true" ? .trueKeyword : .falseKeyword,
-                    presence: .missing
-                )
+                booleanLiteral: node.value.lowercased() == "true" ? SyntaxFactory.makeTrueKeyword() : SyntaxFactory.makeFalseKeyword()
             ))
         case .NULL:
             return ExprSyntax(SyntaxFactory.makeNilLiteralExpr(nilKeyword: SyntaxFactory.makeNilKeyword()))
