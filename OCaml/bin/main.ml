@@ -32,7 +32,7 @@ let main argc argv =
 let () = main (Array.length Sys.argv) Sys.argv
 
 
-let main () =
+(* let main () =
   let s = Compile_common.parse_impl {
   source_file = "/Users/tsunekwataiki/Documents/GitHub/mlpystring/test/test.ml";
   module_name = "My_Module";
@@ -48,4 +48,4 @@ let main () =
   let _ = List.iter (fun _ -> ()) s in
   print_ast_as_code s
 
-let _ = main ()
+let _ = main () *)
