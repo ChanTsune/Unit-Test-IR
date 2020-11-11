@@ -37,14 +37,6 @@ let make_module_expr ?(attrs=[]) ?(loc=Location.none) mod_desc = {
   pmod_attributes = attrs;
 }
 
-let make_open_infos ?(attrs=[]) ?(loc=Location.none) open_expr override_flag =
-    {
-     popen_expr=open_expr;
-     popen_override = override_flag;
-     popen_loc=loc;
-     popen_attributes=attrs;
-    }
-
 let make_value_binding ?(attrs=[]) ?(loc=Location.none) ptn expr = {
     pvb_pat = ptn;
     pvb_expr = expr;
