@@ -7,3 +7,4 @@ services:
       dockerfile: ./OCaml/Dockerfile
     volumes:
       - "./:/home/opam/opam-repository/shared/"
+    # tty: true # 起動状態を維持する
