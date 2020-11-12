@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  ocaml:
+    build:
+      context: .
+      dockerfile: ./OCaml/Dockerfile
+    volumes:
+      - "./:/home/opam/opam-repository/shared/"
