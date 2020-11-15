@@ -12,6 +12,13 @@ Intermediate Representation for unit tests.
 - OCaml4.09.x
 
 
+## セットアップ
+
+`.env` ファイルを作成して以下を記述
+```
+INPUT=sample_data/test_sample.py
+OUTPUT=sample_data/test_sample.yaml
+```
 ## 実行
 
 ```
