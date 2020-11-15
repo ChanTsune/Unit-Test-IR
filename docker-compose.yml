@@ -26,3 +26,11 @@ services:
       - ".:/app"
     command:
       bash -c "cd ./kotlin && ./gradlew run --args='../${OUTPUT}'"
+  swift:
+    build:
+      context: .
+      dockerfile: "./swift/Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c " cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift"
