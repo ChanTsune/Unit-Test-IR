@@ -18,3 +18,11 @@ services:
     command:
       bash -c "cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml"
     # tty: true # 起動状態を維持する
+  kotlin:
+    build:
+      context: .
+      dockerfile: "./kotlin/Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c "cd ./kotlin && ./gradlew run --args='../${OUTPUT}'"
