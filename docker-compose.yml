@@ -6,5 +6,7 @@ services:
       context: .
       dockerfile: ./OCaml/Dockerfile
     volumes:
-      - "./:/home/opam/opam-repository/shared/"
+      - ".:/app"
+    command:
+      bash -c "cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml"
     # tty: true # 起動状態を維持する
