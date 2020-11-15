@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
 
     try {
         val fileContent = File(
-                args.firstOrNull() ?: Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.json").toString()
+                args.firstOrNull() ?: Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.yaml").toString()
         ).readText()
 
         Json{
