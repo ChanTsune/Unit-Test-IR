@@ -1,6 +1,14 @@
 version: "3"
 
 services:
+  python:
+    build:
+      context: .
+      dockerfile: "./Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c "python main.py ${INPUT} ${OUTPUT}"
   ocaml:
     build:
       context: .
