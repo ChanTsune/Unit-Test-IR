@@ -3,7 +3,10 @@
 (name utir)
 (version 0.0.0)
 (generate_opam_files true)
-
+(source (github ChanTsune/unit-test-ir))
+(license MIT)
+(authors "ChanTsune")
+(maintainers "ChanTsune")
 (package
  (name utir)
  (synopsis "")
