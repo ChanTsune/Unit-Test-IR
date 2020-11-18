@@ -8,19 +8,6 @@ from collections import UserList
 
 
 class BaseTest:
-    # These tests are for buffers of values (bytes) and not
-    # specific to character interpretation, used for bytes objects
-    # and various string implementations
-
-    # The type to be tested
-    # Change in subclasses to change the behaviour of fixtesttype()
-
-#@@    type2test = None
-
-    # Whether the "contained items" of the container are integers in
-    # range(0, 256) (i.e. bytes, bytearray) or strings of length 1
-    # (str)
-#@@    contains_bytes = False
 
     # check that obj.method(*args) returns result
     def checkequal(self, result, obj, methodname, *args, **kwargs):
