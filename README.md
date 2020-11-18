@@ -16,7 +16,7 @@ Intermediate Representation for unit tests.
 
 `.env` ファイルを作成して以下を記述
 ```
-INPUT=sample_data/test_sample.py
+INPUT=sample_data/string_test.py
 OUTPUT=sample_data/test_sample.yaml
 ```
 ## 実行
