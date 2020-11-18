@@ -18,7 +18,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
             return ir_ast.StmtExpr(node)
         elif isinstance(node, ir_ast.Stmt):
             return node
-        raise Exception('Excepted Decl or Expr, but %s' %
+        raise Exception('Expected Decl or Expr, but %s' %
                         node.__class__.__name__)
 
     def _assign_detect(self, lst):
@@ -47,7 +47,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit(self, node):
         """Visit a node."""
         if not isinstance(node, py_ast.AST):
-            raise TypeError('python node excepted, but %s received.' %
+            raise TypeError('python node expected, but %s received.' %
                             node.__class__.__name__)
         method = 'visit_' + node.__class__.__name__
         visitor = getattr(self, method, self.visit_unsupported)

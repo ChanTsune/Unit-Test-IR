@@ -151,7 +151,7 @@ sealed class Node {
                         val name: String,
                         val receiver: Expr,
                         val args: Map<String, Expr>,
-                        val excepted: Expr,
+                        val expected: Expr,
                         val message: String?
                 )
             }
@@ -164,7 +164,7 @@ sealed class Node {
                 data class Param(
                         val name: String,
                         val args: Map<String, Expr>,
-                        val excepted: Expr,
+                        val expected: Expr,
                         val message: String?
                 )
             }
@@ -306,8 +306,8 @@ sealed class Node {
                 @Serializable
                 @SerialName("Equal")
                 data class AssertEqual(
-                        @SerialName("Excepted")
-                        val excepted: Expr,
+                        @SerialName("Expected")
+                        val expected: Expr,
                         @SerialName("Actual")
                         val actual: Expr,
                         @SerialName("Message")

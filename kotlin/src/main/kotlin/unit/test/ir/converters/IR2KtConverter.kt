@@ -462,7 +462,7 @@ class IR2KtConverter {
                                         KNode.ValueArg(
                                                 name = null,
                                                 asterisk = false,
-                                                expr = visit(node.kind.excepted)
+                                                expr = visit(node.kind.expected)
                                         ),
                                         KNode.ValueArg(
                                                 name = null,

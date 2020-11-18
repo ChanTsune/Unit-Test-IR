@@ -31,14 +31,14 @@ class DefaultIRTransformer(NodeTransformer):
                         if len(node.args) == 2:
                             return ast.Assert(
                                 kind=ast.AssertEqual(
-                                    excepted=args[0],
+                                    expected=args[0],
                                     actual=args[1],
                                 )
                             )
                         elif len(node.args) == 3:
                             return ast.Assert(
                                 kind=ast.AssertEqual(
-                                    excepted=args[0],
+                                    expected=args[0],
                                     actual=args[1],
                                     message=args[2], # TODO: support
                                 )

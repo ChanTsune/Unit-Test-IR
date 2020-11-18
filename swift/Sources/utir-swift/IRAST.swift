@@ -611,13 +611,13 @@ extension Assert.AssertKind {
 }
 struct AssertEqual: CodableNode {
     var node: String = "Equal"
-    var excepted: Expr
+    var expected: Expr
     var actual: Expr
     var message: String?
 
     enum CodingKeys: String, CodingKey {
         case node = "Node"
-        case excepted = "Excepted"
+        case expected = "Expected"
         case actual = "Actual"
         case message = "Message"
     }

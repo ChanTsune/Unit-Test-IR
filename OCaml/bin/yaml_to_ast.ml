@@ -292,10 +292,10 @@ and parse_assert_kind o =
 }
 
 and parse_assert_equal o =
-  let e = get_dict_node_value "Excepted" o in
+  let e = get_dict_node_value "Expected" o in
   let a = get_dict_node_value "Actual" o in
   let msg = get_dict_node_value "Message" o |> string_of_yaml_value in
- {assert_equal_excepted=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
+ {assert_equal_expected=parse_expr e; assert_equal_actual=parse_expr a; assert_equal_message = msg}
 
 and parse_assert_failure o =
 let error = get_dict_node_value "Error" o |> string_of_yaml_value in

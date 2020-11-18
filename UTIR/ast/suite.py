@@ -41,7 +41,7 @@ class CaseMethodSet(Case):
     class Param:
         receiver: Expr
         args: Dict[str, Expr]
-        excepted: Expr
+        expected: Expr
         message: Optional[str] = None
 
         def serialize(self):
@@ -49,7 +49,7 @@ class CaseMethodSet(Case):
                 'Node': 'Param',
                 'Receiver': self.receiver.serialize(),
                 'Args': self.args,
-                'Excepted': self.excepted.serialize(),
+                'Expected': self.expected.serialize(),
                 'Message': self.message
             }
     name: str
@@ -94,14 +94,14 @@ class AssertKind(IRExpr):
 
 @dataclass
 class AssertEqual(AssertKind):
-    excepted: Expr
+    expected: Expr
     actual: Expr
     message: Optional[str] = None
 
     def serialize(self):
         return {
             'Node': 'Equal',
-            'Excepted': self.excepted.serialize(),
+            'Expected': self.expected.serialize(),
             'Actual': self.actual.serialize(),
             'Message': self.message,
         }

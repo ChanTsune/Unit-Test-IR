@@ -254,7 +254,7 @@ match n.assert_kind with
 and assert_equal_node_to n = 
 make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "assert_equal")))),[
   (Nolabel, expr_node_to n.assert_equal_actual);
-  (Nolabel, expr_node_to n.assert_equal_excepted);
+  (Nolabel, expr_node_to n.assert_equal_expected);
 ]))
 
 and assert_failure_node_to n =

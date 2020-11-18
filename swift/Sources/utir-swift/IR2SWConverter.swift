@@ -528,7 +528,7 @@ class IR2SWConverter {
                     declNameArguments: nil
                 ))
             )
-            let args = [node.actual, node.excepted]
+            let args = [node.actual, node.expected]
             for (i, arg) in args.enumerated() {
                 $0.addArgument(TupleExprElementSyntax {
                     if let expr = visit(arg) {
