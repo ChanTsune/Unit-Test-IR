@@ -223,13 +223,31 @@ and binop_node_to n =
       (Nolabel, expr_node_to n.binop_right);
     ]))
 
-and unaryop_node_to n = match n.unaryop_kind with
-| Minus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [ (* TODO: ~- *)
+and unaryop_node_to n =
+match n.unaryop_value with
+| Constant {constant_kind=Integer; constant_value=x}
+ ->
+  begin
+  match n.unaryop_kind with
+  | Minus -> constant_node_to {constant_kind=Integer; constant_value="-"^x}
+  | Plus -> constant_node_to {constant_kind=Integer; constant_value="+"^x}
+  end
+| Constant {constant_kind=Float; constant_value=x}
+->
+  begin
+    match n.unaryop_kind with
+    | Minus -> constant_node_to {constant_kind=Float; constant_value="-"^x}
+    | Plus -> constant_node_to {constant_kind=Float; constant_value="+"^x}
+  end
+| _ ->
+begin match n.unaryop_kind with
+| Minus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [
   (Nolabel, (expr_node_to n.unaryop_value))
 ]
-| Plus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [ (* TODO: ~+ *)
+| Plus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [
   (Nolabel, (expr_node_to n.unaryop_value))
 ]
+end
 and subscript_node_to n =
 Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.nth"))) [
   (Nolabel, expr_node_to n.subscript_value);
