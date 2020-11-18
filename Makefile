@@ -1,6 +1,6 @@
 # INPUT=sample_data/string_tests.py
 INPUT=sample_data/test_sample.py
-OUTPUT=sample_data/test_sample.json
+OUTPUT=sample_data/test_sample.yaml
 
 ir_gen:
 	python main.py ${INPUT} ${OUTPUT}

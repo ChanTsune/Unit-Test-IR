@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  python:
+    build:
+      context: .
+      dockerfile: "./Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c "python main.py ${INPUT} ${OUTPUT}"
+  ocaml:
+    build:
+      context: .
+      dockerfile: ./OCaml/Dockerfile
+    volumes:
+      - ".:/app"
+    command:
+      bash -c "cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml"
+    # tty: true # 起動状態を維持する
+  kotlin:
+    build:
+      context: .
+      dockerfile: "./kotlin/Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c "cd ./kotlin && ./gradlew run --args='../${OUTPUT}'"
+  swift:
+    build:
+      context: .
+      dockerfile: "./swift/Dockerfile"
+    volumes:
+      - ".:/app"
+    command:
+      bash -c " cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift"
