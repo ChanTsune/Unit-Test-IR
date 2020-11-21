@@ -1,21 +1,29 @@
 include Yaml_to_ast
 include Utils
 
+let read_ir_yaml input = 
+  let inputFile = Fpath.(v input) in
+  let raw_yaml = Yaml_unix.of_file_exn inputFile in
+  parse_node raw_yaml
+
+let write_ocaml_file output structures =
+  let outputFile = Fpath.(v output) in
+  let str = Pprintast.string_of_structure structures in
+  Bos.OS.File.write outputFile str
+
+
 let convert_and_write input output =
   let () = print_endline input in
   let () = print_endline output in
-  let inputFile = Fpath.(v input) in
-  let outputFile = Fpath.(v output) in
-  let parsed = Yaml_unix.of_file_exn inputFile in
-  let a = parse_node parsed
+  let ir_node = read_ir_yaml input in
+  let ir_node = Rewriter.rewrite ir_node Rewriter.default_rewriter
   in
-  let _ = a in let _ = outputFile in
-  let ocaml_structures = Convert.structure_of_ir_node a in
+  let _ = ir_node in
+  let ocaml_structures = Convert.structure_of_ir_node ir_node in
   (* let _ = Ast_invariants.structure ocaml_structures in *)
   (* let () = print_ast_as_code ocaml_structures in *)
   (* let () = print_ast ocaml_structures in *)
-  let str = Ocaml_common.Pprintast.string_of_structure ocaml_structures in
-  let _ = Bos.OS.File.write outputFile str in
+  let _ = write_ocaml_file output ocaml_structures in
   ()
 
 
