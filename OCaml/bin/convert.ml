@@ -76,20 +76,21 @@ and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
   let to_seqence list =
     let rec iter list expr =
       match list with
-      |hd::tl -> begin match expr with
-                      | {
-                        pexp_desc = Pexp_let (rec_flag , value_binding_list , {pexp_desc = Pexp_unreachable;pexp_loc = _;pexp_loc_stack = _;pexp_attributes = _;});
-                        pexp_loc = loc;
-                        pexp_loc_stack = loc_stack;
-                        pexp_attributes = attributes;
-                        } -> {
-                        pexp_desc = Pexp_let (rec_flag , value_binding_list , iter tl hd);
-                        pexp_loc = loc;
-                        pexp_loc_stack = loc_stack;
-                        pexp_attributes = attributes;
-                        }
-                      | _ -> Ast_helper.Exp.sequence expr (iter tl hd)
-                  end
+      |hd::tl -> begin
+        match expr with
+          | {
+            pexp_desc = Pexp_let (rec_flag , value_binding_list , {pexp_desc = Pexp_unreachable;pexp_loc = _;pexp_loc_stack = _;pexp_attributes = _;});
+            pexp_loc = loc;
+            pexp_loc_stack = loc_stack;
+            pexp_attributes = attributes;
+            } -> {
+            pexp_desc = Pexp_let (rec_flag , value_binding_list , iter tl hd);
+            pexp_loc = loc;
+            pexp_loc_stack = loc_stack;
+            pexp_attributes = attributes;
+            }
+          | _ -> Ast_helper.Exp.sequence expr (iter tl hd)
+        end
       |[] -> expr
     in
     match list with
@@ -284,8 +285,5 @@ match n.assert_failure_message with
 | Some s -> [(Optional "msg" , Ast_helper.Exp.constant (Ast_helper.Const.string s))]
 | None -> []
 in
-(* let _ =  in *)
 let args = opt_args @ [(Nolabel, Ast_helper.Exp.construct (Location.mknoloc (Longident.parse e)) None); (Nolabel, arg_f_call)] in
 Ast_helper.Exp.apply ( Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "assert_raises"))) args
-
-(* assert_raises ?msg="" (fun () -> f_call ) *)
