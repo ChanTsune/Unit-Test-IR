@@ -35,10 +35,10 @@ dependencies {
     implementation(platform("com.github.chantsune:kotlin-enum-extensions:0.0.0"))
 
     // [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
     // [kaml](https://github.com/charleskorn/kaml)
-    implementation("com.charleskorn.kaml:kaml:0.23.0")
+    implementation("com.charleskorn.kaml:kaml:0.26.0")
 
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
     implementation("commons-lang:commons-lang:2.6")
