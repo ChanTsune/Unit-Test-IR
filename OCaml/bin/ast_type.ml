@@ -7,9 +7,11 @@ type node =
 and file = {file_version: int; file_body: decl list}
 and block = {block_body: stmt list}
 
+and expr_stmt = {expr: expr}
+and decl_stmt = {decl: decl}
 and stmt =
-  ExprStmt of {expr: expr}
-| DeclStmt of {decl: decl}
+  ExprStmt of expr_stmt
+| DeclStmt of decl_stmt
 | Return of return
 | For of for_
 | Throw of throw
@@ -33,7 +35,8 @@ and func = {func_name:string; func_args: arg list; func_body: block}
 and arg = {arg_field: var; arg_vararg: bool}
 and class_ = {class_name: string; class_bases: string list; class_constractors: func list; class_fields: decl list}
 and suite = {suite_name: string; suite_set_up: expr list; suite_cases: case list; suite_tear_down: expr list}
-and case = CaseBlock of case_block
+and case =
+  CaseBlock of case_block
 and case_block = {case_block_name: string; case_block_body: block}
 
 and expr =
@@ -60,6 +63,8 @@ and subscript = {subscript_value: expr; subscript_index: expr}
 and call = {call_value: expr; call_args: call_arg list}
 and call_arg = {call_arg_name: string option;call_arg_value: expr}
 and assert_ = {assert_kind: assert_kind}
-and assert_kind = Equal of assert_equal | Failure of assert_failure
+and assert_kind =
+  Equal of assert_equal
+| Failure of assert_failure
 and assert_equal = {assert_equal_expected:expr; assert_equal_actual:expr; assert_equal_message: string option}
 and assert_failure = {assert_failure_error:string option; assert_failure_func:expr; assert_failure_args: expr list; assert_failure_message: string option}
