@@ -25,7 +25,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./kotlin && ./gradlew run --args='../${OUTPUT}'"
+      bash -c "cd ./kotlin && gradle run --args='../${OUTPUT}'"
   swift:
     build:
       context: .
