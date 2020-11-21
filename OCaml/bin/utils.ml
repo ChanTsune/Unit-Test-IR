@@ -44,20 +44,6 @@ let make_value_binding ?(attrs=[]) ?(loc=Location.none) ptn expr = {
     pvb_loc = loc;
 }
 
-let make_pattern ?(attrs=[]) ?(loc=Location.none) ?(loc_stack=[]) pat_desc = {
-  ppat_desc = pat_desc;
-  ppat_loc = loc;
-  ppat_loc_stack = loc_stack;
-  ppat_attributes = attrs;
-}
-
-let make_expression ?(attrs=[]) ?(loc=Location.none) ?(loc_stack=[]) exp_desc = {
-  pexp_desc = exp_desc;
-  pexp_loc = loc;
-  pexp_loc_stack = loc_stack;
-  pexp_attributes = attrs;
-}
-
 let make_list_expression expr_desc_list =
   let expr_desc_list = expr_desc_list |> List.rev in
   let join = make_loc (Longident.parse "::") in
@@ -68,20 +54,18 @@ let make_list_expression expr_desc_list =
     | hd::tl -> iter tl (
       Pexp_construct (
         join,
-        Some (make_expression (
-          Pexp_tuple [
-                  make_expression hd;
-                  make_expression result;
-                  ]
+        Some (Ast_helper.Exp.tuple [
+                  Ast_helper.Exp.mk hd;
+                  Ast_helper.Exp.mk result;
+            ]
           )
         )
       )
-     )
     |[]-> result
   in
   let list = iter expr_desc_list braket in
-  make_expression list
+  Ast_helper.Exp.mk list
 
-let unit_expression = make_expression (Pexp_construct (make_loc (Longident.parse "()"), None))
+let unit_expression = Ast_helper.Exp.construct (make_loc (Longident.parse "()")) None
 
 let unwrap v = match v with| Some s -> s| None -> raise (Invalid_argument "optional unwrap faied.")

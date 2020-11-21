@@ -44,14 +44,13 @@ and suite_node_to n =
    |> List.map (fun x -> x.pvb_expr)
    |> List.map (fun x -> x.pexp_desc)
     in
-
-  let ident = make_expression (Pexp_ident (make_loc (Longident.parse ">:::"))) in
-  let suite_expr = make_expression (Pexp_apply (ident, [
-    (Nolabel, (make_expression (Pexp_constant (Pconst_string (n.suite_name, None)))));
+  let ident = Ast_helper.Exp.ident (make_loc (Longident.parse ">:::")) in
+  let suite_expr = Ast_helper.Exp.apply ident [
+    (Nolabel, (Ast_helper.Exp.constant (Ast_helper.Const.string n.suite_name)));
     (Nolabel, (make_list_expression expr_desc_list));
-  ])) in
+  ] in
   make_structure_item (Pstr_value (Nonrecursive, [
-    make_value_binding (make_pattern (Ppat_var (make_loc (n.suite_name |> String.uncapitalize_ascii)))) suite_expr;
+    make_value_binding (Ast_helper.Pat.var (make_loc (n.suite_name |> String.uncapitalize_ascii))) suite_expr;
   ]))
 
   and case_node_to n =
@@ -63,12 +62,12 @@ and case_node_to_value_binding n =
   | CaseBlock c -> case_block_node_to c
 
 and case_block_node_to n =
-  let ident = make_expression (Pexp_ident (make_loc (Longident.parse ">::"))) in
-  let case_expr = make_expression (Pexp_apply (ident, [
-    (Nolabel, (make_expression (Pexp_constant (Pconst_string (n.case_block_name, None)))));
+  let ident = Ast_helper.Exp.ident (make_loc (Longident.parse ">::")) in
+  let case_expr = Ast_helper.Exp.apply ident [
+    (Nolabel, (Ast_helper.Exp.constant (Ast_helper.Const.string n.case_block_name)));
     (Nolabel, (block_node_to n.case_block_body));
-  ])) in
-  make_value_binding (make_pattern (Ppat_var (make_loc n.case_block_name))) case_expr
+  ] in
+  make_value_binding (Ast_helper.Pat.var (make_loc n.case_block_name)) case_expr
 
 and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
   let to_seqence list =
@@ -86,7 +85,7 @@ and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
                         pexp_loc_stack = loc_stack;
                         pexp_attributes = attributes;
                         }
-                      | _ -> make_expression (Pexp_sequence (expr, iter tl hd))
+                      | _ -> Ast_helper.Exp.sequence expr (iter tl hd)
                   end
       |[] -> expr
     in
@@ -96,7 +95,7 @@ and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
     | hd::tl -> iter tl hd
     in
   let lst = n.block_body |> List.map stmt_node_to in
-    make_expression (Pexp_fun (Nolabel, (*expression option*) None, pattern , (to_seqence lst)))
+    Ast_helper.Exp.fun_ Nolabel (*expression option*) None pattern (to_seqence lst)
 
 and stmt_node_to n:expression =
 match n with
@@ -113,9 +112,9 @@ and decl_node_as_expr n =
 let decl = decl_node_to n in
 match decl with
 | {pstr_desc = pstr;pstr_loc = _;} -> match pstr with
-|Pstr_value (rec_flag, vblist)-> 
-make_expression (Pexp_let (rec_flag, vblist, make_expression Pexp_unreachable))
-|Pstr_class _ -> 
+| Pstr_value (rec_flag, vblist) ->
+  Ast_helper.Exp.let_ rec_flag vblist (Ast_helper.Exp.unreachable ())
+| Pstr_class _ ->
 let () = print_endline "Unsupported class decl found in stmt." in
  (Ast_helper.Exp.constant (Ast_helper.Const.string (Pprintast.string_of_structure [decl])))
 | _ -> exit_with "unsupported decl in stmt!"
@@ -146,20 +145,16 @@ match n with
 | Call c -> call_node_to c
 | Assert a -> assert_node_to a
 
-and name_node_to n = make_expression (Pexp_ident (make_loc (Longident.parse n.name_name)))
+and name_node_to n = Ast_helper.Exp.ident (make_loc (Longident.parse n.name_name))
 and constant_node_to n =
 match n.constant_kind with
 | String
-| Bytes -> make_expression (Pexp_constant (Pconst_string (n.constant_value, None)))
-| Integer ->
- make_expression (Pexp_constant (Pconst_integer (n.constant_value, None)))
-| Float -> let _ = print_endline ("const " ^ n.constant_value ^ "reached!!") in
- make_expression (Pexp_constant (Pconst_float (n.constant_value, None)))
-| Null -> make_expression (Pexp_construct (make_loc (Longident.parse "None"), None))
-| Boolean ->
-  let _ = print_endline ("const " ^ n.constant_value ^ "reached!!") in
- make_expression (Pexp_constant (Pconst_integer (n.constant_value, None)))
- 
+| Bytes -> Ast_helper.Exp.constant (Ast_helper.Const.string n.constant_value)
+| Integer -> Ast_helper.Exp.constant (Ast_helper.Const.integer n.constant_value)
+| Float -> Ast_helper.Exp.constant (Ast_helper.Const.float n.constant_value)
+| Null -> Ast_helper.Exp.construct (make_loc (Longident.parse "None")) None
+| Boolean -> Ast_helper.Exp.constant (Pconst_integer (n.constant_value, None)) (* TODO: bool *)
+
 and list_node_to n =
   let exp_desc_list = n.list_values 
   |> List.map expr_node_to 
@@ -174,54 +169,54 @@ and tuple_node_to n =
 and binop_node_to n =
   match n.binop_kind with
   | Assign ->
-    make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse ":=")))), [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse ":="))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
+    ]
   | Add ->
-    make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "+")))), [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
+    ]
   | Sub ->
-    make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "-")))), [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
+    ]
   | Dot -> 
       let name = match n.binop_right with
       |Name n -> n.name_name
       | _ -> raise (Invalid_argument "BinOp right node must be a Name node!") in
       Ast_helper.Exp.send (expr_node_to n.binop_left) (make_loc name)
-  | Mul -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "*")))), [
+  | Mul -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "*"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
-  | Div -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "/")))), [
+    ]
+  | Div -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "/"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
-  | Mod -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "mod")))), [
+    ]
+  | Mod -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "mod"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
-  | Left_shift -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "lsl")))), [
+    ]
+  | Left_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "lsl"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
-  | Right_shift -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "lsr")))), [ (* TODO: asr 算術シフト・論理シフトの区別 *)
+    ]
+  | Right_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "lsr"))) [ (* TODO: asr 算術シフト・論理シフトの区別 *)
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
-  | Not_equal -> make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "<>")))), [
+    ]
+  | Not_equal -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "<>"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
+    ]
   | In ->
-      make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "List.mem")))), [
+      Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.mem"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
-    ]))
+    ]
 
 and unaryop_node_to n =
 match n.unaryop_value with
@@ -269,11 +264,11 @@ match n.assert_kind with
 | Equal e -> assert_equal_node_to e
 | Failure f -> assert_failure_node_to f
 
-and assert_equal_node_to n = 
-make_expression (Pexp_apply ((make_expression (Pexp_ident (make_loc (Longident.parse "assert_equal")))),[
+and assert_equal_node_to n =
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "assert_equal"))) [
   (Nolabel, expr_node_to n.assert_equal_actual);
   (Nolabel, expr_node_to n.assert_equal_expected);
-]))
+]
 
 and assert_failure_node_to n =
 let e = match n.assert_failure_error with | Some s -> s| None -> "AnyError" in
