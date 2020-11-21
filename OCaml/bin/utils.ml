@@ -1,5 +1,4 @@
 open Parsetree
-open Asttypes
 
 let print_yaml y =
   Yaml.pp Format.std_formatter y
