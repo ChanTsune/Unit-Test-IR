@@ -10,10 +10,9 @@ let rec structure_of_ir_node n:structure =
 
 and file_node_to n =
   let x = Longident.parse "Ounit2" in
-  let m = Pmod_ident (make_loc x) in
-  let m_exp = make_module_expr m in
+  let m_exp = Ast_helper.Mod.ident (Location.mknoloc x) in
   let opn = Ast_helper.Opn.mk m_exp in
-  make_structure_item (Pstr_open opn) ::
+  Ast_helper.Str.open_ opn ::
   (n.file_body |> List.map decl_node_to)
 
 and decl_node_to n =
@@ -26,17 +25,21 @@ and decl_node_to n =
 
 and var_node_to n =
   let value = unwrap n.var_value in
-  make_structure_item (Pstr_value (Nonrecursive, [
-    make_value_binding (Ast_helper.Pat.var (make_loc n.var_name)) (expr_node_to value)
-  ]))
+  Ast_helper.Str.value Nonrecursive [
+    Ast_helper.Vb.mk (Ast_helper.Pat.var (Location.mknoloc n.var_name)) (expr_node_to value)
+  ]
 and func_node_to n =
   let _ = n in
   let _ = print_endline "Func node skipped!!" in
-  make_structure_item (Pstr_value (Nonrecursive, []))
+  Ast_helper.Str.value Nonrecursive [
+
+  ]
 and class_node_to n =
 let _ = n in
 let _ = print_endline "Class node skipped!!" in
-make_structure_item (Pstr_class [])
+Ast_helper.Str.class_ [
+
+]
 
 and suite_node_to n =
   let expr_desc_list = n.suite_cases
@@ -44,14 +47,14 @@ and suite_node_to n =
    |> List.map (fun x -> x.pvb_expr)
    |> List.map (fun x -> x.pexp_desc)
     in
-  let ident = Ast_helper.Exp.ident (make_loc (Longident.parse ">:::")) in
+  let ident = Ast_helper.Exp.ident (Location.mknoloc (Longident.parse ">:::")) in
   let suite_expr = Ast_helper.Exp.apply ident [
     (Nolabel, (Ast_helper.Exp.constant (Ast_helper.Const.string n.suite_name)));
     (Nolabel, (make_list_expression expr_desc_list));
   ] in
-  make_structure_item (Pstr_value (Nonrecursive, [
-    make_value_binding (Ast_helper.Pat.var (make_loc (n.suite_name |> String.uncapitalize_ascii))) suite_expr;
-  ]))
+  Ast_helper.Str.value Nonrecursive [
+    Ast_helper.Vb.mk (Ast_helper.Pat.var (Location.mknoloc (n.suite_name |> String.uncapitalize_ascii))) suite_expr;
+  ]
 
   and case_node_to n =
 match n with
@@ -62,12 +65,12 @@ and case_node_to_value_binding n =
   | CaseBlock c -> case_block_node_to c
 
 and case_block_node_to n =
-  let ident = Ast_helper.Exp.ident (make_loc (Longident.parse ">::")) in
+  let ident = Ast_helper.Exp.ident (Location.mknoloc (Longident.parse ">::")) in
   let case_expr = Ast_helper.Exp.apply ident [
     (Nolabel, (Ast_helper.Exp.constant (Ast_helper.Const.string n.case_block_name)));
     (Nolabel, (block_node_to n.case_block_body));
   ] in
-  make_value_binding (Ast_helper.Pat.var (make_loc n.case_block_name)) case_expr
+  Ast_helper.Vb.mk (Ast_helper.Pat.var (Location.mknoloc n.case_block_name)) case_expr
 
 and block_node_to ?(pattern=Ast_helper.Pat.any ()) n =
   let to_seqence list =
@@ -122,8 +125,8 @@ let () = print_endline "Unsupported class decl found in stmt." in
 
 
 and for_node_to n =
-let v = Ast_helper.Pat.var (make_loc n.for_value.var_name) in
-Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.iter"))) [
+let v = Ast_helper.Pat.var (Location.mknoloc n.for_value.var_name) in
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "List.iter"))) [
   (Nolabel, block_node_to ~pattern:v n.for_body);
   (Nolabel, expr_node_to n.for_generator);
 ]
@@ -145,14 +148,14 @@ match n with
 | Call c -> call_node_to c
 | Assert a -> assert_node_to a
 
-and name_node_to n = Ast_helper.Exp.ident (make_loc (Longident.parse n.name_name))
+and name_node_to n = Ast_helper.Exp.ident (Location.mknoloc (Longident.parse n.name_name))
 and constant_node_to n =
 match n.constant_kind with
 | String
 | Bytes -> Ast_helper.Exp.constant (Ast_helper.Const.string n.constant_value)
 | Integer -> Ast_helper.Exp.constant (Ast_helper.Const.integer n.constant_value)
 | Float -> Ast_helper.Exp.constant (Ast_helper.Const.float n.constant_value)
-| Null -> Ast_helper.Exp.construct (make_loc (Longident.parse "None")) None
+| Null -> Ast_helper.Exp.construct (Location.mknoloc (Longident.parse "None")) None
 | Boolean -> Ast_helper.Exp.constant (Pconst_integer (n.constant_value, None)) (* TODO: bool *)
 
 and list_node_to n =
@@ -169,17 +172,17 @@ and tuple_node_to n =
 and binop_node_to n =
   match n.binop_kind with
   | Assign ->
-    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse ":="))) [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse ":="))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
   | Add ->
-    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "+"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
   | Sub ->
-    Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [
+    Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "-"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
@@ -187,33 +190,33 @@ and binop_node_to n =
       let name = match n.binop_right with
       |Name n -> n.name_name
       | _ -> raise (Invalid_argument "BinOp right node must be a Name node!") in
-      Ast_helper.Exp.send (expr_node_to n.binop_left) (make_loc name)
-  | Mul -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "*"))) [
+      Ast_helper.Exp.send (expr_node_to n.binop_left) (Location.mknoloc name)
+  | Mul -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "*"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
-  | Div -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "/"))) [
+  | Div -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "/"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
-  | Mod -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "mod"))) [
+  | Mod -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "mod"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
-  | Left_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "lsl"))) [
+  | Left_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "lsl"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
-  | Right_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "lsr"))) [ (* TODO: asr 算術シフト・論理シフトの区別 *)
+  | Right_shift -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "lsr"))) [ (* TODO: asr 算術シフト・論理シフトの区別 *)
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
-  | Not_equal -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "<>"))) [
+  | Not_equal -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "<>"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
   | In ->
-      Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.mem"))) [
+      Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "List.mem"))) [
       (Nolabel, expr_node_to n.binop_left);
       (Nolabel, expr_node_to n.binop_right);
     ]
@@ -236,15 +239,15 @@ match n.unaryop_value with
   end
 | _ ->
 begin match n.unaryop_kind with
-| Minus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "-"))) [
+| Minus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "-"))) [
   (Nolabel, (expr_node_to n.unaryop_value))
 ]
-| Plus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "+"))) [
+| Plus -> Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "+"))) [
   (Nolabel, (expr_node_to n.unaryop_value))
 ]
 end
 and subscript_node_to n =
-Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "List.nth"))) [
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "List.nth"))) [
   (Nolabel, expr_node_to n.subscript_value);
   (Nolabel, expr_node_to n.subscript_index);
 ]
@@ -265,7 +268,7 @@ match n.assert_kind with
 | Failure f -> assert_failure_node_to f
 
 and assert_equal_node_to n =
-Ast_helper.Exp.apply (Ast_helper.Exp.ident (make_loc (Longident.parse "assert_equal"))) [
+Ast_helper.Exp.apply (Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "assert_equal"))) [
   (Nolabel, expr_node_to n.assert_equal_actual);
   (Nolabel, expr_node_to n.assert_equal_expected);
 ]
@@ -282,7 +285,7 @@ match n.assert_failure_message with
 | None -> []
 in
 (* let _ =  in *)
-let args = opt_args @ [(Nolabel, Ast_helper.Exp.construct (make_loc (Longident.parse e)) None); (Nolabel, arg_f_call)] in
-Ast_helper.Exp.apply ( Ast_helper.Exp.ident (make_loc (Longident.parse "assert_raises"))) args
+let args = opt_args @ [(Nolabel, Ast_helper.Exp.construct (Location.mknoloc (Longident.parse e)) None); (Nolabel, arg_f_call)] in
+Ast_helper.Exp.apply ( Ast_helper.Exp.ident (Location.mknoloc (Longident.parse "assert_raises"))) args
 
 (* assert_raises ?msg="" (fun () -> f_call ) *)
