@@ -3,15 +3,41 @@
  */
 package unit.test.ir
 
+import com.charleskorn.kaml.PolymorphismStyle
+import com.charleskorn.kaml.Yaml
+import com.charleskorn.kaml.YamlConfiguration
 import kastree.ast.Visitor
 import kastree.ast.Writer
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import unit.test.ir.ast.node.Node
 import unit.test.ir.converters.IR2KtConverter
 import java.io.File
 import java.nio.file.Paths
 
+enum class FileFormat {
+    JSON,
+    YAML,
+}
+@ExperimentalSerializationApi
+fun formatConfig(type:FileFormat): StringFormat {
+    return when(type){
+        FileFormat.JSON -> Json {
+            classDiscriminator = "Node"
+            ignoreUnknownKeys = true
+        }
+        FileFormat.YAML -> Yaml(
+                configuration = YamlConfiguration(
+                        strictMode = false,
+                        polymorphismStyle = PolymorphismStyle.Property,
+                        polymorphismPropertyName = "Node"
+                )
+        )
+    }
+}
 
+@ExperimentalSerializationApi
 fun main(args: Array<String>) {
     val code = """
         package foo
@@ -51,10 +77,8 @@ fun main(args: Array<String>) {
                 args.firstOrNull() ?: Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.yaml").toString()
         ).readText()
 
-        Json{
-            classDiscriminator = "Node"
-            ignoreUnknownKeys = true
-        }.apply {
+        formatConfig(FileFormat.YAML)
+                .apply {
             try {
                 decodeFromString(Node.serializer(), fileContent).let {
                     IR2KtConverter().visit(it).let {
