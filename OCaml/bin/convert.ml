@@ -222,19 +222,13 @@ and binop_node_to n =
 
 and unaryop_node_to n =
 match n.unaryop_value with
-| Constant {constant_kind=Integer; constant_value=x}
- ->
-  begin
-  match n.unaryop_kind with
-  | Minus -> constant_node_to {constant_kind=Integer; constant_value="-"^x}
-  | Plus -> constant_node_to {constant_kind=Integer; constant_value="+"^x}
-  end
-| Constant {constant_kind=Float; constant_value=x}
+| Constant {constant_kind=Integer as f; constant_value=x}
+| Constant {constant_kind=Float as f; constant_value=x}
 ->
   begin
     match n.unaryop_kind with
-    | Minus -> constant_node_to {constant_kind=Float; constant_value="-"^x}
-    | Plus -> constant_node_to {constant_kind=Float; constant_value="+"^x}
+    | Minus -> constant_node_to {constant_kind=f; constant_value="-"^x}
+    | Plus -> constant_node_to {constant_kind=f; constant_value="+"^x}
   end
 | _ ->
 begin match n.unaryop_kind with
