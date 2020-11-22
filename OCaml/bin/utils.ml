@@ -32,3 +32,4 @@ let make_list_expression expr_list =
 let unit_expression = Ast_helper.Exp.construct (Location.mknoloc (Longident.parse "()")) None
 
 let unwrap v = match v with| Some s -> s| None -> raise (Invalid_argument "optional unwrap faied.")
+let safe_apply f v = match v with| Some s -> Some (f s) | None -> None
