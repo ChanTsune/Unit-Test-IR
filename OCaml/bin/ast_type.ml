@@ -7,8 +7,6 @@ type node =
 and file = {file_version: int; file_body: decl list}
 and block = {block_body: stmt list}
 
-and expr_stmt = {expr: expr}
-and decl_stmt = {decl: decl}
 and stmt =
   ExprStmt of expr_stmt
 | DeclStmt of decl_stmt
@@ -18,6 +16,8 @@ and stmt =
 | Try of try_
 | Catch of catch
 
+and expr_stmt = {expr: expr}
+and decl_stmt = {decl: decl}
 and return = {return_value: expr}
 and for_ = {for_value: var; for_generator: expr; for_body: block}
 and throw = {throw_value: expr}
