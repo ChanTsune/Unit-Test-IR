@@ -2,7 +2,7 @@ import ast as py_ast
 from ast import NodeTransformer as PyNodeTransformer
 from itertools import chain
 
-from UTIR import ast as ir_ast
+from utir import ast as ir_ast
 
 
 def filterNull(lst):

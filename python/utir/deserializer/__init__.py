@@ -1,6 +1,6 @@
 
-from UTIR import ast
-from UTIR.exception import InvalidFileFormatError
+from utir import ast
+from utir.exception import InvalidFileFormatError
 
 
 class ASTDeserializer:

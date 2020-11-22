@@ -4,11 +4,11 @@ services:
   python:
     build:
       context: .
-      dockerfile: "./Dockerfile"
+      dockerfile: "./python/Dockerfile"
     volumes:
       - ".:/app"
     command:
-      bash -c "python main.py ${INPUT} ${OUTPUT}"
+      bash -c "cd ./python && python main.py ../${INPUT} ../${OUTPUT}"
   ocaml:
     build:
       context: .

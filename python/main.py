@@ -1,10 +1,10 @@
 import sys
-from UTIR import ast
-from UTIR import serializer
-from UTIR import dumper
-from UTIR import generator
-from UTIR.transformer import DefaultIRTransformer
-from UTIR.transformer import NodeTransformer
+from utir import ast
+from utir import serializer
+from utir import dumper
+from utir import generator
+from utir.transformer import DefaultIRTransformer
+from utir.transformer import NodeTransformer
 
 
 class MyIRTransformer(DefaultIRTransformer):
@@ -20,8 +20,8 @@ def main(argv):
 
 
 def _main(argv):
-    from UTIR import Code2IR, IR2Code
-    from UTIR.dumper import YamlDumper
+    from utir import Code2IR, IR2Code
+    from utir.dumper import YamlDumper
     from transformers import MyTransformer, InlineTransformer
 
     class MyCode2IR(Code2IR):

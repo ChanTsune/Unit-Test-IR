@@ -1,4 +1,4 @@
-from UTIR import ast
+from utir import ast
 
 
 class ASTSerializer:

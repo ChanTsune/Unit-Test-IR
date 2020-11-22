@@ -1,4 +1,4 @@
-from UTIR.ast import *
+from utir.ast import *
 
 
 def iter_fields(node):

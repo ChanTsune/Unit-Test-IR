@@ -1,6 +1,6 @@
 import ast as py_ast
-from UTIR import ast as ir_ast
-from UTIR.transformer import NodeTransformer as IRNodeTransformer
+from utir import ast as ir_ast
+from utir.transformer import NodeTransformer as IRNodeTransformer
 
 
 def isExpr(node):

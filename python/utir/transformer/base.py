@@ -1,5 +1,5 @@
-from UTIR.ast import AST
-from UTIR.visitor import NodeVisitor, iter_fields
+from utir.ast import AST
+from utir.visitor import NodeVisitor, iter_fields
 
 
 class NodeTransformer(NodeVisitor):
