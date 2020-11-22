@@ -1,5 +1,5 @@
+include Utils
 open Ast_type
-open Utils
 
 type rewriter = {
  node_rewriter : (rewriter -> Ast_type.node -> Ast_type.node);
