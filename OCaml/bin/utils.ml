@@ -1,5 +1,3 @@
-open Parsetree
-
 let print_yaml y =
   Yaml.pp Format.std_formatter y
 
@@ -12,27 +10,24 @@ let print_ast s =
 
 let exit_with msg = print_endline msg ;exit 1
 
-let make_list_expression expr_desc_list =
-  let expr_desc_list = expr_desc_list |> List.rev in
+let make_list_expression expr_list =
+  let expr_desc_list = expr_list |> List.rev in
   let join = Location.mknoloc (Longident.parse "::") in
-  let braket = (Pexp_construct ((Location.mknoloc (Longident.parse "[]")), None)) in
+  let braket = Ast_helper.Exp.construct (Location.mknoloc (Longident.parse "[]")) None in
 
   let rec iter list result =
     match list with
-    | hd::tl -> iter tl (
-      Pexp_construct (
-        join,
-        Some (Ast_helper.Exp.tuple [
-                  Ast_helper.Exp.mk hd;
-                  Ast_helper.Exp.mk result;
-            ]
-          )
-        )
+    | hd::tl ->
+       iter tl (Ast_helper.Exp.construct 
+        join
+        (Some (Ast_helper.Exp.tuple [
+                  hd;
+                  result;
+            ]))
       )
-    |[]-> result
+    | [] -> result
   in
-  let list = iter expr_desc_list braket in
-  Ast_helper.Exp.mk list
+  iter expr_desc_list braket
 
 let unit_expression = Ast_helper.Exp.construct (Location.mknoloc (Longident.parse "()")) None
 

@@ -42,15 +42,14 @@ Ast_helper.Str.class_ [
 ]
 
 and suite_node_to n =
-  let expr_desc_list = n.suite_cases
+  let expr_list = n.suite_cases
    |> List.map case_node_to_value_binding
    |> List.map (fun x -> x.pvb_expr)
-   |> List.map (fun x -> x.pexp_desc)
     in
   let ident = Ast_helper.Exp.ident (Location.mknoloc (Longident.parse ">:::")) in
   let suite_expr = Ast_helper.Exp.apply ident [
     (Nolabel, (Ast_helper.Exp.constant (Ast_helper.Const.string n.suite_name)));
-    (Nolabel, (make_list_expression expr_desc_list));
+    (Nolabel, (make_list_expression expr_list));
   ] in
   Ast_helper.Str.value Nonrecursive [
     Ast_helper.Vb.mk (Ast_helper.Pat.var (Location.mknoloc (n.suite_name |> String.uncapitalize_ascii))) suite_expr;
@@ -160,11 +159,10 @@ match n.constant_kind with
 | Boolean -> Ast_helper.Exp.constant (Pconst_integer (n.constant_value, None)) (* TODO: bool *)
 
 and list_node_to n =
-  let exp_desc_list = n.list_values 
+  let expr_list = n.list_values 
   |> List.map expr_node_to 
-  |> List.map (fun x -> x.pexp_desc)
   in
- make_list_expression exp_desc_list
+ make_list_expression expr_list
 and tuple_node_to n =
   let exp_desc_list = n.tuple_values
   |> List.map expr_node_to in
