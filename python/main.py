@@ -21,13 +21,13 @@ def main(argv):
 
 def _main(argv):
     from utir import Code2IR, IR2Code
-    from utir.dumper import YamlDumper
+    from utir.dumper import YamlDumper, JsonDumper
     from transformers import MyTransformer, InlineTransformer
 
     class MyCode2IR(Code2IR):
         py_ast_transformer_classes = [InlineTransformer, MyTransformer]
         ir_ast_transformer_classes = [MyIRTransformer]
-        ir_ast_dumper_class = YamlDumper
+        ir_ast_dumper_class = JsonDumper
 
     code2ir = MyCode2IR()
     ir2code = IR2Code()
