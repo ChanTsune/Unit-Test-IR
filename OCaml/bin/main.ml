@@ -1,5 +1,16 @@
 include Yaml_to_ast
+include Ast_type
 include Utils
+
+let method_call_to_function_call_rewriter =
+  { Rewriter.default_rewriter with
+    call_rewriter = (fun rw c ->
+    match c with
+    | {call_value=BinOp {binop_left=Constant {constant_kind=String;constant_value=_} as l;binop_kind=Dot;binop_right=r}; call_args=args}
+     -> {call_value=r|> rw.expr_rewriter rw; call_args={call_arg_name=None;call_arg_value=l}::args |> List.map (fun x -> rw.call_arg_rewriter rw x)}
+    | _ -> c
+    )
+  }
 
 let read_ir_yaml input = 
   let inputFile = Fpath.(v input) in
@@ -16,7 +27,7 @@ let convert_and_write input output =
   let () = print_endline input in
   let () = print_endline output in
   let ir_node = read_ir_yaml input in
-  let ir_node = Rewriter.rewrite ir_node Rewriter.default_rewriter
+  let ir_node = Rewriter.rewrite ir_node method_call_to_function_call_rewriter
   in
   let _ = ir_node in
   let ocaml_structures = Convert.structure_of_ir_node ir_node in
