@@ -5,7 +5,7 @@ exception TypeError
 
 let raise_ir_parse_error msg y =
   let s = Yaml.to_string_exn y in
-  raise (Invalid_argument (msg ^ "\n" ^ s))
+  raise (Invalid_argument (msg ^ "(" ^ s ^ ")"))
 
 let case_of_decl decl = match decl with| Case c -> c |_ -> raise TypeError
 
