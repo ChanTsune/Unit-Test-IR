@@ -3,7 +3,7 @@ INPUT=sample_data/test_sample.py
 OUTPUT=sample_data/test_sample.yaml
 
 ir_gen:
-	python main.py ${INPUT} ${OUTPUT}
+	cd python && python main.py ../${INPUT} ../${OUTPUT}
 
 run_kotlin_only:
 	cd ./kotlin && ./gradlew run --args="../${OUTPUT}"
