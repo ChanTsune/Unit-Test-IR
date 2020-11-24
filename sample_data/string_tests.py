@@ -2,9 +2,7 @@
 # Common tests shared by test_unicode, test_userstring and test_bytes.
 # """
 
-import unittest, string, sys, struct
-from test import support
-from collections import UserList
+import sys
 
 
 class BaseTest:
