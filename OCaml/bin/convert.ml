@@ -9,7 +9,7 @@ let rec structure_of_ir_node n:structure =
   | _ -> exit_with "structure_of_ir_node"
 
 and file_node_to n =
-  let x = Longident.parse "Ounit2" in
+  let x = Longident.parse "OUnit2" in
   let m_exp = Ast_helper.Mod.ident (Location.mknoloc x) in
   let opn = Ast_helper.Opn.mk m_exp in
   Ast_helper.Str.open_ opn ::
