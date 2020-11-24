@@ -6,19 +6,6 @@ import unittest, string, sys, struct
 from test import support
 from collections import UserList
 
-class Sequence:
-    def __init__(self, seq='wxyz'): self.seq = seq
-    def __len__(self): return len(self.seq)
-    def __getitem__(self, i): return self.seq[i]
-
-class BadSeq1(Sequence):
-    def __init__(self): self.seq = [7, 'hello', 123]
-    def __str__(self): return '{0} {1} {2}'.format(*self.seq)
-
-class BadSeq2(Sequence):
-    def __init__(self): self.seq = ['a', 'b', 'c']
-    def __len__(self): return 8
-
 class BaseTest:
     # These tests are for buffers of values (bytes) and not
     # specific to character interpretation, used for bytes objects
@@ -36,23 +23,6 @@ class BaseTest:
     # All tests pass their arguments to the testing methods
     # as str objects. fixtesttype() can be used to propagate
     # these arguments to the appropriate type
-    def fixtype(self, obj):
-        if isinstance(obj, str):
-            return self.__class__.type2test(obj)
-        elif isinstance(obj, list):
-            return [self.fixtype(x) for x in obj]
-        elif isinstance(obj, tuple):
-            return tuple([self.fixtype(x) for x in obj])
-        elif isinstance(obj, dict):
-            return dict([
-               (self.fixtype(key), self.fixtype(value))
-               for (key, value) in obj.items()
-            ])
-        else:
-            return obj
-
-    def test_fixtype(self):
-        self.assertIs(type(self.fixtype("123")), self.type2test)
 
     # check that obj.method(*args) returns result
     def checkequal(self, result, obj, methodname, *args, **kwargs):
@@ -139,13 +109,12 @@ class BaseTest:
                 i, m = divmod(i, base)
                 entry.append(charset[m])
             teststrings.add(''.join(entry))
-        teststrings = [self.fixtype(ts) for ts in teststrings]
         for i in teststrings:
             n = len(i)
             for j in teststrings:
                 r1 = i.count(j)
                 if j:
-                    r2, rem = divmod(n - len(i.replace(j, self.fixtype(''))),
+                    r2, rem = divmod(n - len(i.replace(j, '')),
                                      len(j))
                 else:
                     r2, rem = len(i)+1, 0
@@ -197,7 +166,6 @@ class BaseTest:
                 i, m = divmod(i, base)
                 entry.append(charset[m])
             teststrings.add(''.join(entry))
-        teststrings = [self.fixtype(ts) for ts in teststrings]
         for i in teststrings:
             for j in teststrings:
                 loc = i.find(j)
@@ -241,7 +209,6 @@ class BaseTest:
                 i, m = divmod(i, base)
                 entry.append(charset[m])
             teststrings.add(''.join(entry))
-        teststrings = [self.fixtype(ts) for ts in teststrings]
         for i in teststrings:
             for j in teststrings:
                 loc = i.rfind(j)
@@ -1184,7 +1151,7 @@ class BaseTest:
         self.checkequal('abcd', '', 'join', ('a', 'b', 'c', 'd'))
         self.checkequal('bd', '', 'join', ('', 'b', '', 'd'))
         self.checkequal('ac', '', 'join', ('a', '', 'c', ''))
-        self.checkequal('w x y z', ' ', 'join', Sequence())
+        self.checkequal('w x y z', ' ', 'join', 'wxyz')
         self.checkequal('abc', 'a', 'join', ('abc',))
         self.checkequal('z', 'a', 'join', UserList(['z']))
         self.checkequal('a.b.c', '.', 'join', ['a', 'b', 'c'])
@@ -1195,9 +1162,6 @@ class BaseTest:
             self.checkequal(((('a' * i) + '-') * i)[:-1], '-', 'join',
                  ('a' * i,) * i)
 
-        #self.checkequal(str(BadSeq1()), ' ', 'join', BadSeq1())
-        self.checkequal('a b c', ' ', 'join', BadSeq2())
-
         self.checkraises(TypeError, ' ', 'join')
         self.checkraises(TypeError, ' ', 'join', None)
         self.checkraises(TypeError, ' ', 'join', 7)
@@ -1205,7 +1169,7 @@ class BaseTest:
         try:
             def f():
                 yield 4 + ""
-            self.fixtype(' ').join(f())
+            ' '.join(f())
         except TypeError as e:
             if '+' not in str(e):
                 self.fail('join() ate exception message')
