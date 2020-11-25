@@ -238,8 +238,12 @@ and parse_tuple o =
 and parse_constant o =
   let kind = match get_dict_node_param "Kind" o with
   | _,`String "STRING" -> String
+  | _,`String "BYTES" -> Bytes
   | _,`String "INTEGER" -> Integer
-  |_ -> Null in
+  | _, `String "FLOAT" -> Float
+  | _, `String "BOOLEAN" -> Boolean
+  | _, `String "NULL" -> Null
+  | _ -> let _ = (print_endline ("WARN::IR::PARSE  " ^ "Unsupported const kind.")) in Null in
   let value = match get_dict_node_param "Value" o with
   |_,`String s -> s
   |_ -> raise TypeError in
