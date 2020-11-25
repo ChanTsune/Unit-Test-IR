@@ -48,7 +48,7 @@ Kotlin,Swift,OCamlのうち一つを選んでいただき次の実験を行う�
 プロジェクトの直下(`docker-compose.yml`ファイルのあるディレクトリ)に`.env` ファイルを作成して以下を記述
 
 ```
-INPUT=sample_data/string_test.py
+INPUT=sample_data/string_tests.py
 OUTPUT=sample_data/test_sample.yaml
 ```
 
