@@ -45,15 +45,16 @@ Kotlin,Swift,OCamlのうち一つを選んでいただき次の実験を行う�
 `sample_data/string_tests.py` に対して同梱のツールを利用し 中間表現を経由して生成した移植先の言語のテストファイルをコンパイルが通るところまで手直ししてもらう。
 
 #### セットアップ
+プロジェクトの直下(`docker-compose.yml`ファイルのあるディレクトリ)に`.env` ファイルを作成して以下を記述
 
-`.env` ファイルを作成して以下を記述
 ```
 INPUT=sample_data/string_test.py
 OUTPUT=sample_data/test_sample.yaml
 ```
+
 #### 実行
 
-```
+```bash
 docker-compose up
 ```
 
