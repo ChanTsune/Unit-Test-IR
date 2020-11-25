@@ -156,7 +156,7 @@ match n.constant_kind with
 | Integer -> Ast_helper.Exp.constant (Ast_helper.Const.integer n.constant_value)
 | Float -> Ast_helper.Exp.constant (Ast_helper.Const.float n.constant_value)
 | Null -> Ast_helper.Exp.construct (Location.mknoloc (Longident.parse "None")) None
-| Boolean -> Ast_helper.Exp.constant (Pconst_integer (n.constant_value, None)) (* TODO: bool *)
+| Boolean -> Ast_helper.Exp.constant (Pconst_integer (n.constant_value |> String.lowercase_ascii , None)) (* TODO: bool *)
 
 and list_node_to n =
   let expr_list = n.list_values 
