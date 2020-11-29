@@ -7,13 +7,16 @@ let package = Package(
     name: "utir-swift",
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        // (SwiftSyntax)[https://github.com/apple/swift-syntax]
+        // [SwiftSyntax](https://github.com/apple/swift-syntax)
         .package(name: "SwiftSyntax", url: "https://github.com/apple/swift-syntax.git", .exact("0.50300.0")),
-        // (SwiftFormat)[https://github.com/apple/swift-format]
+        // [SwiftFormat](https://github.com/apple/swift-format)
         .package(name: "swift-format", url: "https://github.com/apple/swift-format.git", .exact("0.50300.0")),
-        // (Yams)[https://github.com/jpsim/Yams]
+        // [Yams](https://github.com/jpsim/Yams)
         .package(name: "Yams", url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
+        // [SwiftyPyString](https://github.com/ChanTsune/SwiftyPyString)
         .package(url: "https://github.com/ChanTsune/SwiftyPyString.git", from: "2.0.0"),
+        // [swift-argument-parser](https://github.com/apple/swift-argument-parser)
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.3.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -26,6 +29,7 @@ let package = Package(
                 "Yams",
                 .product(name: "SwiftFormat", package: "swift-format"),
                 "SwiftyPyString",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .testTarget(

@@ -11,7 +11,7 @@ run_kotlin_only:
 run_kotlin: ir_gen run_kotlin_only
 
 run_swift_only:
-	cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift
+	cd ./swift && swift run utir-swift -i ../${OUTPUT} -o ../sample_data/test_string.swift
 
 run_swift: ir_gen run_swift_only
 

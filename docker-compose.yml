@@ -25,7 +25,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./kotlin && gradle run --args='-i ../${OUTPUT}' -o ../sample_data/test_sample.kt"
+      bash -c "cd ./kotlin && gradle run --args='-i ../${OUTPUT} -o ../sample_data/test_sample.kt'"
   swift:
     build:
       context: .
@@ -33,4 +33,4 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c " cd ./swift && swift run utir-swift ../${OUTPUT} ../sample_data/test_string.swift"
+      bash -c " cd ./swift && swift run utir-swift -i ../${OUTPUT} -o ../sample_data/test_string.swift"
