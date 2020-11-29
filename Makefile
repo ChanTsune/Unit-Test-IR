@@ -6,7 +6,7 @@ ir_gen:
 	cd python && python main.py ../${INPUT} ../${OUTPUT}
 
 run_kotlin_only:
-	cd ./kotlin && ./gradlew run --args="../${OUTPUT}"
+	cd ./kotlin && ./gradlew run --args="-i ../${OUTPUT} -o ../sample_data/test_sample.kt"
 
 run_kotlin: ir_gen run_kotlin_only
 

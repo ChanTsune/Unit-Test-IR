@@ -25,7 +25,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./kotlin && gradle run --args='../${OUTPUT}'"
+      bash -c "cd ./kotlin && gradle run --args='-i ../${OUTPUT}' -o ../sample_data/test_sample.kt"
   swift:
     build:
       context: .

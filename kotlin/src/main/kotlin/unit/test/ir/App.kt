@@ -8,13 +8,15 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import kastree.ast.Visitor
 import kastree.ast.Writer
+import kotlinx.cli.ArgParser
+import kotlinx.cli.ArgType
+import kotlinx.cli.default
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.StringFormat
 import kotlinx.serialization.json.Json
 import unit.test.ir.ast.node.Node
 import unit.test.ir.converters.IR2KtConverter
 import java.io.File
-import java.nio.file.Paths
 
 enum class FileFormat {
     JSON,
@@ -39,6 +41,11 @@ fun formatConfig(type:FileFormat): StringFormat {
 
 @ExperimentalSerializationApi
 fun main(args: Array<String>) {
+    val parser = ArgParser("utir-kotlin")
+    val input by parser.option(ArgType.String, shortName = "i").default("../sample_data/test_sample.yaml")
+    val output by parser.option(ArgType.String, shortName = "o").default("../sample_data/test_sample.kt")
+    parser.parse(args)
+
     val code = """
         package foo
         
@@ -73,9 +80,7 @@ fun main(args: Array<String>) {
     }
 
     try {
-        val fileContent = File(
-                args.firstOrNull() ?: Paths.get("").toAbsolutePath().parent.resolve("sample_data").resolve("test_sample.yaml").toString()
-        ).readText()
+        val fileContent = File(input).readText()
 
         formatConfig(FileFormat.YAML)
                 .apply {
@@ -83,7 +88,7 @@ fun main(args: Array<String>) {
                 decodeFromString(Node.serializer(), fileContent).let {
                     IR2KtConverter().visit(it).let {
                         val ktCode = Writer.write(it)
-                        File("../sample_data/test_sample.kt").writeText(ktCode)
+                        File(output).writeText(ktCode)
                     }
                 }
             } catch (e: Throwable) {

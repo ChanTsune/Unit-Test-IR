@@ -17,6 +17,7 @@ repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
@@ -40,8 +41,11 @@ dependencies {
     // [kaml](https://github.com/charleskorn/kaml)
     implementation("com.charleskorn.kaml:kaml:0.26.0")
 
-    // https://mvnrepository.com/artifact/commons-lang/commons-lang
+    // [commons-lang](https://mvnrepository.com/artifact/commons-lang/commons-lang)
     implementation("commons-lang:commons-lang:2.6")
+
+    // [kotlinx-cli](https://github.com/Kotlin/kotlinx-cli)
+    implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
