@@ -8,7 +8,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./python && python main.py ../${INPUT} ../${OUTPUT}"
+      bash -c "cd ./python && python main.py ../${PYTHON_SOURCE} ../${IR_DIST}"
   ocaml:
     build:
       context: .
@@ -16,7 +16,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./OCaml && dune exec utir -- -i ../${OUTPUT} -o ../sample_data/test_string.ml"
+      bash -c "cd ./OCaml && dune exec utir -- -i ../${IR_DIST} -o ../${OCAML_DIST}"
     # tty: true # 起動状態を維持する
   kotlin:
     build:
@@ -25,7 +25,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./kotlin && gradle run --args='-i ../${OUTPUT} -o ../sample_data/test_sample.kt'"
+      bash -c "cd ./kotlin && gradle run --args='-i ../${IR_DIST} -o ../${KOTLIN_DIST}'"
   swift:
     build:
       context: .
@@ -33,4 +33,4 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c " cd ./swift && swift run utir-swift -i ../${OUTPUT} -o ../sample_data/test_string.swift"
+      bash -c " cd ./swift && swift run utir-swift -i ../${IR_DIST} -o ../${SWIFT_DIST}"
