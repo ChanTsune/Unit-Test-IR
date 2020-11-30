@@ -37,18 +37,18 @@ let convert_and_write input output =
   let _ = write_ocaml_file output ocaml_structures in
   ()
 
+let input = ref ""
+let output = ref ""
+let spec = [
+  ("-i", Arg.Set_string input, "input");
+  ("-o", Arg.Set_string output, "output");
+]
 
-let main argc argv =
-  if argc < 3 then
-    exit_with "too few arguments. must be bigger than 2"
-  else
-    begin
-      let input = (Array.get argv 1) in
-      let output = (Array.get argv 2) in
-      convert_and_write input output
-    end
+let () = Arg.parse spec (fun _ -> ()) ""
 
-let () = main (Array.length Sys.argv) Sys.argv
+let main () = convert_and_write !input !output
+
+let () = main ()
 
 
 (* let main () =

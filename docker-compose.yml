@@ -16,7 +16,7 @@ services:
     volumes:
       - ".:/app"
     command:
-      bash -c "cd ./OCaml && dune exec utir ../${OUTPUT} ../sample_data/test_string.ml"
+      bash -c "cd ./OCaml && dune exec utir -- -i ../${OUTPUT} -o ../sample_data/test_string.ml"
     # tty: true # 起動状態を維持する
   kotlin:
     build:
