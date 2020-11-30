@@ -1,9 +1,0 @@
-[submodule "test_env/SwiftyPyString"]
-	path = test_env/SwiftyPyString
-	url = https://github.com/ChanTsune/SwiftyPyString.git
-[submodule "test_env/ktPyString"]
-	path = test_env/ktPyString
-	url = https://github.com/ChanTsune/ktPyString.git
-[submodule "test_env/mlpystring"]
-	path = test_env/mlpystring
-	url = https://github.com/ChanTsune/mlpystring.git
