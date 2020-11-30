@@ -1,0 +1,4 @@
+(library
+ (name mlpystring)
+ (public_name mlpystring)
+ )
