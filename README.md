@@ -31,6 +31,11 @@ brew cask install docker
 brew install docker-compose
 ```
 
+Dockerのインストールか完了したら、プロジェクトルートで以下を実行
+
+```
+make world
+```
 ### Kotlin - intellij idea(任意)
 
 Kotlinを利用する場合はIEDとして`intellij idea`の利用を推奨します。

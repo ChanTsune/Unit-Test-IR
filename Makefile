@@ -23,3 +23,10 @@ run_ocaml_only:
 run_ocaml: ir_gen run_ocaml_only
 
 run: ir_gen run_kotlin_only run_swift_only run_ocaml_only
+
+
+world:
+	docker-compose build
+	cd test_env/ktPyString && docker-compose build
+	cd test_env/SwiftyPyString && docker-compose build
+	cd test_env/mlpystring && docker-compose build
