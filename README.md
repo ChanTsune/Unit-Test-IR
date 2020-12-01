@@ -87,6 +87,8 @@ docker-compose up
 
 `sample_data/`ディレクトリ下に中間表現ファイル(`string_tests.yaml`)が吐き出されていることを確認。
 
+Dockerコンテナの実行順序が制御できない都合、中間表現ファイルの生成前に変換先コードの生成が実行されてしまう場合があるのでその場合は再度上記コマンドを実行。
+
 #### 手直し
 
 Kotlinの場合は`test_env/ktPyString/src/test/kotlin/ktPyString/AutoGenerate.kt`ファイル  
