@@ -8,6 +8,8 @@ RUN sudo mkdir /env_create
 
 COPY OCaml/ env_create/
 
+RUN opam update
+
 RUN opam install -y env_create/
 
 RUN sudo mkdir /app
