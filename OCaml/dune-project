@@ -9,8 +9,8 @@
 (maintainers "ChanTsune")
 (package
  (name utir)
- (synopsis "")
- (description "")
+ (synopsis "utir")
+ (description "utir")
  (depends
   (ocaml (>= 4.09))
   (dune (> 2.5))
