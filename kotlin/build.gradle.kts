@@ -33,7 +33,7 @@ dependencies {
 
     // kotlin enum extension
     // [kotlin-enum-extensions](https://github.com/ChanTsune/kotlin-enum-extensions)
-    implementation(platform("com.github.chantsune:kotlin-enum-extensions:0.0.0"))
+    implementation(platform("com.github.chantsune:kotlin-enum-extensions:0.1.0"))
 
     // [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
