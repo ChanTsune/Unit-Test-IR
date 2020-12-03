@@ -38,11 +38,11 @@ make world
 ```
 ### Kotlin - intellij idea(任意)
 
-Kotlinを利用する場合はIEDとして`intellij idea`の利用を推奨します。
+Kotlinを利用する場合はIDEとして`intellij idea`の利用を推奨します。
 
 ### Swift - Xcode(任意)
 
-Swiftを利用する場合はIEDとして`Xcode`の利用を推奨します。
+Swiftを利用する場合はIDEとして`Xcode`の利用を推奨します。
 
 ### OCaml(任意)
 
