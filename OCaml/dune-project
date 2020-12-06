@@ -9,8 +9,8 @@
 (maintainers "ChanTsune")
 (package
  (name utir)
- (synopsis "utir")
- (description "utir")
+ (synopsis "Unit-Test-IR")
+ (description "Unit-Test-IR")
  (depends
   (ocaml (>= 4.09))
   (dune (> 2.5))
