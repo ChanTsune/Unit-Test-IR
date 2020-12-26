@@ -168,7 +168,11 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit_ListComp(self, node):
         # リスト内包表記
         print('warn: Unsupported', node)
-        print(node.elt, node.generators)
+        # print(dir(node))
+        # for i in node.generators:
+        #     print(dir(i))
+        #     print(i.ifs, i.iter, i.target)
+        # print(node.elt, node.generators)
         return self.Unsupported()
 
     def visit_GeneratorExp(self, node):
