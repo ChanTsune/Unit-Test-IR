@@ -400,7 +400,7 @@ struct Constant: CodableNode {
 struct List: CodableNode {
     var node = "List"
     var values: [Expr]
-    enum CodingKeys:String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case node = "Node"
         case values = "Values"
     }
@@ -409,7 +409,7 @@ struct List: CodableNode {
 struct Tuple: CodableNode {
     var node = "Tuple"
     var values: [Expr]
-    enum CodingKeys:String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case node = "Node"
         case values = "Values"
     }
@@ -628,7 +628,7 @@ struct AssertFailure: CodableNode {
     var error: String?
     var func_: Expr
     var args: [Expr]
-    
+
     enum CodingKeys: String, CodingKey {
         case node = "Node"
         case error = "Error"
