@@ -140,11 +140,6 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         # TODO: python 3.8
         return arg_defs
 
-    def visit_keyword(self, node):
-        # TODO: support keyword
-        # print("@@@", node.arg, node.value)
-        return ir_ast.KwArg(node.arg, self.visit(node.value))
-
     def visit_Starred(self, node):
         print('warn: Unsupported', node)
         print(node.value)
@@ -344,7 +339,7 @@ class PyAST2IRASTConverter(PyNodeTransformer):
     def visit_Call(self, node):
         args = [ir_ast.Call.Arg(name=None, value=self.visit(i))
                 for i in node.args]
-        # print(node.keywords) # TODO: kwargs
+        args += [ir_ast.Call.Arg(name=k.arg, value=self.visit(k.value)) for k in node.keywords]
         return ir_ast.Call(self.visit(node.func),
                            args,
                            )
