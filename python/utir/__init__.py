@@ -23,13 +23,15 @@ class Code2IR:
     def convert(self, read_path, write_path):
         source_reader = self.source_reader_class()
         python_ast = source_reader.readf(read_path)
-        for transformer_class in self.py_ast_transformer_classes:
-            transformer = transformer_class()
+        for transformer in self.py_ast_transformer_classes:
+            if isinstance(transformer, type):
+                transformer = transformer()
             python_ast = transformer.visit(python_ast)
         ast_converter = self.ast_converter_class()
         ir_ast = ast_converter.convert(python_ast)
-        for transformer_class in self.ir_ast_transformer_classes:
-            transformer = transformer_class()
+        for transformer in self.ir_ast_transformer_classes:
+            if isinstance(transformer, type):
+                transformer = transformer()
             ir_ast = transformer.visit(ir_ast)
         ast_serializer = self.ir_ast_serializer_class()
         object = ast_serializer.serialize(ir_ast)
