@@ -411,7 +411,7 @@ class IR2SWConverter {
     func visit(_ node: Constant) -> ExprSyntax? {
         switch node.kind {
         case .STRING, .BYTES:
-            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value.debugDescription[1,-1]))
+            return ExprSyntax(SyntaxFactory.makeStringLiteralExpr(node.value.debugDescription[1, -1]))
         case .INTEGER:
             return ExprSyntax(SyntaxFactory.makeIntegerLiteralExpr(digits: SyntaxFactory.makeIntegerLiteral(node.value)))
         case .FLOAT:
@@ -427,7 +427,7 @@ class IR2SWConverter {
     func visit(_ node: List) -> ExprSyntax? {
         return ExprSyntax(ArrayExprSyntax {
             $0.useLeftSquare(SyntaxFactory.makeLeftSquareBracketToken())
-            for (i,item) in node.values.enumerated() {
+            for (i, item) in node.values.enumerated() {
                 if let item = visit(item) {
                     $0.addElement(SyntaxFactory.makeArrayElement(expression: item, trailingComma: i != (node.values.count - 1) ? SyntaxFactory.makeCommaToken() : nil))
                 } else {
@@ -464,7 +464,6 @@ class IR2SWConverter {
             } else {
                 print("Skipped \(node.value)")
             }
-            
         })
     }
     func visit(_ node: Subscript) -> ExprSyntax? {
@@ -562,7 +561,6 @@ class IR2SWConverter {
                     }
                 })
             }
-            
         })
         return ExprSyntax(FunctionCallExprSyntax {
             $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
