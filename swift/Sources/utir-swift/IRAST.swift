@@ -588,7 +588,7 @@ extension Assert.AssertKind {
             self = .failure(x)
             return
         }
-        throw DecodingError.typeMismatch(Case.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
+        throw DecodingError.typeMismatch(Assert.AssertKind.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
