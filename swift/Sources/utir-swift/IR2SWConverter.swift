@@ -11,18 +11,6 @@ import SwiftyPyString
 
 
 class IR2SWConverter {
-    func visit(_ node: TopLevelNode) -> Syntax? {
-        switch node {
-        case .file(let x):
-            return Syntax(visit(x))
-        case .block(let x):
-            return Syntax(visit(x))
-        case .decl(let x):
-            return Syntax(visit(x))
-        case .expr(let x):
-            return Syntax(visit(x))
-        }
-    }
     func visit(_ node: File) -> SourceFileSyntax? {
         return SourceFileSyntax {
             $0.addStatement(CodeBlockItemSyntax {

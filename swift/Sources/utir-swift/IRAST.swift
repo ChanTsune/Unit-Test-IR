@@ -15,49 +15,6 @@ class NodeNotMatchError: Error { }
 typealias CodableNode = UTIRNode & Codable
 
 
-enum TopLevelNode: Codable {
-    case file(File)
-    case block(Block)
-    case decl(Decl)
-    case expr(Expr)
-}
-extension TopLevelNode {
-    init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let x = try? container.decode(File.self) {
-            self = .file(x)
-            return
-        }
-        if let x = try? container.decode(Block.self) {
-            self = .block(x)
-            return
-        }
-        if let x = try? container.decode(Decl.self) {
-            self = .decl(x)
-            return
-        }
-        if let x = try? container.decode(Expr.self) {
-            self = .expr(x)
-            return
-        }
-        throw DecodingError.typeMismatch(TopLevelNode.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .file(let x):
-            try container.encode(x)
-        case .block(let x):
-            try container.encode(x)
-        case .decl(let x):
-            try container.encode(x)
-        case .expr(let x):
-            try container.encode(x)
-        }
-    }
-}
-
 struct File: CodableNode {
     var node: String = "File"
     var body: [Decl]
