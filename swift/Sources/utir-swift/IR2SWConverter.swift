@@ -438,7 +438,17 @@ class IR2SWConverter {
         })
     }
     func visit(_ node: Tuple) -> ExprSyntax? {
-        return nil
+        return ExprSyntax(TupleExprSyntax {
+            $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
+            $0.useRightParen(SyntaxFactory.makeRightParenToken())
+            for (i, item) in node.values.enumerated() {
+                if let item = visit(item) {
+                    $0.addElement(SyntaxFactory.makeTupleExprElement(label: nil, colon: nil, expression: item, trailingComma: i != (node.values.count - 1) ? SyntaxFactory.makeCommaToken() : nil))
+                } else {
+                    print("Skipped \(item)")
+                }
+            }
+        })
     }
     func visit(_ node: UnaryOp) -> ExprSyntax? {
         // TODO: postfix op
