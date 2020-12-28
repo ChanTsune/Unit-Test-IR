@@ -7,20 +7,12 @@
 
 import Foundation
 
-protocol ClassNameGettable {
-    var className: String { get }
-}
-extension ClassNameGettable {
-    var className: String {
-        return String(describing: type(of: self)) // ClassName
-    }
-}
 protocol UTIRNode {
     var node: String { get }
 }
 
 class NodeNotMatchError: Error { }
-typealias CodableNode = UTIRNode & Codable & ClassNameGettable
+typealias CodableNode = UTIRNode & Codable
 
 
 enum TopLevelNode: Codable {
