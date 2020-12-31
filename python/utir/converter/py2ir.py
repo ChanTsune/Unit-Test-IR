@@ -92,15 +92,16 @@ class PyAST2IRASTConverter(PyNodeTransformer):
         return self.visit(node.value)
 
     def visit_ClassDef(self, node):
-        _bases = [self.visit(i) for i in node.bases]
-        bases = []
-        for i in _bases:
-            if isinstance(i, ir_ast.Name):
-                bases.append(i.name)
-            elif isinstance(i, ir_ast.BinOp) and i.kind == ir_ast.BinOpKind.DOT:
-                bases.append(i.right)
-            else:
-                raise TypeError("%s" % i.__class__.__name__)
+        bases = [self.visit(i) for i in node.bases]
+
+        def _to_Name(node):
+            if isinstance(node, ir_ast.Name):
+                return node.name
+            elif isinstance(node, ir_ast.BinOp) and node.kind == ir_ast.BinOpKind.DOT:
+                return _to_Name(node.right)
+            raise TypeError("%s" % node.__class__.__name__)
+
+        bases = [_to_Name(i) for i in bases]
 
         return ir_ast.Class(node.name,
                             bases,
