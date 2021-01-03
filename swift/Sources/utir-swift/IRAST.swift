@@ -575,13 +575,13 @@ struct AssertEqual: CodableNode {
 struct AssertFailure: CodableNode {
     var node: String = "Failure"
     var error: String?
-    var func_: Expr
+    var `func`: Expr
     var args: [Expr]
 
     enum CodingKeys: String, CodingKey {
         case node = "Node"
         case error = "Error"
-        case func_ = "Func"
+        case `func` = "Func"
         case args = "Args"
     }
 }

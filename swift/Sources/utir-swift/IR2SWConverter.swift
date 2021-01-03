@@ -544,10 +544,10 @@ class IR2SWConverter {
         let callExpr = ExprSyntax(FunctionCallExprSyntax {
             $0.useRightParen(SyntaxFactory.makeRightParenToken())
             $0.useLeftParen(SyntaxFactory.makeLeftParenToken())
-            if let ex = visit(node.func_) {
+            if let ex = visit(node.func) {
                 $0.useCalledExpression(ex)
             } else {
-                print("Skipped \(node.func_)")
+                print("Skipped \(node.func)")
             }
             for (i, arg) in node.args.enumerated() {
                 $0.addArgument(TupleExprElementSyntax {
