@@ -11,7 +11,7 @@ Intermediate Representation for unit tests.
 ## セットアップ
 
 Dockerのインストールが必須。
-あとはKotlin,Swift,OCamlのうち一つを選んでIED等をインストール。
+あとはKotlin,Swift,OCamlのうち一つを選んでIDE等をインストール。
 
 ### Docker(必須)
 
