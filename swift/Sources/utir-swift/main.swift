@@ -71,8 +71,7 @@ struct UTIR: ParsableCommand {
                         let linter = SwiftLinter.init(configuration: .init(), diagnosticEngine: .init())
                         try linter.lint(syntax: syntax, assumingFileURL: .init(fileURLWithPath: "source"))
                         let formatter = SwiftFormatter.init(configuration: .init())
-                        var txt = ""
-                        try formatter.format(syntax: syntax, assumingFileURL: nil, to: &txt)
+                        let txt = try formatter.format(syntax: syntax)
                         try txt.write(to: outputURL, atomically: false, encoding: .utf8)
                     } catch {
                         print(error)
