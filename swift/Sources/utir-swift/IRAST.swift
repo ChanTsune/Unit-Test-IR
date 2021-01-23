@@ -14,6 +14,9 @@ protocol UTIRNode {
 class NodeNotMatchError: Error { }
 typealias CodableNode = UTIRNode & Codable
 
+enum NodeCodingKeys: String, CodingKey {
+    case node = "Node"
+}
 
 struct File: CodableNode {
     var node: String = "File"
@@ -251,45 +254,31 @@ indirect enum Expr: Codable {
 }
 extension Expr {
     init(from decoder: Decoder) throws {
+        let keyContainer = try decoder.container(keyedBy: NodeCodingKeys.self)
         let container = try decoder.singleValueContainer()
-
-        if let x = try? container.decode(Assert.self) {
-            self = .assert(x)
-            return
+        let node = try keyContainer.decode(String.self, forKey: .node)
+        switch node.lowercased() {
+        case "assert":
+            self = .assert(try container.decode(Assert.self))
+        case "unaryop":
+            self = .unaryOp(try container.decode(UnaryOp.self))
+        case "subscript":
+            self = .subscript_(try container.decode(Subscript.self))
+        case "call":
+            self = .call(try container.decode(Call.self))
+        case "list":
+            self = .list(try container.decode(List.self))
+        case "tuple":
+            self = .tuple(try container.decode(Tuple.self))
+        case "binop":
+            self = .binOp(try container.decode(BinOp.self))
+        case "name":
+            self = .name(try container.decode(Name.self))
+        case "constant":
+            self = .constant(try container.decode(Constant.self))
+        default:
+            throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
-        if let x = try? container.decode(UnaryOp.self) {
-            self = .unaryOp(x)
-            return
-        }
-        if let x = try? container.decode(Subscript.self) {
-            self = .subscript_(x)
-            return
-        }
-        if let x = try? container.decode(Call.self) {
-            self = .call(x)
-            return
-        }
-        if let x = try? container.decode(List.self) {
-            self = .list(x)
-            return
-        }
-        if let x = try? container.decode(Tuple.self) {
-            self = .tuple(x)
-            return
-        }
-        if let x = try? container.decode(BinOp.self) {
-            self = .binOp(x)
-            return
-        }
-        if let x = try? container.decode(Name.self) {
-            self = .name(x)
-            return
-        }
-        if let x = try? container.decode(Constant.self) {
-            self = .constant(x)
-            return
-        }
-        throw DecodingError.typeMismatch(Expr.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
