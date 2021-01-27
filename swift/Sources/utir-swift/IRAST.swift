@@ -362,6 +362,8 @@ struct BinOp: CodableNode {
         case MOD
         case LEFT_SHIFT
         case RIGHT_SHIFT
+        case NOT_EQUAL
+        case IN
     }
     enum CodingKeys: String, CodingKey {
         case node = "Node"
