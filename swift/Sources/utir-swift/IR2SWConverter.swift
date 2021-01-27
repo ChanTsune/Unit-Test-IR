@@ -391,6 +391,18 @@ class IR2SWConverter {
                     SyntaxFactory.makeToken(.equal, presence: .present).withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
                 )
             }))
+        case .NOT_EQUAL:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("!=").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
+        case .IN:
+            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
+                $0.useOperatorToken(
+                    SyntaxFactory.makeBinaryOperator("in").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
+                )
+            }))
         case .DOT:
             fatalError("never execution branch \(node.kind) executed.")
         }
