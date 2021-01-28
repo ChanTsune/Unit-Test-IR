@@ -477,12 +477,15 @@ struct Try: CodableNode {
 enum Case: Codable {
     case caseBlock(CaseBlock)
     init(from decoder: Decoder) throws {
+        let keycontainer = try decoder.container(keyedBy: NodeCodingKeys.self)
         let container = try decoder.singleValueContainer()
-        if let x = try? container.decode(CaseBlock.self) {
-            self = .caseBlock(x)
-            return
+        let node = try keycontainer.decode(String.self, forKey: .node)
+        switch node.lowercased() {
+        case "caseblock":
+            self = .caseBlock(try container.decode(CaseBlock.self))
+        default:
+            throw DecodingError.typeMismatch(Case.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
-        throw DecodingError.typeMismatch(Case.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
