@@ -42,7 +42,7 @@ enum Stmt: Codable {
     case decl(StmtDecl)
     case expr(StmtExpr)
     case `throw`(Throw)
-    case return_(Return)
+    case `return`(Return)
     case for_(For)
     case try_(Try)
 }
@@ -82,7 +82,7 @@ extension Stmt {
             return
         }
         if let x = try? container.decode(Return.self) {
-            self = .return_(x)
+            self = .return(x)
             return
         }
         if let x = try? container.decode(Try.self) {
@@ -105,7 +105,7 @@ extension Stmt {
             try container.encode(x)
         case .throw(let x):
             try container.encode(x)
-        case .return_(let x):
+        case .return(let x):
             try container.encode(x)
         case .for_(let x):
             try container.encode(x)
