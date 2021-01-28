@@ -43,8 +43,8 @@ enum Stmt: Codable {
     case expr(StmtExpr)
     case `throw`(Throw)
     case `return`(Return)
-    case for_(For)
-    case try_(Try)
+    case `for`(For)
+    case `try`(Try)
 }
 
 struct StmtDecl: CodableNode {
@@ -78,7 +78,7 @@ extension Stmt {
             return
         }
         if let x = try? container.decode(For.self) {
-            self = .for_(x)
+            self = .for(x)
             return
         }
         if let x = try? container.decode(Return.self) {
@@ -86,7 +86,7 @@ extension Stmt {
             return
         }
         if let x = try? container.decode(Try.self) {
-            self = .try_(x)
+            self = .try(x)
             return
         }
         if let x = try? container.decode(Throw.self) {
@@ -107,9 +107,9 @@ extension Stmt {
             try container.encode(x)
         case .return(let x):
             try container.encode(x)
-        case .for_(let x):
+        case .for(let x):
             try container.encode(x)
-        case .try_(let x):
+        case .try(let x):
             try container.encode(x)
         }
     }
@@ -248,7 +248,7 @@ indirect enum Expr: Codable {
     case tuple(Tuple)
     case binOp(BinOp)
     case unaryOp(UnaryOp)
-    case subscript_(Subscript)
+    case `subscript`(Subscript)
     case call(Call)
     case assert(Assert)
 }
@@ -263,7 +263,7 @@ extension Expr {
         case "unaryop":
             self = .unaryOp(try container.decode(UnaryOp.self))
         case "subscript":
-            self = .subscript_(try container.decode(Subscript.self))
+            self = .subscript(try container.decode(Subscript.self))
         case "call":
             self = .call(try container.decode(Call.self))
         case "list":
@@ -296,7 +296,7 @@ extension Expr {
             try container.encode(x)
         case .unaryOp(let x):
             try container.encode(x)
-        case .subscript_(let x):
+        case .subscript(let x):
             try container.encode(x)
         case .call(let x):
             try container.encode(x)

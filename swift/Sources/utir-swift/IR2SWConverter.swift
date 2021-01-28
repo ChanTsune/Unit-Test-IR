@@ -54,9 +54,9 @@ class IR2SWConverter {
             return Syntax(visit(x))
         case .return(let x):
             return Syntax(visit(x))
-        case .for_(let x):
+        case .for(let x):
             return Syntax(visit(x))
-        case .try_(let x):
+        case .try(let x):
             return Syntax(visit(x))
         }
     }
@@ -312,7 +312,7 @@ class IR2SWConverter {
             return visit(x)
         case .unaryOp(let x):
             return visit(x)
-        case .subscript_(let x):
+        case .subscript(let x):
             return visit(x)
         case .call(let x):
             return visit(x)
