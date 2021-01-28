@@ -50,7 +50,7 @@ class IR2SWConverter {
             return Syntax(visit(x.decl))
         case .expr(let x):
             return Syntax(visit(x.expr))
-        case .throw_(let x):
+        case .throw(let x):
             return Syntax(visit(x))
         case .return_(let x):
             return Syntax(visit(x))
