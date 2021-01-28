@@ -68,32 +68,25 @@ struct StmtExpr: CodableNode {
 
 extension Stmt {
     init(from decoder: Decoder) throws {
+        let keycontainer = try decoder.container(keyedBy: NodeCodingKeys.self)
         let container = try decoder.singleValueContainer()
-        if let x = try? container.decode(StmtDecl.self) {
-            self = .decl(x)
-            return
+        let node = try keycontainer.decode(String.self, forKey: .node)
+        switch node.lowercased() {
+        case "decl":
+            self = .decl(try container.decode(StmtDecl.self))
+        case "expr":
+            self = .expr(try container.decode(StmtExpr.self))
+        case "for":
+            self = .for(try container.decode(For.self))
+        case "return":
+            self = .return(try container.decode(Return.self))
+        case "try":
+            self = .try(try container.decode(Try.self))
+        case "throw":
+            self = .throw(try container.decode(Throw.self))
+        default:
+            throw DecodingError.typeMismatch(Stmt.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
-        if let x = try? container.decode(StmtExpr.self) {
-            self = .expr(x)
-            return
-        }
-        if let x = try? container.decode(For.self) {
-            self = .for(x)
-            return
-        }
-        if let x = try? container.decode(Return.self) {
-            self = .return(x)
-            return
-        }
-        if let x = try? container.decode(Try.self) {
-            self = .try(x)
-            return
-        }
-        if let x = try? container.decode(Throw.self) {
-            self = .throw(x)
-            return
-        }
-        throw DecodingError.typeMismatch(Stmt.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
