@@ -521,16 +521,17 @@ struct Assert: CodableNode, IR {
 }
 extension Assert.AssertKind {
     init(from decoder: Decoder) throws {
+        let keycontainer = try decoder.container(keyedBy: NodeCodingKeys.self)
         let container = try decoder.singleValueContainer()
-        if let x = try? container.decode(AssertEqual.self) {
-            self = .equal(x)
-            return
+        let node = try keycontainer.decode(String.self, forKey: .node)
+        switch node.lowercased() {
+        case "equal":
+            self = .equal(try container.decode(AssertEqual.self))
+        case "failure":
+            self = .failure(try container.decode(AssertFailure.self))
+        default:
+            throw DecodingError.typeMismatch(Assert.AssertKind.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
-        if let x = try? container.decode(AssertFailure.self) {
-            self = .failure(x)
-            return
-        }
-        throw DecodingError.typeMismatch(Assert.AssertKind.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
