@@ -99,13 +99,13 @@ class IR2SWConverter {
     //MARK:- Decl
     func visit(_ node: Decl) -> DeclSyntax? {
         switch node {
-        case .class_(let x):
+        case .class(let x):
             return visit(x)
-        case .func_(let x):
+        case .func(let x):
             return visit(x)
         case .suite(let x):
             return visit(x)
-        case .var_(let x):
+        case .var(let x):
             return visit(x)
         case .cases(let x):
             return visit(x)

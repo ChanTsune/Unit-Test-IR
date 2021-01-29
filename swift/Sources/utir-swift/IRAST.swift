@@ -109,9 +109,9 @@ extension Stmt {
 }
 
 enum Decl: Codable {
-    case var_(Var)
-    case func_(Func)
-    case class_(Class)
+    case `var`(Var)
+    case `func`(Func)
+    case `class`(Class)
     case suite(Suite)
     case cases(Case)
 }
@@ -123,15 +123,15 @@ extension Decl {
 
         switch node.lowercased() {
         case "func":
-            self = .func_(try container.decode(Func.self))
+            self = .func(try container.decode(Func.self))
         case "class":
-            self = .class_(try container.decode(Class.self))
+            self = .class(try container.decode(Class.self))
         case "suite":
             self = .suite(try container.decode(Suite.self))
         case "case":
             self = .cases(try container.decode(Case.self))
         case "var":
-            self = .var_(try container.decode(Var.self))
+            self = .var(try container.decode(Var.self))
         default:
             throw DecodingError.typeMismatch(Decl.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
@@ -140,11 +140,11 @@ extension Decl {
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .var_(let x):
+        case .var(let x):
             try container.encode(x)
-        case .func_(let x):
+        case .func(let x):
             try container.encode(x)
-        case .class_(let x):
+        case .class(let x):
             try container.encode(x)
         case .suite(let x):
             try container.encode(x)
