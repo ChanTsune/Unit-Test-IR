@@ -333,6 +333,31 @@ class IR2SWConverter {
             default:
                 fatalError("dot op right must be Name class! but \(node.right) was recived.")
             }
+        } else if node.kind == .IN {
+            let right = visit(node.right)
+            guard let left = visit(node.left) else {
+                print("Skipped \(node) node")
+                return nil
+            }
+            let expr = SyntaxFactory.makeMemberAccessExpr(
+                base: right,
+                dot: SyntaxFactory.makePeriodToken(),
+                name: SyntaxFactory.makeIdentifier("contains"),
+                declNameArguments: nil
+            )
+            let args = [SyntaxFactory.makeTupleExprElement(
+                label: nil,
+                colon: nil,
+                expression: left,
+                trailingComma: nil)]
+            return ExprSyntax(SyntaxFactory.makeFunctionCallExpr(
+                calledExpression: ExprSyntax(expr),
+                leftParen: SyntaxFactory.makeLeftParenToken(),
+                argumentList: SyntaxFactory.makeTupleExprElementList(args),
+                rightParen: SyntaxFactory.makeRightParenToken(),
+                trailingClosure: nil,
+                additionalTrailingClosures: nil
+            ))
         }
         var binList: [ExprSyntax] = []
         if let left = visit(node.left) {
@@ -397,13 +422,7 @@ class IR2SWConverter {
                     SyntaxFactory.makeBinaryOperator("!=").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
                 )
             }))
-        case .IN:
-            binList.append(ExprSyntax(BinaryOperatorExprSyntax {
-                $0.useOperatorToken(
-                    SyntaxFactory.makeBinaryOperator("in").withLeadingTrivia(.spaces(1)).withTrailingTrivia(.spaces(1))
-                )
-            }))
-        case .DOT:
+        case .IN, .DOT:
             fatalError("never execution branch \(node.kind) executed.")
         }
         if let right = visit(node.right) {
