@@ -117,35 +117,24 @@ enum Decl: Codable {
 }
 extension Decl {
     init(from decoder: Decoder) throws {
+        let keyContainer = try decoder.container(keyedBy: NodeCodingKeys.self)
         let container = try decoder.singleValueContainer()
+        let node = try keyContainer.decode(String.self, forKey: .node)
 
-        print("excec decl stm.")
-        if let x = try? container.decode(Func.self) {
-            self = .func_(x)
-            return
+        switch node.lowercased() {
+        case "func":
+            self = .func_(try container.decode(Func.self))
+        case "class":
+            self = .class_(try container.decode(Class.self))
+        case "suite":
+            self = .suite(try container.decode(Suite.self))
+        case "case":
+            self = .cases(try container.decode(Case.self))
+        case "var":
+            self = .var_(try container.decode(Var.self))
+        default:
+            throw DecodingError.typeMismatch(Decl.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
         }
-        print("excec decl not func.")
-        if let x = try? container.decode(Class.self) {
-            self = .class_(x)
-            return
-        }
-        print("excec decl not class.")
-        if let x = try? container.decode(Suite.self) {
-            self = .suite(x)
-            return
-        }
-        print("exec decl not suite.")
-        if let x = try? container.decode(Case.self) {
-            self = .cases(x)
-            return
-        }
-        print("exec decl not case.")
-        if let x = try? container.decode(Var.self) {
-            self = .var_(x)
-            return
-        }
-        print("excec decl not var.")
-        throw DecodingError.typeMismatch(Decl.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for InstructionElement"))
     }
 
     func encode(to encoder: Encoder) throws {
