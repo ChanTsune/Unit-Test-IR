@@ -445,22 +445,22 @@ struct For: CodableNode {
 struct Try: CodableNode {
     var node = "Try"
     var body: Block
-    var catch_: Catch
+    var `catch`: Catch
     enum CodingKeys: String, CodingKey {
         case node = "Node"
         case body = "Body"
-        case catch_ = "Catch"
+        case `catch` = "Catch"
     }
     class Catch: CodableNode { // TODO:
         var node = "Catch"
         var type: String
         var body: Block
-        var catch_: Catch? = nil
+        var `catch`: Catch? = nil
         enum CodingKeys: String, CodingKey {
             case node = "Node"
             case type = "Type"
             case body = "Body"
-            case catch_ = "Catch"
+            case `catch` = "Catch"
         }
     }
 }
