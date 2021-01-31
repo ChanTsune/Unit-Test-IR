@@ -603,15 +603,9 @@ class IR2SWConverter {
                 ))
             )
             $0.addArgument(TupleExprElementSyntax {
-                $0.useExpression(ExprSyntax(ClosureExprSyntax {
-                    $0.useLeftBrace(SyntaxFactory.makeLeftBraceToken())
-                    $0.useRightBrace(SyntaxFactory.makeRightBraceToken())
-                    $0.addStatement(CodeBlockItemSyntax {
-                        $0.useItem(Syntax(ExprSyntax(TryExprSyntax {
-                            $0.useTryKeyword(SyntaxFactory.makeTryKeyword())
-                            $0.useExpression(callExpr)
-                        })))
-                    })
+                $0.useExpression(ExprSyntax(TryExprSyntax {
+                    $0.useTryKeyword(SyntaxFactory.makeTryKeyword())
+                    $0.useExpression(callExpr)
                 }))
             })
         })
